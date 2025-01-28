@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contatti - Oratorio</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <button class="mobile-menu-btn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <nav class="main-nav">
+        <div class="logo">
+            <img src="../static/images/logo.png" alt="Logo">
+            <h1>Oratorio</h1>
+        </div>
+
+        <ul class="nav-list">
+            <li><a href="index.html"><i class="fas fa-home"></i>Home</a></li>
+            <li><a href="eventi.html"><i class="fas fa-calendar"></i>Eventi</a></li>
+            <li><a href="chi-siamo.html"><i class="fas fa-users"></i>Chi Siamo</a></li>
+            <li><a href="contatti.html" class="active"><i class="fas fa-envelope"></i>Contatti</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-wrapper">
+        <div class="content">
+            <h1>Contattaci</h1>
+            
+            <section class="contact-grid">
+                <div class="contact-info">
+                    <h2>Informazioni di Contatto</h2>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Indirizzo</h3>
+                            <p>Via dell'Oratorio 1<br>00100 Roma RM</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Telefono</h3>
+                            <p>+39 06 1234567</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>info@oratorio.it</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h3>Orari di Apertura</h3>
+                            <p>Lunedì - Venerdì: 15:00 - 19:00<br>
+                               Sabato: 15:00 - 22:00<br>
+                               Domenica: 10:00 - 12:00, 15:00 - 19:00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form">
+                    <h2>Inviaci un Messaggio</h2>
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label for="name">Nome e Cognome</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Oggetto</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Messaggio</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="button">Invia Messaggio</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="map-section">
+                <h2>Come Raggiungerci</h2>
+                <div class="map-container">
+                    <iframe
+                        src="https://www.openstreetmap.org/export/embed.html?bbox=12.4,41.8,12.6,42.0&layer=mapnik"
+                        width="100%"
+                        height="450"
+                        frameborder="0"
+                        style="border:0"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </section>
+
+            <section class="faq-section">
+                <h2>Domande Frequenti</h2>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <h3>Come posso iscrivermi alle attività?</h3>
+                        <p>Puoi iscriverti direttamente presso la segreteria dell'oratorio durante gli orari di apertura o utilizzando il form di contatto su questa pagina.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Quali sono i costi delle attività?</h3>
+                        <p>La maggior parte delle attività sono gratuite. Per alcune attività specifiche potrebbe essere richiesto un contributo simbolico.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Posso proporre nuove attività?</h3>
+                        <p>Certamente! Siamo sempre aperti a nuove proposte. Contattaci per condividere le tue idee.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="social-section">
+                <h3>Social</h3>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="contact-section">
+                <h3>Contatti</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Via dell'Oratorio 1, Roma</p>
+                <p><i class="fas fa-phone"></i> +39 06 1234567</p>
+                <p><i class="fas fa-envelope"></i> info@oratorio.it</p>
+            </div>
+            <div class="newsletter-section">
+                <h3>Newsletter</h3>
+                <form id="newsletter-form">
+                    <input type="email" placeholder="La tua email" required>
+                    <button type="submit">Iscriviti</button>
+                </form>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../static/js/main.js"></script>
+    <script src="../static/js/components/contact.js"></script>
+</body>
+</html>
