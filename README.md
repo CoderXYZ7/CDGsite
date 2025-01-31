@@ -48,6 +48,7 @@ Per avviare il progetto in locale:
 - [ ] Implementazione di analytics
 
 
+```mermaid
 %%{init: {
   'theme': 'dark',
   'themeVariables': {
@@ -91,3 +92,4 @@ graph TD
     style MainServer fill:#2C3E50,stroke:#E74C3C,stroke-width:4px,color:#fff
     style GoogleSite fill:#8E44AD,stroke:#9B59B6,stroke-width:4px,color:#fff
     style OtherServer fill:#2980B9,stroke:#3498DB,stroke-width:4px,color:#fff
+```
