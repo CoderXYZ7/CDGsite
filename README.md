@@ -47,7 +47,7 @@ Per avviare il progetto in locale:
 - [ ] Ottimizzazione SEO
 - [ ] Implementazione di analytics
 
-```mermaid
+
 %%{init: {
   'theme': 'dark',
   'themeVariables': {
@@ -58,7 +58,6 @@ Per avviare il progetto in locale:
 }}%%
 
 graph TD
-    %% Modern styling classes
     classDef mainServer fill:#2C3E50,stroke:#E74C3C,stroke-width:3px
     classDef google fill:#8E44AD,stroke:#9B59B6,stroke-width:3px
     classDef other fill:#2980B9,stroke:#3498DB,stroke-width:3px
@@ -89,8 +88,6 @@ graph TD
     B -.->|"LINK ESTERNO"| E
     B -.->|"LINK ESTERNO"| F
 
-    %% Apply modern styles to subgraphs
     style MainServer fill:#2C3E50,stroke:#E74C3C,stroke-width:4px,color:#fff
     style GoogleSite fill:#8E44AD,stroke:#9B59B6,stroke-width:4px,color:#fff
     style OtherServer fill:#2980B9,stroke:#3498DB,stroke-width:4px,color:#fff
-```
