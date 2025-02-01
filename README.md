@@ -65,7 +65,7 @@ graph TD
     classDef mainNode fill:#34495E,stroke:#E74C3C,stroke-width:2px,color:#fff
     classDef linkNode fill:#34495E,stroke:#3498DB,stroke-width:2px,color:#fff
 
-    subgraph MainServer["CENTRAL HUB"]
+    subgraph MainServer["PAGINA CENTRALE CP"]
         A["cpsangiorgio.it"]:::mainNode
         B["Index"]:::mainNode
         C["Parrocchia 3<br/>(cpsangiorgio.it/par3)"]:::mainNode
@@ -76,7 +76,7 @@ graph TD
         E["Parrocchia 1<br/>(sites.google.com/.../par1)"]:::linkNode
     end
 
-    subgraph OtherServer["ALTRO SERVIZIO DI HOSTING"]
+    subgraph OtherServer["ALTRO SERVIZIO"]
         F["Parrocchia 2<br/>(dominio.par2.com)"]:::linkNode
     end
 
