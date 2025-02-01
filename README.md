@@ -72,18 +72,18 @@ graph TD
         D["Parrocchia 4<br/>(cpsangiorgio.it/par4)"]:::mainNode
     end
 
-    subgraph GoogleSite["☁️ GOOGLE REALM"]
+    subgraph GoogleSite["GOOGLE SITE"]
         E["Parrocchia 1<br/>(sites.google.com/.../par1)"]:::linkNode
     end
 
-    subgraph OtherServer["🌐 EXTERNAL ZONE"]
+    subgraph OtherServer["ALTRO SERVIZIO DI HOSTING"]
         F["Parrocchia 2<br/>(dominio.par2.com)"]:::linkNode
     end
 
     %% Dynamic connections
-    A ==>|"CONTAINS"| B
-    A ==>|"HOSTS"| C
-    A ==>|"HOSTS"| D
+    A ==>|"HA COME PAGINA PRINCIPALE"| B
+    A ==>|"OSPITA"| C
+    A ==>|"OSPITA"| D
     B -.->|"LINK INTERNO"| C
     B -.->|"LINK INTERNO"| D
     B -.->|"LINK ESTERNO"| E
