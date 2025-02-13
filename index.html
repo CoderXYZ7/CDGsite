@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Oratorio - Portale delle comunità">
     <title>Oratorio - Home</title>
-    <link rel="stylesheet" href="static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #1a365d;
+            --text-color: #333;
+            --secondary-text: #666;
+            --background: #f5f5f5;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            --spacing: 2rem;
+            --border-radius: 1rem;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,9 +27,10 @@
         body {
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            background-color: #f5f5f5;
+            background-color: var(--background);
             min-height: 100vh;
-            padding: 2rem;
+            padding: var(--spacing);
+            color: var(--text-color);
         }
 
         .container {
@@ -27,19 +39,26 @@
             padding: 0 1rem;
         }
 
+        .page-title {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing);
+            font-size: 2.5rem;
+        }
+
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            margin: 2rem auto;
+            gap: var(--spacing);
+            margin: var(--spacing) auto;
             justify-content: center;
         }
 
         .card {
             background: white;
-            border-radius: 1rem;
+            border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--card-shadow);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             height: 100%;
             display: flex;
@@ -48,7 +67,7 @@
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--card-hover-shadow);
         }
 
         .card-image {
@@ -67,14 +86,14 @@
         }
 
         .card-content h3 {
-            color: #1a365d;
+            color: var(--primary-color);
             margin-bottom: 0.75rem;
             font-size: 1.25rem;
         }
 
         .card-content p {
-            color: #666;
-            margin-bottom: 0;
+            color: var(--secondary-text);
+            margin-bottom: 1rem;
             flex-grow: 1;
         }
 
@@ -83,6 +102,24 @@
             color: inherit;
             display: flex;
             height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--primary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card-link:hover::after {
+            transform: scaleX(1);
         }
 
         @media (min-width: 768px) {
@@ -101,52 +138,59 @@
             .cards-grid {
                 grid-template-columns: 1fr;
                 max-width: 400px;
-                margin: 2rem auto;
+                margin: var(--spacing) auto;
+            }
+            
+            .page-title {
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Comment/Uncomment the following line to enable redirect to work page -->
+    <script>window.location.href = 'pages/work.html';</script>
 
     <main class="main-wrapper">
         <div class="container">
+            <h1 class="page-title">Le Nostre Comunità</h1>
             <div class="cards-grid">
                 <a href="pages/index.html" class="card-link">
                     <div class="card">
-                        <img src="https://placehold.co/400x320" alt="Site 1" class="card-image">
+                        <img src="https://placehold.co/400x320" alt="San Giorgio di Nogaro" class="card-image">
                         <div class="card-content">
                             <h3>San Giorgio di Nogaro</h3>
-                            <p>descrizione qui descrizione qui descrizione qui descrizione qui descrizione qui</p>
+                            <p>Scopri la vivace comunità di San Giorgio di Nogaro e le sue attività parrocchiali.</p>
                         </div>
                     </div>
                 </a>
 
-                <a href="https://example.com/site2" class="card-link">
+                <a href="pages/porpetto.html" class="card-link">
                     <div class="card">
-                        <img src="https://placehold.co/400x320" alt="Site 2" class="card-image">
+                        <img src="https://placehold.co/400x320" alt="Porpetto" class="card-image">
                         <div class="card-content">
                             <h3>Porpetto</h3>
-                            <p>descrizione qui descrizione qui descrizione qui descrizione qui descrizione qui</p>
+                            <p>Esplora le iniziative e gli eventi della comunità di Porpetto.</p>
                         </div>
                     </div>
                 </a>
 
-                <a href="https://example.com/site3" class="card-link">
+                <a href="pages/marano.html" class="card-link">
                     <div class="card">
-                        <img src="https://placehold.co/400x320" alt="Site 3" class="card-image">
+                        <img src="https://placehold.co/400x320" alt="Marano" class="card-image">
                         <div class="card-content">
                             <h3>Marano</h3>
-                            <p>descrizione qui descrizione qui descrizione qui descrizione qui descrizione qui</p>
+                            <p>Unisciti alla comunità di Marano e partecipa alle nostre attività.</p>
                         </div>
                     </div>
                 </a>
 
-                <a href="https://example.com/site4" class="card-link">
+                <a href="pages/castello.html" class="card-link">
                     <div class="card">
-                        <img src="https://placehold.co/400x320" alt="Site 4" class="card-image">
+                        <img src="https://placehold.co/400x320" alt="Castello" class="card-image">
                         <div class="card-content">
                             <h3>Castello</h3>
-                            <p>descrizione qui descrizione qui descrizione qui descrizione qui descrizione qui</p>
+                            <p>Scopri la storia e le tradizioni della comunità di Castello.</p>
                         </div>
                     </div>
                 </a>
@@ -154,15 +198,12 @@
         </div>
     </main>
 
-
-    <!-- Add components script -->
-    <script src="static/js/components.js"></script>
     <script>
-        // Add click handler for cards
         document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (e) => {
                 const link = card.closest('.card-link');
                 if (link) {
+                    e.preventDefault(); // Prevent default only if we want to handle the navigation
                     window.location.href = link.href;
                 }
             });
