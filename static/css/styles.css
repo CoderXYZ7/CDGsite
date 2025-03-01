@@ -581,6 +581,7 @@ body {
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    align-items: center;
 }
 
 .newsletter-form {
@@ -677,6 +678,7 @@ footer {
 }
 
 #newsletter-form {
+    align-items: center;
     display: flex;
     gap: 0.5rem;
     max-width: 400px;
@@ -686,10 +688,10 @@ footer {
 #newsletter-form input {
     flex: 1;
     padding: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 0px solid rgba(0, 0, 0, 0.2);
     border-radius: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
+    background: rgba(0, 0, 0, 0.1);
+    color: black;
 }
 
 #newsletter-form button {
