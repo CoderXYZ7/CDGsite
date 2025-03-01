@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const navHtml = `<nav class="main-nav">
         <div class="logo">
             <img src="https://placehold.co/60x60" alt="Logo">
-            <h1>Oratorio</h1>
+            <h1>Collaborazione Pastorale</h1>
         </div>
         <ul class="nav-list">
             <li><a href="index.html"><i class="fas fa-home"></i>Home</a></li>
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>
             <div class="footer-info">
-                <p>&copy; 2025 Oratorio. Tutti i diritti riservati.</p>
+                <p>&copy; 2025 Collaborazione Pastorale San Giorgio di Nogaro. Tutti i diritti riservati.</p>
             </div>
         </div>
     </footer>`;
