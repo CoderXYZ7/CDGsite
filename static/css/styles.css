@@ -460,8 +460,7 @@ body {
     content: '';
     position: absolute;
     top: 0;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
     width: 2px;
     height: 100%;
     background: var(--primary-color);
@@ -469,17 +468,24 @@ body {
 
 .timeline-item {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: flex-start;
     margin: 2rem 0;
 }
 
 .timeline-item .year {
+    position: relative;
     background: var(--primary-color);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 4px;
-    margin: 0 2rem;
+    margin: 0 0 1rem 0;
+}
+
+.timeline-item .content {
+    /* allign the content to the left */
+    text-align: left;
+    margin: 0 0 1rem 0;
 }
 
 /* Contact Page */
@@ -598,6 +604,16 @@ footer {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 2rem;
     padding: 3rem 2rem;
+}
+
+.footer-links {
+    text-decoration: none;
+    color: #c53030;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: white;
 }
 
 .quick-links ul {
@@ -739,19 +755,19 @@ section h2:after {
         text-align: center;
     }
 
-    .timeline:before {
-        left: 0;
-    }
-
-    .timeline-item {
-        flex-direction: column;
-        margin-left: 2rem;
-    }
-
-    .timeline-item .year {
-        margin: 0 0 1rem 0;
-    }
+    
 }
+
+.timeline:before {
+    left: 0;
+}
+
+.timeline-item {
+    flex-direction: column;
+    margin-left: 2rem;
+}
+
+
 
 @media (max-width: 1024px) {
     body {
