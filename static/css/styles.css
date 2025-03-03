@@ -156,6 +156,10 @@ body {
     transition: transform 0.3s;
 }
 
+.card.main-card {
+    width: 100%;
+}
+
 .card:hover {
     transform: translateY(-5px);
 }
