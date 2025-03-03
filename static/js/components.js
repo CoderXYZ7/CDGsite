@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Navigation HTML
     const navHtml = `<nav class="main-nav">
         <div class="logo">
-            <img src="https://placehold.co/60x60" alt="Logo">
+            <img src="../static/images/LogoNoBG.png" alt="Logo">
             <h1>Collaborazione Pastorale</h1>
         </div>
         <ul class="nav-list">
