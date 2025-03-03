@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <li><a href="chi-siamo.html"><i class="fas fa-users"></i>Chi Siamo</a></li>
             <li><a href="contatti.html"><i class="fas fa-envelope"></i>Contatti</a></li>
         </ul>
+        <div class="attention">ATTENZIONE: IL SITO CONTIENE DEI DATI NON AGGIORNATI, VI PREGHIAMO GENTILMENTE DI FARE AFFIDAMENTO AI FOGLIETTI DISTRIBUITI NELLE MESSE FINO A QUANDO IL SITO NON SARA' A REGIME, GRAZIE PER LA COMPRENSIONE</div>
     </nav>
     <button class="mobile-menu-btn" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>

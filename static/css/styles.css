@@ -9,6 +9,8 @@
     --primary-color: #1a365d;
     --accent-color: #e53e3e;
     --nav-width: 280px;
+    --attention-color1: #e53e3e;
+    --attention-color2: #ff6a3d;
 }
 
 body {
@@ -31,6 +33,29 @@ body {
     overflow-y: auto;
     z-index: 100;
 }
+
+.attention {
+    color: white;
+    width: 90%;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 0 auto 2rem;
+    background-color: var(--attention-color1);
+    animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+    0% {
+        background-color: var(--attention-color1);
+    }
+    50% {
+        background-color: var(--attention-color2);
+    }
+    100% {
+        background-color: var(--attention-color1);
+    }
+}
+
 
 .logo {
     padding: 0 2rem;
