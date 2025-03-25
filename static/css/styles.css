@@ -30,8 +30,29 @@ body {
     background-color: var(--primary-color);
     color: white;
     padding: 2rem 0;
-    overflow-y: auto;
     z-index: 100;
+    overflow-y: auto; /* Enable vertical scrolling */
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: var(--accent-color) var(--primary-color); /* For Firefox */
+}
+
+/* Custom scrollbar for Webkit browsers (Chrome, Safari) */
+.main-nav::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-nav::-webkit-scrollbar-track {
+    background: var(--primary-color);
+}
+
+.main-nav::-webkit-scrollbar-thumb {
+    background-color: var(--accent-color);
+    border-radius: 4px;
+}
+
+/* Ensure the content doesn't get hidden behind the scrollbar */
+.main-nav > * {
+    padding-right: 8px; /* Match scrollbar width */
 }
 
 .collapsible-list {
@@ -74,6 +95,7 @@ body {
     color: white;
     width: 90%;
     padding: 10px;
+    margin-right: 8px;
     border-radius: 8px;
     margin: 10px auto 2rem;
     background-color: var(--attention-color1);
