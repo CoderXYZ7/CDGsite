@@ -114,6 +114,19 @@ body {
     }
 }
 
+.foglietto {
+    width: auto;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .foglietto {
+        width: 768px;
+        height: auto;
+        margin-bottom: 1rem;
+    }
+}
 
 .logo {
     padding: 0 2rem;
