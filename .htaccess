@@ -1,6 +1,0 @@
-
-RewriteEngine on
-RewriteCond %{HTTP_HOST} ^cpsangiorgio\.it$ [OR]
-RewriteCond %{HTTP_HOST} ^www\.cpsangiorgio\.it$
-RewriteRule ^/?$ "https\:\/\/cpsangiorgio\.it\/index\.html" [R=301,L]
-
