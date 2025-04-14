@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimaID - Admin Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --danger-color: #e74c3c;
+            --success-color: #27ae60;
+            --text-color: #2c3e50;
+            --light-text: #7f8c8d;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --sidebar-bg: #2c3e50;
+            --sidebar-text: #ecf0f1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+            background-color: var(--background);
+            color: var(--text-color);
+        }
+        
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 1.5rem 0;
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+        
+        .sidebar-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-subtitle {
+            margin: 0.25rem 0 0;
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: normal;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-item {
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-item.active {
+            border-left-color: var(--primary-color);
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-item:hover:not(.active) {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar-link {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .main-content {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .page-title {
+            margin: 0;
+            font-size: 1.75rem;
+        }
+        
+        .logout-btn {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-title {
+            margin: 0 0 0.5rem;
+            font-size: 0.875rem;
+            color: var(--light-text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-value {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        
+        .table-container {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .badge-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            font-size: 0.875rem;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .loading {
+            padding: 2rem;
+            text-align: center;
+            color: var(--light-text);
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="sidebar-title">AnimaID</h1>
+            <p class="sidebar-subtitle">Admin Panel</p>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="sidebar-item active">
+                <a href="dashboard.html" class="sidebar-link">Dashboard</a>
+            </li>
+            <li class="sidebar-item">
+                <a href="users.html" class="sidebar-link">User Management</a>
+            </li>
+            <li class="sidebar-item">
+                <a href="activation-codes.html" class="sidebar-link">Activation Codes</a>
+            </li>
+            <li class="sidebar-item">
+                <a href="tags.html" class="sidebar-link">Tag Management</a>
+            </li>
+            <li class="sidebar-item">
+                <a href="ranks.html" class="sidebar-link">Rank Management</a>
+            </li>
+            <li class="sidebar-item">
+                <a href="system-connections.html" class="sidebar-link">System Connections</a>
+            </li>
+        </ul>
+    </aside>
+    
+    <main class="main-content">
+        <div class="header">
+            <h1 class="page-title">Admin Dashboard</h1>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 class="stat-title">Total Users</h3>
+                <p class="stat-value" id="total-users">-</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="stat-title">Active Today</h3>
+                <p class="stat-value" id="active-today">-</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="stat-title">New This Week</h3>
+                <p class="stat-value" id="new-this-week">-</p>
+            </div>
+            <div class="stat-card">
+                <h3 class="stat-title">Available Codes</h3>
+                <p class="stat-value" id="available-codes">-</p>
+            </div>
+        </div>
+        
+        <h2>Recent Users</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Rank</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recent-users">
+                    <tr>
+                        <td colspan="7" class="loading">Loading recent users...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        // Check for authentication and admin privileges
+        const token = localStorage.getItem('animaToken');
+        if (!token) {
+            window.location.href = '../login.html';
+        }
+        
+        // Verify admin status
+        async function verifyAdmin() {
+            try {
+                const response = await fetch('/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to verify user');
+                }
+                
+                const userData = await response.json();
+                
+                // Check if user is admin (assuming rank level 3 is admin)
+                if (userData.rankLevel < 3) {
+                    window.location.href = '../dashboard.html';
+                }
+                
+            } catch (error) {
+                console.error('Admin verification error:', error);
+                window.location.href = '../login.html';
+            }
+        }
+        
+        // Logout button
+        document.getElementById('logout-btn').addEventListener('click', async function() {
+            try {
+                await fetch('/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                localStorage.removeItem('animaToken');
+                window.location.href = '../login.html';
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Failed to logout. Please try again.');
+            }
+        });
+        
+        // Load dashboard data
+        async function loadDashboardData() {
+            try {
+                // Load stats
+                const statsResponse = await fetch('/admin/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (statsResponse.ok) {
+                    const statsData = await statsResponse.json();
+                    document.getElementById('total-users').textContent = statsData.totalUsers;
+                    document.getElementById('active-today').textContent = statsData.activeToday;
+                    document.getElementById('new-this-week').textContent = statsData.newThisWeek;
+                    document.getElementById('available-codes').textContent = statsData.availableCodes;
+                }
+                
+                // Load recent users
+                const usersResponse = await fetch('/users/search?limit=5&sort=lastLogin_desc', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (usersResponse.ok) {
+                    const usersData = await usersResponse.json();
+                    const usersTable = document.getElementById('recent-users');
+                    usersTable.innerHTML = '';
+                    
+                    if (usersData.length === 0) {
+                        usersTable.innerHTML = '<tr><td colspan="7">No users found</td></tr>';
+                    } else {
+                        usersData.forEach(user => {
+                            const tr = document.createElement('tr');
+                            
+                            tr.innerHTML = `
+                                <td>${user.userId}</td>
+                                <td>${user.username}</td>
+                                <td>${user.email}</td>
+                                <td>${user.rankName}</td>
+                                <td><span class="badge ${user.status === 'active' ? 'badge-success' : ''}">${user.status}</span></td>
+                                <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="viewUser(${user.userId})">View</button>
+                                </td>
+                            `;
+                            
+                            usersTable.appendChild(tr);
+                        });
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                alert('Failed to load dashboard data. Please try again.');
+            }
+        }
+        
+        // View user function
+        function viewUser(userId) {
+            window.location.href = `user-details.html?id=${userId}`;
+        }
+        
+        // Initialize page
+        verifyAdmin().then(loadDashboardData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: animaid-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=animaid
+      - DB_USER=animaid_user
+      - DB_PASS=animaid_password
+      - JWT_SECRET=your-secret-key-here
+    depends_on:
+      - db
+    networks:
+      - animaid-network
+
+  db:
+    image: mysql:8.0
+    container_name: animaid-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=animaid
+      - MYSQL_USER=animaid_user
+      - MYSQL_PASSWORD=animaid_password
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - animaid-network
+
+volumes:
+  mysql_data:
+
+networks:
+  animaid-network:
+    driver: bridge
