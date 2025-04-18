@@ -91,7 +91,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             </section>
 
             <?php if ($most_recent_pdf): ?>
-                <section class="card main-card">
+                <section class="main-card">
                     <div class="card-content">
                         <h3><i class="fas fa-file-pdf"></i> Documento più recente (<?php echo str_replace('.pdf', '', basename($most_recent_pdf)); ?>)</h3>
                         <div class="pdf-viewer">
@@ -110,14 +110,14 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                     </div>
                 </section>
             <?php else: ?>
-                <section class="card main-card">
+                <section class="main-card">
                     <div class="card-content">
                         <p>Nessun documento PDF disponibile al momento.</p>
                     </div>
                 </section>
             <?php endif; ?>
 
-            <section class="card main-card">
+            <section class="main-card">
                 <div class="card-content">
                     <h3><i class="fas fa-list"></i> Tutti i Documenti</h3>
                     <?php if (!empty($pdf_files)): ?>
