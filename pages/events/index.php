@@ -75,7 +75,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         }
         
         .pdf-controls button:hover {
-            background-color: var(--primary-color-dark);
+            background-color: var(--accent-color);
         }
         
         .pdf-controls .page-info {
