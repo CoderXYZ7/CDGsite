@@ -139,7 +139,7 @@ function uploadErrorToString($error) {
     <!-- Side Navigation -->
     <nav class="main-nav">
         <div class="logo">
-            <img src="../static/images/LogoNoBG.png" alt="Logo">
+            <img src="../../static/images/LogoNoBG.png" alt="Logo">
             <h1>PDF Manager</h1>
         </div>
         
