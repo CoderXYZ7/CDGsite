@@ -16,7 +16,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
 <head>
     <link rel="icon" type="image/png" href="../../static/images/LogoNoBG.png" />
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PDF Viewer</title>
     <link rel="stylesheet" href="../../static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -42,6 +42,14 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             background-color: #525659;
             position: relative;
             transition: all 0.3s ease;
+            touch-action: none; /* Disable browser's default touch actions */
+        }
+        
+        #pdf-canvas-container {
+            position: relative;
+            transform-origin: 0 0;
+            transition: transform 0.1s ease;
+            margin: 0 auto;
         }
         
         #pdf-canvas {
@@ -171,7 +179,8 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         .exit-fullscreen-btn:hover {
             background-color: rgba(255, 255, 255, 0.3);
         }
-        
+
+        /* Mobile button text and fullscreen button control */
         @media (max-width: 768px) {
             #pdf-viewer {
                 height: 500px;
@@ -179,6 +188,23 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             
             .pdf-controls {
                 padding: 8px;
+            }
+            
+            /* Hide button text on mobile, only show icons */
+            .pdf-controls button .button-text {
+                display: none;
+            }
+            
+            /* Hide fullscreen button on mobile */
+            #fullscreen-btn {
+                display: none !important;
+            }
+            
+            /* Make buttons more compact */
+            .pdf-controls button {
+                padding: 8px;
+                min-width: 36px;
+                justify-content: center;
             }
             
             /* On mobile, auto fullscreen when viewing PDFs */
@@ -211,13 +237,36 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             }
             
             .pdf-controls button {
-                padding: 6px 10px;
+                padding: 6px;
                 font-size: 0.9em;
             }
             
             .pdf-list th, .pdf-list td {
                 padding: 8px;
             }
+        }
+        
+        /* Reset default touch behaviors to prevent unwanted browser zooming */
+        #pdf-canvas-container {
+            touch-action: none;
+        }
+        
+        /* Zoom indicator */
+        .zoom-level {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .zoom-level.visible {
+            opacity: 1;
         }
     </style>
 </head>
@@ -249,18 +298,22 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                         
                         <div class="pdf-container" id="pdf-container">
                             <div class="pdf-controls" id="pdf-controls">
-                                <button id="prev-page"><i class="fas fa-chevron-left"></i> Precedente</button>
+                                <button id="prev-page"><i class="fas fa-chevron-left"></i> <span class="button-text">Precedente</span></button>
                                 <div class="page-info">
                                     Pagina <input type="number" id="current-page" min="1" value="1"> di <span id="page-count">0</span>
                                 </div>
-                                <button id="next-page">Successiva <i class="fas fa-chevron-right"></i></button>
-                                <button id="zoom-in"><i class="fas fa-search-plus"></i> Zoom In</button>
-                                <button id="zoom-out"><i class="fas fa-search-minus"></i> Zoom Out</button>
-                                <button id="fullscreen-btn" class="desktop-only"><i class="fas fa-expand"></i> Schermo intero</button>
+                                <button id="next-page"><span class="button-text">Successiva</span> <i class="fas fa-chevron-right"></i></button>
+                                <button id="zoom-in"><i class="fas fa-search-plus"></i> <span class="button-text">Zoom In</span></button>
+                                <button id="zoom-out"><i class="fas fa-search-minus"></i> <span class="button-text">Zoom Out</span></button>
+                                <button id="reset-zoom"><i class="fas fa-sync-alt"></i> <span class="button-text">Reset Zoom</span></button>
+                                <button id="fullscreen-btn"><i class="fas fa-expand"></i> <span class="button-text">Schermo intero</span></button>
                             </div>
                             <div id="pdf-viewer">
                                 <div class="loading-spinner" id="loading-spinner"></div>
-                                <canvas id="pdf-canvas"></canvas>
+                                <div id="pdf-canvas-container">
+                                    <canvas id="pdf-canvas"></canvas>
+                                </div>
+                                <div class="zoom-level" id="zoom-level">Zoom: 100%</div>
                             </div>
                             <button class="exit-fullscreen-btn" id="exit-fullscreen-btn" style="display: none;"><i class="fas fa-times"></i></button>
                         </div>
@@ -337,8 +390,20 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             canvas = document.getElementById('pdf-canvas'),
             ctx = canvas.getContext('2d'),
             isFullscreen = false,
-            isMobile = window.innerWidth <= 768;
+            isMobile = window.innerWidth <= 768,
+            container = document.getElementById('pdf-canvas-container'),
+            pdfViewer = document.getElementById('pdf-viewer'),
+            zoomLevel = document.getElementById('zoom-level');
             
+        // Touch variables for pinch zoom
+        let initialPinchDistance = 0;
+        let initialScale = 1;
+        let lastX = 0;
+        let lastY = 0;
+        let isDragging = false;
+        let canvasOffsetX = 0;
+        let canvasOffsetY = 0;
+        
         // Check if device is mobile
         function checkMobile() {
             isMobile = window.innerWidth <= 768;
@@ -369,6 +434,9 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             // Reset variables
             pageNum = 1;
             scale = 1.0;
+            canvasOffsetX = 0;
+            canvasOffsetY = 0;
+            updateCanvasTransform();
             
             // Get document
             pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
@@ -404,6 +472,11 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
+                
+                // Reset transformation when rendering a new page
+                canvasOffsetX = 0;
+                canvasOffsetY = 0;
+                updateCanvasTransform();
                 
                 // Render PDF page into canvas context
                 const renderContext = {
@@ -473,6 +546,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
          */
         function zoomIn() {
             scale += 0.2;
+            updateZoomLevel();
             queueRenderPage(pageNum);
         }
 
@@ -482,7 +556,44 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         function zoomOut() {
             if (scale <= 0.5) return;
             scale -= 0.2;
+            updateZoomLevel();
             queueRenderPage(pageNum);
+        }
+        
+        /**
+         * Reset zoom
+         */
+        function resetZoom() {
+            scale = 1.0;
+            canvasOffsetX = 0;
+            canvasOffsetY = 0;
+            updateCanvasTransform();
+            updateZoomLevel();
+            queueRenderPage(pageNum);
+        }
+        
+        /**
+         * Update the canvas transform based on scale and offset
+         */
+        function updateCanvasTransform() {
+            container.style.transform = `translate(${canvasOffsetX}px, ${canvasOffsetY}px) scale(${scale})`;
+            
+            // Update zoom level display
+            updateZoomLevel();
+        }
+        
+        /**
+         * Update zoom level display
+         */
+        function updateZoomLevel() {
+            zoomLevel.textContent = `Zoom: ${Math.round(scale * 100)}%`;
+            zoomLevel.classList.add('visible');
+            
+            // Hide zoom level after 2 seconds
+            clearTimeout(window.zoomTimeout);
+            window.zoomTimeout = setTimeout(() => {
+                zoomLevel.classList.remove('visible');
+            }, 2000);
         }
         
         /**
@@ -515,12 +626,123 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 }, 300);
             }
         }
+        
+        // Calculate distance between two touch points
+        function getPinchDistance(e) {
+            return Math.hypot(
+                e.touches[0].pageX - e.touches[1].pageX,
+                e.touches[0].pageY - e.touches[1].pageY
+            );
+        }
+        
+        // Get center point between two touches
+        function getTouchCenter(e) {
+            return {
+                x: (e.touches[0].pageX + e.touches[1].pageX) / 2,
+                y: (e.touches[0].pageY + e.touches[1].pageY) / 2
+            };
+        }
+        
+        // Handle touch start event
+        function handleTouchStart(e) {
+            if (e.touches.length === 2) {
+                // Pinch gesture starts
+                e.preventDefault();
+                initialPinchDistance = getPinchDistance(e);
+                initialScale = scale;
+            } else if (e.touches.length === 1) {
+                // Single touch for panning
+                lastX = e.touches[0].pageX;
+                lastY = e.touches[0].pageY;
+                isDragging = true;
+            }
+        }
+        
+        // Handle touch move event
+        function handleTouchMove(e) {
+            if (e.touches.length === 2) {
+                // Pinch gesture (zooming)
+                e.preventDefault();
+                const currentDistance = getPinchDistance(e);
+                if (initialPinchDistance > 0) {
+                    // Calculate new scale
+                    const pinchRatio = currentDistance / initialPinchDistance;
+                    const newScale = Math.max(0.5, Math.min(5, initialScale * pinchRatio));
+                    
+                    // Get center of pinch
+                    const center = getTouchCenter(e);
+                    
+                    // Calculate viewer offset to get proper coordinates
+                    const rect = pdfViewer.getBoundingClientRect();
+                    const viewerOffsetX = rect.left;
+                    const viewerOffsetY = rect.top;
+                    
+                    // Calculate touch position relative to the viewer
+                    const touchX = center.x - viewerOffsetX;
+                    const touchY = center.y - viewerOffsetY;
+                    
+                    // Calculate how much we need to move the canvas so the zoom happens at the pinch point
+                    const viewerCenterX = touchX - canvasOffsetX;
+                    const viewerCenterY = touchY - canvasOffsetY;
+                    
+                    // Update scale
+                    const oldScale = scale;
+                    scale = newScale;
+                    
+                    // Adjust offset to zoom towards pinch center
+                    canvasOffsetX = touchX - (viewerCenterX / oldScale * newScale);
+                    canvasOffsetY = touchY - (viewerCenterY / oldScale * newScale);
+                    
+                    updateCanvasTransform();
+                }
+            } else if (e.touches.length === 1 && isDragging && scale > 1) {
+                // Single touch panning (only when zoomed in)
+                e.preventDefault();
+                const currentX = e.touches[0].pageX;
+                const currentY = e.touches[0].pageY;
+                
+                // Calculate the delta movement
+                const deltaX = currentX - lastX;
+                const deltaY = currentY - lastY;
+                
+                // Update the last position
+                lastX = currentX;
+                lastY = currentY;
+                
+                // Update canvas offset
+                canvasOffsetX += deltaX;
+                canvasOffsetY += deltaY;
+                
+                updateCanvasTransform();
+            }
+        }
+        
+        // Handle touch end event
+        function handleTouchEnd(e) {
+            initialPinchDistance = 0;
+            isDragging = false;
+            
+            // If scale is very close to 1, snap back to exactly 1
+            if (Math.abs(scale - 1) < 0.1) {
+                scale = 1;
+                canvasOffsetX = 0;
+                canvasOffsetY = 0;
+                updateCanvasTransform();
+            }
+        }
+        
+        // Setup touch event listeners
+        const pdfViewerElement = document.getElementById('pdf-viewer');
+        pdfViewerElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+        pdfViewerElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+        pdfViewerElement.addEventListener('touchend', handleTouchEnd);
 
         // Button events
         document.getElementById('prev-page').addEventListener('click', onPrevPage);
         document.getElementById('next-page').addEventListener('click', onNextPage);
         document.getElementById('zoom-in').addEventListener('click', zoomIn);
         document.getElementById('zoom-out').addEventListener('click', zoomOut);
+        document.getElementById('reset-zoom').addEventListener('click', resetZoom);
         document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
         document.getElementById('exit-fullscreen-btn').addEventListener('click', toggleFullscreen);
         
