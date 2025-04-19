@@ -677,9 +677,12 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 container.classList.add('fullscreen-container');
                 isFullscreen = true;
                 
+<<<<<<< HEAD
                 // Change button icon to "exit fullscreen"
                 fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i> <span class="button-text">Esci da schermo intero</span>';
                 
+=======
+>>>>>>> a3a2b89 (Improved the pdf viewer even more)
                 // Adjust viewport after transition
                 setTimeout(() => {
                     centerCanvasInViewport();
@@ -690,9 +693,12 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 container.classList.remove('fullscreen-container');
                 isFullscreen = false;
                 
+<<<<<<< HEAD
                 // Change button icon back to "fullscreen"
                 fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> <span class="button-text">Schermo intero</span>';
                 
+=======
+>>>>>>> a3a2b89 (Improved the pdf viewer even more)
                 // Adjust viewport after transition
                 setTimeout(() => {
                     centerCanvasInViewport();
