@@ -34,22 +34,26 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             background-color: #f5f5f5;
             transition: all 0.3s ease;
         }
+
+        .pdf-scroll-container {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            touch-action: auto;
+            cursor: default;
+        }
+        
+        .pdf-scroll-container.zoomed {
+            cursor: move;
+        }
         
         #pdf-viewer {
             width: 100%;
             height: 600px;
-            overflow: auto;
+            position: relative;
             background-color: #525659;
-            position: relative;
             transition: all 0.3s ease;
-            touch-action: none; /* Disable browser's default touch actions */
-        }
-        
-        #pdf-canvas-container {
-            position: relative;
-            transform-origin: 0 0;
-            transition: transform 0.1s ease;
-            margin: 0 auto;
+            overflow: hidden;
         }
         
         #pdf-canvas {
@@ -195,39 +199,11 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 display: none;
             }
             
-            /* Hide fullscreen button on mobile */
-            #fullscreen-btn {
-                display: none !important;
-            }
-            
             /* Make buttons more compact */
             .pdf-controls button {
                 padding: 8px;
                 min-width: 36px;
                 justify-content: center;
-            }
-            
-            /* On mobile, auto fullscreen when viewing PDFs */
-            body.mobile-view .pdf-container {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 9999;
-                margin: 0;
-                border-radius: 0;
-                border: none;
-            }
-            
-            body.mobile-view #pdf-viewer {
-                height: calc(100vh - 65px);
-            }
-            
-            body.mobile-view .pdf-controls {
-                background-color: rgba(0, 0, 0, 0.7);
-                border-bottom: 1px solid #444;
-                color: white;
             }
         }
         
@@ -246,11 +222,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             }
         }
         
-        /* Reset default touch behaviors to prevent unwanted browser zooming */
-        #pdf-canvas-container {
-            touch-action: none;
-        }
-        
         /* Zoom indicator */
         .zoom-level {
             position: absolute;
@@ -263,6 +234,8 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             font-size: 14px;
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 100;
+            pointer-events: none;
         }
         
         .zoom-level.visible {
@@ -310,7 +283,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                             </div>
                             <div id="pdf-viewer">
                                 <div class="loading-spinner" id="loading-spinner"></div>
-                                <div id="pdf-canvas-container">
+                                <div class="pdf-scroll-container">
                                     <canvas id="pdf-canvas"></canvas>
                                 </div>
                                 <div class="zoom-level" id="zoom-level">Zoom: 100%</div>
@@ -391,27 +364,28 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             ctx = canvas.getContext('2d'),
             isFullscreen = false,
             isMobile = window.innerWidth <= 768,
-            container = document.getElementById('pdf-canvas-container'),
             pdfViewer = document.getElementById('pdf-viewer'),
             zoomLevel = document.getElementById('zoom-level');
             
-        // Touch variables for pinch zoom
+        // Touch and mouse variables for zoom and pan
         let initialPinchDistance = 0;
-        let initialScale = 1;
         let lastX = 0;
         let lastY = 0;
         let isDragging = false;
-        let canvasOffsetX = 0;
-        let canvasOffsetY = 0;
+        let isMouseDown = false;
+        let viewportTransform = {
+            offsetX: 0,
+            offsetY: 0,
+            scale: 1.0
+        };
+        
+        // Minimum and maximum zoom limits
+        const MIN_SCALE = 1.0;  // 100%
+        const MAX_SCALE = 5.0;  // 500%
         
         // Check if device is mobile
         function checkMobile() {
             isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                document.body.classList.add('mobile-view');
-            } else {
-                document.body.classList.remove('mobile-view');
-            }
         }
         
         // Run on page load and window resize
@@ -434,9 +408,13 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             // Reset variables
             pageNum = 1;
             scale = 1.0;
-            canvasOffsetX = 0;
-            canvasOffsetY = 0;
-            updateCanvasTransform();
+            viewportTransform = {
+                offsetX: 0,
+                offsetY: 0,
+                scale: 1.0
+            };
+            pdfViewer.scrollLeft = 0;
+            pdfViewer.scrollTop = 0;
             
             // Get document
             pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
@@ -447,11 +425,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 
                 // Initial/first page rendering
                 renderPage(pageNum);
-                
-                // If mobile, automatically go fullscreen
-                if (isMobile && !isFullscreen) {
-                    toggleFullscreen();
-                }
             }).catch(function(error) {
                 console.error('Error loading PDF:', error);
                 document.getElementById('loading-spinner').style.display = 'none';
@@ -468,15 +441,14 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             
             // Get page
             pdfDoc.getPage(num).then(function(page) {
+                // Always apply the current scale to the page viewport
                 const viewport = page.getViewport({ scale: scale });
                 
                 canvas.height = viewport.height;
                 canvas.width = viewport.width;
                 
-                // Reset transformation when rendering a new page
-                canvasOffsetX = 0;
-                canvasOffsetY = 0;
-                updateCanvasTransform();
+                // Center the canvas if smaller than viewport
+                centerCanvasInViewport();
                 
                 // Render PDF page into canvas context
                 const renderContext = {
@@ -527,6 +499,8 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 return;
             }
             pageNum--;
+            // Reset scroll position and zoom when changing pages
+            resetZoom();
             queueRenderPage(pageNum);
         }
 
@@ -538,6 +512,8 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 return;
             }
             pageNum++;
+            // Reset scroll position and zoom when changing pages
+            resetZoom();
             queueRenderPage(pageNum);
         }
 
@@ -545,55 +521,96 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
          * Zoom in
          */
         function zoomIn() {
-            scale += 0.2;
-            updateZoomLevel();
+            // Limit maximum zoom to 500%
+            if (scale >= MAX_SCALE) return;
+            
+            const oldScale = scale;
+            scale = Math.min(MAX_SCALE, scale + 0.2);
+            
+            // Re-render at the new scale
             queueRenderPage(pageNum);
+            
+            // Update zoom indicator
+            updateZoomIndicator();
+            updateCursorForZoom();
         }
 
         /**
          * Zoom out
          */
         function zoomOut() {
-            if (scale <= 0.5) return;
-            scale -= 0.2;
-            updateZoomLevel();
+            // Limit minimum zoom to 100%
+            if (scale <= MIN_SCALE) return;
+            
+            const oldScale = scale;
+            scale = Math.max(MIN_SCALE, scale - 0.2);
+            
+            // Re-render at the new scale
             queueRenderPage(pageNum);
+            
+            // Update zoom indicator
+            updateZoomIndicator();
+            updateCursorForZoom();
         }
         
         /**
-         * Reset zoom
+         * Reset zoom to 100%
          */
         function resetZoom() {
             scale = 1.0;
-            canvasOffsetX = 0;
-            canvasOffsetY = 0;
-            updateCanvasTransform();
-            updateZoomLevel();
-            queueRenderPage(pageNum);
-        }
-        
-        /**
-         * Update the canvas transform based on scale and offset
-         */
-        function updateCanvasTransform() {
-            container.style.transform = `translate(${canvasOffsetX}px, ${canvasOffsetY}px) scale(${scale})`;
+            viewportTransform.offsetX = 0;
+            viewportTransform.offsetY = 0;
+            viewportTransform.scale = 1.0;
+            pdfViewer.scrollLeft = 0;
+            pdfViewer.scrollTop = 0;
             
-            // Update zoom level display
-            updateZoomLevel();
+            queueRenderPage(pageNum);
+            updateZoomIndicator();
+            updateCursorForZoom();
         }
         
         /**
-         * Update zoom level display
+         * Update zoom level indicator
          */
-        function updateZoomLevel() {
-            zoomLevel.textContent = `Zoom: ${Math.round(scale * 100)}%`;
+        function updateZoomIndicator() {
+            const percentage = Math.round(scale * 100);
+            zoomLevel.textContent = `Zoom: ${percentage}%`;
             zoomLevel.classList.add('visible');
             
-            // Hide zoom level after 2 seconds
+            // Hide zoom indicator after 2 seconds
             clearTimeout(window.zoomTimeout);
             window.zoomTimeout = setTimeout(() => {
                 zoomLevel.classList.remove('visible');
             }, 2000);
+        }
+        
+        /**
+         * Update cursor based on zoom level
+         */
+        function updateCursorForZoom() {
+            const scrollContainer = document.querySelector('.pdf-scroll-container');
+            if (scale > 1) {
+                scrollContainer.classList.add('zoomed');
+                scrollContainer.style.cursor = isMouseDown ? 'grabbing' : 'move';
+            } else {
+                scrollContainer.classList.remove('zoomed');
+                scrollContainer.style.cursor = 'default';
+            }
+        }
+        
+        /**
+         * Center canvas in viewport
+         */
+        function centerCanvasInViewport() {
+            const pdfViewerWidth = pdfViewer.clientWidth;
+            const pdfViewerHeight = pdfViewer.clientHeight;
+            
+            // Calculate margins for centering
+            const marginX = Math.max(0, (pdfViewerWidth - canvas.width) / 2);
+            const marginY = Math.max(0, (pdfViewerHeight - canvas.height) / 2);
+            
+            // Apply margins to canvas
+            canvas.style.margin = `${marginY}px ${marginX}px`;
         }
         
         /**
@@ -609,9 +626,9 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 exitBtn.style.display = 'flex';
                 isFullscreen = true;
                 
-                // Rerender the current page to adjust to new container size
+                // Adjust viewport after transition
                 setTimeout(() => {
-                    queueRenderPage(pageNum);
+                    centerCanvasInViewport();
                 }, 300);
                 
             } else {
@@ -620,9 +637,9 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 exitBtn.style.display = 'none';
                 isFullscreen = false;
                 
-                // Rerender the current page to adjust to original container size
+                // Adjust viewport after transition
                 setTimeout(() => {
-                    queueRenderPage(pageNum);
+                    centerCanvasInViewport();
                 }, 300);
             }
         }
@@ -630,17 +647,9 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         // Calculate distance between two touch points
         function getPinchDistance(e) {
             return Math.hypot(
-                e.touches[0].pageX - e.touches[1].pageX,
-                e.touches[0].pageY - e.touches[1].pageY
+                e.touches[0].clientX - e.touches[1].clientX,
+                e.touches[0].clientY - e.touches[1].clientY
             );
-        }
-        
-        // Get center point between two touches
-        function getTouchCenter(e) {
-            return {
-                x: (e.touches[0].pageX + e.touches[1].pageX) / 2,
-                y: (e.touches[0].pageY + e.touches[1].pageY) / 2
-            };
         }
         
         // Handle touch start event
@@ -649,11 +658,10 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 // Pinch gesture starts
                 e.preventDefault();
                 initialPinchDistance = getPinchDistance(e);
-                initialScale = scale;
             } else if (e.touches.length === 1) {
                 // Single touch for panning
-                lastX = e.touches[0].pageX;
-                lastY = e.touches[0].pageY;
+                lastX = e.touches[0].clientX;
+                lastY = e.touches[0].clientY;
                 isDragging = true;
             }
         }
@@ -664,78 +672,132 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 // Pinch gesture (zooming)
                 e.preventDefault();
                 const currentDistance = getPinchDistance(e);
+                
                 if (initialPinchDistance > 0) {
-                    // Calculate new scale
+                    // Calculate new scale factor
                     const pinchRatio = currentDistance / initialPinchDistance;
-                    const newScale = Math.max(0.5, Math.min(5, initialScale * pinchRatio));
+                    const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * pinchRatio));
                     
-                    // Get center of pinch
-                    const center = getTouchCenter(e);
+                    // Only update if scale actually changed
+                    if (newScale !== scale) {
+                        scale = newScale;
+                        queueRenderPage(pageNum);
+                        updateZoomIndicator();
+                        updateCursorForZoom();
+                    }
                     
-                    // Calculate viewer offset to get proper coordinates
-                    const rect = pdfViewer.getBoundingClientRect();
-                    const viewerOffsetX = rect.left;
-                    const viewerOffsetY = rect.top;
-                    
-                    // Calculate touch position relative to the viewer
-                    const touchX = center.x - viewerOffsetX;
-                    const touchY = center.y - viewerOffsetY;
-                    
-                    // Calculate how much we need to move the canvas so the zoom happens at the pinch point
-                    const viewerCenterX = touchX - canvasOffsetX;
-                    const viewerCenterY = touchY - canvasOffsetY;
-                    
-                    // Update scale
-                    const oldScale = scale;
-                    scale = newScale;
-                    
-                    // Adjust offset to zoom towards pinch center
-                    canvasOffsetX = touchX - (viewerCenterX / oldScale * newScale);
-                    canvasOffsetY = touchY - (viewerCenterY / oldScale * newScale);
-                    
-                    updateCanvasTransform();
+                    // Reset initial distance for smoother zooming
+                    initialPinchDistance = currentDistance;
                 }
             } else if (e.touches.length === 1 && isDragging && scale > 1) {
                 // Single touch panning (only when zoomed in)
-                e.preventDefault();
-                const currentX = e.touches[0].pageX;
-                const currentY = e.touches[0].pageY;
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY;
                 
-                // Calculate the delta movement
+                // Calculate drag distance
                 const deltaX = currentX - lastX;
                 const deltaY = currentY - lastY;
                 
-                // Update the last position
+                // Update scroll position
+                pdfViewer.scrollLeft -= deltaX;
+                pdfViewer.scrollTop -= deltaY;
+                
+                // Update last position
                 lastX = currentX;
                 lastY = currentY;
-                
-                // Update canvas offset
-                canvasOffsetX += deltaX;
-                canvasOffsetY += deltaY;
-                
-                updateCanvasTransform();
             }
         }
         
         // Handle touch end event
-        function handleTouchEnd(e) {
+        function handleTouchEnd() {
             initialPinchDistance = 0;
             isDragging = false;
+        }
+        
+        // Handle mouse down event for PC drag
+        function handleMouseDown(e) {
+            e.preventDefault();
+            isMouseDown = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
             
-            // If scale is very close to 1, snap back to exactly 1
-            if (Math.abs(scale - 1) < 0.1) {
-                scale = 1;
-                canvasOffsetX = 0;
-                canvasOffsetY = 0;
-                updateCanvasTransform();
+            // Only change cursor to grabbing if we're zoomed in
+            if (scale > 1) {
+                pdfViewer.style.cursor = 'grabbing';
             }
         }
         
-        // Setup touch event listeners
-        const pdfViewerElement = document.getElementById('pdf-viewer');
-        pdfViewerElement.addEventListener('touchstart', handleTouchStart, { passive: false });
-        pdfViewerElement.addEventListener('touchmove', handleTouchMove, { passive: false });
-        pdfViewerElement.addEventListener('touchend', handleTouchEnd);
+        // Handle mouse move event for PC drag
+        function handleMouseMove(e) {
+            if (!isMouseDown) return;
+            
+            const deltaX = e.clientX - lastX;
+            const deltaY = e.clientY - lastY;
+            
+            // Only enable drag functionality when zoomed in
+            if (scale > 1) {
+                pdfViewer.scrollLeft -= deltaX;
+                pdfViewer.scrollTop -= deltaY;
+            }
+            
+            lastX = e.clientX;
+            lastY = e.clientY;
+        }
+        
+        // Handle mouse up event
+        function handleMouseUp() {
+            isMouseDown = false;
+            // Only set cursor to move if zoomed in, otherwise return to default
+            pdfViewer.style.cursor = scale > 1 ? 'move' : 'default';
+        }
+        
+        // Handle mouse leave event
+        function handleMouseLeave() {
+            if (isMouseDown) {
+                isMouseDown = false;
+                // Only set cursor to move if zoomed in, otherwise return to default
+                pdfViewer.style.cursor = scale > 1 ? 'move' : 'default';
+            }
+        }
+        
+        // Setup mouse event listeners for PC
+        pdfViewer.addEventListener('mousedown', handleMouseDown);
+        pdfViewer.addEventListener('mousemove', handleMouseMove);
+        pdfViewer.addEventListener('mouseup', handleMouseUp);
+        pdfViewer.addEventListener('mouseleave', handleMouseLeave);
+        
+        // Setup touch event listeners for mobile
+        pdfViewer.addEventListener('touchstart', handleTouchStart, { passive: false });
+        pdfViewer.addEventListener('touchmove', handleTouchMove, { passive: false });
+        pdfViewer.addEventListener('touchend', handleTouchEnd);
+        pdfViewer.addEventListener('touchcancel', handleTouchEnd);
+
+        // Handle mouse wheel zoom
+        pdfViewer.addEventListener('wheel', function(e) {
+            // Only zoom with Ctrl key pressed (standard zoom behavior)
+            if (e.ctrlKey) {
+                e.preventDefault();
+                
+                // Zoom in or out based on wheel direction
+                if (e.deltaY < 0) {
+                    // Wheel up - zoom in
+                    if (scale < MAX_SCALE) {
+                        scale = Math.min(MAX_SCALE, scale + 0.1);
+                        queueRenderPage(pageNum);
+                        updateZoomIndicator();
+                        updateCursorForZoom();
+                    }
+                } else {
+                    // Wheel down - zoom out
+                    if (scale > MIN_SCALE) {
+                        scale = Math.max(MIN_SCALE, scale - 0.1);
+                        queueRenderPage(pageNum);
+                        updateZoomIndicator();
+                        updateCursorForZoom();
+                    }
+                }
+            }
+        }, { passive: false });
 
         // Button events
         document.getElementById('prev-page').addEventListener('click', onPrevPage);
@@ -751,6 +813,8 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             const num = parseInt(this.value);
             if (num >= 1 && num <= pdfDoc.numPages) {
                 pageNum = num;
+                // Reset zoom when changing pages
+                resetZoom();
                 queueRenderPage(pageNum);
             } else {
                 this.value = pageNum;
@@ -772,6 +836,25 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 onPrevPage();
             } else if (e.key === 'Escape' && isFullscreen) {
                 toggleFullscreen();
+            } else if (e.key === '0' && e.ctrlKey) {
+                // Ctrl+0 to reset zoom (common shortcut)
+                e.preventDefault();
+                resetZoom();
+            } else if (e.key === '+' && e.ctrlKey) {
+                // Ctrl++ to zoom in (common shortcut)
+                e.preventDefault();
+                zoomIn();
+            } else if (e.key === '-' && e.ctrlKey) {
+                // Ctrl+- to zoom out (common shortcut)
+                e.preventDefault();
+                zoomOut();
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (pdfDoc) {
+                centerCanvasInViewport();
             }
         });
     </script>
