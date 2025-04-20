@@ -1,0 +1,218 @@
+/* Additional styles specific to PDF viewer */
+.pdf-container {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    background-color: #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+.pdf-scroll-container {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    touch-action: auto;
+    cursor: default;
+}
+
+.pdf-scroll-container.zoomed {
+    cursor: move;
+}
+
+#pdf-viewer {
+    width: 100%;
+    height: 600px;
+    position: relative;
+    background-color: #525659;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+#pdf-canvas {
+    margin: 0 auto;
+    display: block;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.pdf-controls {
+    display: flex;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    z-index: 100;
+}
+
+.pdf-controls button {
+    padding: 8px 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pdf-controls button:hover {
+    background-color: var(--accent-color);
+}
+
+.pdf-controls .page-info {
+    margin: 0 15px;
+    font-weight: 500;
+}
+
+.pdf-controls input {
+    width: 60px;
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pdf-list table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pdf-list th, .pdf-list td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e1e4e8;
+}
+
+.pdf-list th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Fullscreen styles */
+.fullscreen-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+}
+
+.fullscreen-container .pdf-controls {
+    background-color: rgba(0, 0, 0, 0.7);
+    border-bottom: 1px solid #444;
+    color: white;
+}
+
+.fullscreen-container #pdf-viewer {
+    flex: 1;
+    height: calc(100vh - 65px);
+    background-color: #333;
+}
+
+.exit-fullscreen-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10000;
+}
+
+.exit-fullscreen-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile button text and fullscreen button control */
+@media (max-width: 768px) {
+    #pdf-viewer {
+        height: 500px;
+    }
+    
+    .pdf-controls {
+        padding: 8px;
+    }
+    
+    /* Hide button text on mobile, only show icons */
+    .pdf-controls button .button-text {
+        display: none;
+    }
+    
+    /* Make buttons more compact */
+    .pdf-controls button {
+        padding: 8px;
+        min-width: 36px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .pdf-controls {
+        padding: 5px;
+    }
+    
+    .pdf-controls button {
+        padding: 6px;
+        font-size: 0.9em;
+    }
+    
+    .pdf-list th, .pdf-list td {
+        padding: 8px;
+    }
+}
+
+/* Zoom indicator */
+.zoom-level {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.zoom-level.visible {
+    opacity: 1;
+}

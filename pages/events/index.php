@@ -22,273 +22,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- PDF.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf_viewer.min.css">
-    <style>
-        /* Additional styles specific to PDF viewer */
-        .pdf-container {
-            display: flex;
-            flex-direction: column;
-            margin: 10px 0;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            background-color: #f5f5f5;
-            transition: all 0.3s ease;
-        }
-
-        .pdf-scroll-container {
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            touch-action: auto;
-            cursor: default;
-        }
-        
-        .pdf-scroll-container.zoomed {
-            cursor: move;
-        }
-        
-        #pdf-viewer {
-            width: 100%;
-            height: 600px;
-            position: relative;
-            background-color: #525659;
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        
-        #pdf-canvas {
-            margin: 0 auto;
-            display: block;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .pdf-controls {
-            display: flex;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #ddd;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            z-index: 100;
-        }
-        
-        .pdf-controls button {
-            padding: 8px 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .pdf-controls button:hover {
-            background-color: var(--accent-color);
-        }
-        
-        .pdf-controls .page-info {
-            margin: 0 15px;
-            font-weight: 500;
-        }
-        
-        .pdf-controls input {
-            width: 60px;
-            padding: 6px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .pdf-list table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .pdf-list th, .pdf-list td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e1e4e8;
-        }
-        
-        .pdf-list th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-        
-        .loading-spinner {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        /* Fullscreen styles */
-        .fullscreen-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 9999;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .fullscreen-container .pdf-controls {
-            background-color: rgba(0, 0, 0, 0.7);
-            border-bottom: 1px solid #444;
-            color: white;
-        }
-        
-        .fullscreen-container #pdf-viewer {
-            flex: 1;
-            height: calc(100vh - 65px);
-            background-color: #333;
-        }
-
-        /* Search bar styles */
-        .search-container {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        #clear-search {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #999;
-            display: none;
-        }
-
-        /* Mobile menu button styles */
-        .mobile-menu-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 997;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .mobile-menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 998;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .mobile-menu-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .main-nav {
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .main-nav.active {
-            transform: translateX(0);
-        }
-
-        /* Mobile button text and fullscreen button control */
-        @media (max-width: 768px) {
-            #pdf-viewer {
-                height: 500px;
-            }
-            
-            .pdf-controls {
-                padding: 8px;
-            }
-            
-            /* Hide button text on mobile, only show icons */
-            .pdf-controls button .button-text {
-                display: none;
-            }
-            
-            /* Make buttons more compact */
-            .pdf-controls button {
-                padding: 8px;
-                min-width: 36px;
-                justify-content: center;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .pdf-controls {
-                padding: 5px;
-            }
-            
-            .pdf-controls button {
-                padding: 6px;
-                font-size: 0.9em;
-            }
-            
-            .pdf-list th, .pdf-list td {
-                padding: 8px;
-            }
-        }
-        
-        /* Zoom indicator */
-        .zoom-level {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 14px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 100;
-            pointer-events: none;
-        }
-        
-        .zoom-level.visible {
-            opacity: 1;
-        }
-
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-    </style>
+    <link rel="stylesheet" href="../../static/css/stylesViewer.css">
 </head>
 <body>
     <!-- Side Navigation -->
@@ -303,8 +37,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             <li><a href="admin.php"><i class="fas fa-lock"></i> Area Admin</a></li>
         </ul>
     </nav>
-
-    <div class="mobile-menu-overlay"></div>
 
     <main class="main-wrapper">
         <div class="content">
@@ -337,6 +69,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                                 </div>
                                 <div class="zoom-level" id="zoom-level">Zoom: 100%</div>
                             </div>
+                            <button class="exit-fullscreen-btn" id="exit-fullscreen-btn" style="display: none;"><i class="fas fa-times"></i></button>
                         </div>
                         
                         <div class="section-footer">
@@ -357,10 +90,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             <section class="main-card">
                 <div class="card-content">
                     <h3><i class="fas fa-list"></i> Tutti i Documenti</h3>
-                    <div class="search-container">
-                        <input type="text" id="pdf-search" placeholder="Cerca documenti..." class="search-input">
-                        <button id="clear-search"><i class="fas fa-times"></i></button>
-                    </div>
                     <?php if (!empty($pdf_files)): ?>
                         <div class="pdf-list">
                             <table>
@@ -417,8 +146,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             isFullscreen = false,
             isMobile = window.innerWidth <= 768,
             pdfViewer = document.getElementById('pdf-viewer'),
-            zoomLevel = document.getElementById('zoom-level'),
-            fullscreenBtn = document.getElementById('fullscreen-btn');
+            zoomLevel = document.getElementById('zoom-level');
             
         // Touch and mouse variables for zoom and pan
         let initialPinchDistance = 0;
@@ -671,18 +399,14 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
          */
         function toggleFullscreen() {
             const container = document.getElementById('pdf-container');
+            const exitBtn = document.getElementById('exit-fullscreen-btn');
             
             if (!isFullscreen) {
                 // Enter fullscreen
                 container.classList.add('fullscreen-container');
+                exitBtn.style.display = 'flex';
                 isFullscreen = true;
                 
-<<<<<<< HEAD
-                // Change button icon to "exit fullscreen"
-                fullscreenBtn.innerHTML = '<i class="fas fa-compress"></i> <span class="button-text">Esci da schermo intero</span>';
-                
-=======
->>>>>>> a3a2b89 (Improved the pdf viewer even more)
                 // Adjust viewport after transition
                 setTimeout(() => {
                     centerCanvasInViewport();
@@ -691,14 +415,9 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             } else {
                 // Exit fullscreen
                 container.classList.remove('fullscreen-container');
+                exitBtn.style.display = 'none';
                 isFullscreen = false;
                 
-<<<<<<< HEAD
-                // Change button icon back to "fullscreen"
-                fullscreenBtn.innerHTML = '<i class="fas fa-expand"></i> <span class="button-text">Schermo intero</span>';
-                
-=======
->>>>>>> a3a2b89 (Improved the pdf viewer even more)
                 // Adjust viewport after transition
                 setTimeout(() => {
                     centerCanvasInViewport();
@@ -868,6 +587,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         document.getElementById('zoom-out').addEventListener('click', zoomOut);
         document.getElementById('reset-zoom').addEventListener('click', resetZoom);
         document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+        document.getElementById('exit-fullscreen-btn').addEventListener('click', toggleFullscreen);
         
         // Page input
         document.getElementById('current-page').addEventListener('change', function() {
@@ -885,41 +605,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         // Mobile menu toggle
         document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
             document.querySelector('.main-nav').classList.toggle('active');
-            document.querySelector('.mobile-menu-overlay').classList.toggle('active');
-        });
-
-        document.querySelector('.mobile-menu-overlay').addEventListener('click', function() {
-            document.querySelector('.main-nav').classList.remove('active');
-            this.classList.remove('active');
-        });
-        
-        // Search functionality
-        const pdfSearch = document.getElementById('pdf-search');
-        const clearSearch = document.getElementById('clear-search');
-
-        pdfSearch.addEventListener('input', () => {
-            const searchTerm = pdfSearch.value.toLowerCase();
-            
-            if (searchTerm) {
-                clearSearch.style.display = 'block';
-            } else {
-                clearSearch.style.display = 'none';
-            }
-            
-            // Search in table
-            document.querySelectorAll('.pdf-list tbody tr').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
-
-        clearSearch.addEventListener('click', () => {
-            pdfSearch.value = '';
-            clearSearch.style.display = 'none';
-            
-            document.querySelectorAll('.pdf-list tbody tr').forEach(el => {
-                el.style.display = '';
-            });
         });
         
         // Handle keyboard events for navigation
