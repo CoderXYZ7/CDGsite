@@ -120,78 +120,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             color: var(--primary-color);
         }
         
-        .pdf-card {
-            display: none;
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .pdf-card-content {
-            transition: transform 0.3s ease;
-        }
-        
-        .pdf-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .pdf-card-title {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-        
-        .pdf-card-actions {
-            display: flex;
-            gap: 8px;
-            position: absolute;
-            right: -100px;
-            top: 0;
-            height: 100%;
-            align-items: center;
-            transition: right 0.3s ease;
-            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05));
-        }
-        
-        .pdf-card.swiped .pdf-card-content {
-            transform: translateX(-100px);
-        }
-        
-        .pdf-card.swiped .pdf-card-actions {
-            right: 0;
-        }
-        
-        .pdf-card-skeleton {
-            display: none;
-            background: #f5f5f5;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            height: 60px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .pdf-card-skeleton::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, 
-                rgba(255,255,255,0) 0%, 
-                rgba(255,255,255,0.8) 50%, 
-                rgba(255,255,255,0) 100%);
-            animation: shimmer 1.5s infinite;
-        }
-        
         .loading-spinner {
             position: absolute;
             top: 50%;
@@ -203,63 +131,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             border-top: 6px solid var(--primary-color);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-        }
-        
-        .search-container {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        #clear-search {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #999;
-        }
-        
-        .pull-to-refresh {
-            text-align: center;
-            padding: 10px;
-            color: var(--primary-color);
-            display: none;
-        }
-        
-        .mobile-menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 998;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .mobile-menu-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        @keyframes spin {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
         }
         
         /* Fullscreen styles */
@@ -287,6 +158,74 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             background-color: #333;
         }
 
+        /* Search bar styles */
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        #clear-search {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            display: none;
+        }
+
+        /* Mobile menu button styles */
+        .mobile-menu-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 997;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .main-nav {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .main-nav.active {
+            transform: translateX(0);
+        }
+
         /* Mobile button text and fullscreen button control */
         @media (max-width: 768px) {
             #pdf-viewer {
@@ -294,24 +233,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             }
             
             .pdf-controls {
-                position: sticky;
-                top: 0;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding: 8px 5px;
-                scrollbar-width: none;
-            }
-            
-            .pdf-controls::-webkit-scrollbar {
-                display: none;
-            }
-            
-            .pdf-controls button {
-                flex-shrink: 0;
                 padding: 8px;
-                min-width: 36px;
-                justify-content: center;
             }
             
             /* Hide button text on mobile, only show icons */
@@ -319,75 +241,11 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 display: none;
             }
             
-            .page-info {
-                flex-shrink: 0;
-                margin: 0 5px;
-            }
-            
-            /* Mobile-specific PDF list styles */
-            .pdf-list table {
-                display: none;
-            }
-            
-            .pdf-card {
-                display: block;
-            }
-            
-            .pdf-card-actions .button-text {
-                display: none;
-            }
-            
-            .pdf-card-actions .button {
+            /* Make buttons more compact */
+            .pdf-controls button {
                 padding: 8px;
                 min-width: 36px;
                 justify-content: center;
-            }
-            
-            .pdf-card-skeleton {
-                display: block;
-            }
-            
-            .pull-to-refresh {
-                display: block;
-            }
-            
-            .mobile-menu-btn {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 997;
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                background: var(--primary-color);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            }
-            
-            .main-nav {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-            
-            .main-nav.active {
-                transform: translateX(0);
-            }
-        }
-        
-        @media (min-width: 769px) {
-            .pdf-list table {
-                display: table;
-            }
-            
-            .pdf-card {
-                display: none;
-            }
-            
-            .pdf-card-skeleton {
-                display: none;
             }
         }
         
@@ -403,10 +261,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             
             .pdf-list th, .pdf-list td {
                 padding: 8px;
-            }
-            
-            .pdf-card {
-                padding: 12px;
             }
         }
         
@@ -428,6 +282,11 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         
         .zoom-level.visible {
             opacity: 1;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
     </style>
 </head>
@@ -502,9 +361,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                         <input type="text" id="pdf-search" placeholder="Cerca documenti..." class="search-input">
                         <button id="clear-search"><i class="fas fa-times"></i></button>
                     </div>
-                    <div class="pull-to-refresh" id="pull-to-refresh">
-                        <i class="fas fa-sync-alt"></i> Trascina verso il basso per aggiornare
-                    </div>
                     <?php if (!empty($pdf_files)): ?>
                         <div class="pdf-list">
                             <table>
@@ -531,33 +387,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
-                            
-                            <!-- Mobile PDF List Cards -->
-                            <div class="pdf-cards">
-                                <?php foreach ($pdf_files as $pdf): ?>
-                                    <?php $file_name = basename($pdf); ?>
-                                    <div class="pdf-card">
-                                        <div class="pdf-card-content">
-                                            <div class="pdf-card-header">
-                                                <div class="pdf-card-title"><?php echo str_replace('.pdf', '', $file_name); ?></div>
-                                            </div>
-                                        </div>
-                                        <div class="pdf-card-actions">
-                                            <a href="javascript:void(0)" onclick="loadPDF('<?php echo $pdf; ?>')" class="button primary small">
-                                                <i class="fas fa-eye"></i> <span class="button-text">Visualizza</span>
-                                            </a>
-                                            <a href="<?php echo $pdf; ?>" download class="button primary small">
-                                                <i class="fas fa-download"></i> <span class="button-text">Scarica</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                <?php endforeach; ?>
-                                
-                                <!-- Skeleton loading cards -->
-                                <div class="pdf-card-skeleton"></div>
-                                <div class="pdf-card-skeleton"></div>
-                                <div class="pdf-card-skeleton"></div>
-                            </div>
                         </div>
                     <?php else: ?>
                         <p>Nessun documento disponibile.</p>
@@ -1071,16 +900,10 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 clearSearch.style.display = 'none';
             }
             
-            // Search in desktop table
+            // Search in table
             document.querySelectorAll('.pdf-list tbody tr').forEach(row => {
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-            
-            // Search in mobile cards
-            document.querySelectorAll('.pdf-card').forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(searchTerm) ? '' : 'none';
             });
         });
 
@@ -1088,69 +911,8 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             pdfSearch.value = '';
             clearSearch.style.display = 'none';
             
-            document.querySelectorAll('.pdf-list tbody tr, .pdf-card').forEach(el => {
+            document.querySelectorAll('.pdf-list tbody tr').forEach(el => {
                 el.style.display = '';
-            });
-        });
-        
-        // Pull-to-refresh functionality
-        const pullToRefresh = document.getElementById('pull-to-refresh');
-        let startY = 0;
-
-        document.addEventListener('touchstart', (e) => {
-            if (window.scrollY === 0) {
-                startY = e.touches[0].clientY;
-            }
-        }, {passive: true});
-
-        document.addEventListener('touchmove', (e) => {
-            const y = e.touches[0].clientY;
-            if (window.scrollY === 0 && y - startY > 50) {
-                pullToRefresh.style.display = 'block';
-            }
-        }, {passive: true});
-
-        document.addEventListener('touchend', () => {
-            if (pullToRefresh.style.display === 'block') {
-                location.reload();
-            }
-        }, {passive: true});
-        
-        // Swipe functionality for mobile cards
-        document.querySelectorAll('.pdf-card').forEach(card => {
-            let startX, moveX;
-            const content = card.querySelector('.pdf-card-content');
-            const actions = card.querySelector('.pdf-card-actions');
-            
-            card.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-            }, {passive: true});
-            
-            card.addEventListener('touchmove', (e) => {
-                moveX = e.touches[0].clientX;
-                const diff = startX - moveX;
-                
-                if (diff > 0 && diff < 100) {
-                    content.style.transform = `translateX(-${diff}px)`;
-                    actions.style.right = `-${100 - diff}px`;
-                }
-            }, {passive: true});
-            
-            card.addEventListener('touchend', () => {
-                if (startX - moveX > 50) {
-                    card.classList.add('swiped');
-                } else {
-                    card.classList.remove('swiped');
-                    content.style.transform = '';
-                    actions.style.right = '';
-                }
-            }, {passive: true});
-        });
-        
-        // Hide skeletons when content loads
-        window.addEventListener('load', () => {
-            document.querySelectorAll('.pdf-card-skeleton').forEach(skeleton => {
-                skeleton.style.display = 'none';
             });
         });
         
