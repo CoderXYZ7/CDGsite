@@ -1,36 +1,61 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Navigation HTML
+    // Calculate base path for resources relative to current page
+    const calculateBasePath = () => {
+        const currentPath = window.location.pathname;
+        
+        // Count the number of directory levels from the project root
+        // Ignore the filename at the end and any empty segments
+        const segments = currentPath.split('/').filter(segment => segment.length > 0);
+        const fileName = segments[segments.length - 1];
+        const hasExtension = fileName && fileName.includes('.');
+        
+        // If the last segment is a file, don't count it as a directory level
+        const directoryLevels = hasExtension ? segments.length - 1 : segments.length;
+        
+        // If we're at the project root, return './'
+        if (directoryLevels <= 0) {
+            return './';
+        }
+        
+        // For each directory level, we need to go up one level
+        return '../'.repeat(directoryLevels);
+    };
+    
+    const basePath = calculateBasePath();
+    console.log('Calculated base path:', basePath);
+
+    // Navigation HTML with dynamic paths
     const navHtml = `<nav class="main-nav">
         <div class="logo">
-            <img src="../static/images/LogoNoBG.png" alt="Logo">
+            <img src="${basePath}static/images/LogoNoBG.png" alt="Logo">
             <h1>Collaborazione Pastorale</h1>
         </div>
         <ul class="nav-list">
-            <li><a href="index.html"><i class="fas fa-home"></i>Home</a></li>
-            <li><a href="eventi.html"><i class="fas fa-calendar"></i>Eventi</a></li>
-            <li><a href="chi-siamo.html"><i class="fas fa-users"></i>Chi Siamo</a></li>
-            <li><a href="contatti.html"><i class="fas fa-envelope"></i>Contatti</a></li>
+            <li><a href="${basePath}pages/index.html"><i class="fas fa-home"></i>Home</a></li>
+            <li><a href="${basePath}pages/foglietto/index.php"><i class="fas fa-file"></i>Foglietto</a></li>
+            <li><a href="${basePath}pages/eventi.html"><i class="fas fa-calendar"></i>Eventi</a></li>
+            <li><a href="${basePath}pages/chi-siamo.html"><i class="fas fa-users"></i>Chi Siamo</a></li>
+            <li><a href="${basePath}pages/contatti.html"><i class="fas fa-envelope"></i>Contatti</a></li>
         </ul>
-        <div class="attention">ATTENZIONE: ALCUNE PAGINE POTREBBERO CONTENERE DATI NON AGGIORNATI.</div>
         <a class="collapsible-list"><i class="fas fa-chevron-right collapsible-icon"></i>Parrochie</a>
         <div class="collapsible-content">
-            <a class="card-link" href="www.cpsangiorgio.it/home.html">Tutte le parrochie</a>
-            <a class="card-link" href="www.cpsangiorgio.it/sangiorgio">San Giorgio di Nogaro</a>
-            <a class="card-link" href="www.cpsangiorgio.it/marano">Marano</a>
-            <a class="card-link" href="www.cpsangiorgio.it/porpetto">Porpetto</a>
-            <a class="card-link" href="www.cpsangiorgio.it/castello">Castello</a>
-            <a class="card-link" href="www.cpsangiorgio.it/carlino">Carlino</a>
-            <a class="card-link" href="www.cpsangiorgio.it/corgnolo">Corgnolo</a>
-            <a class="card-link" href="www.cpsangiorgio.it/portonogaro">Porto Nogaro</a>
-            <a class="card-link" href="www.cpsangiorgio.it/villanova">Villanova</a>
-            <a class="card-link" href="www.cpsangiorgio.it/zellina">Zellina</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/home.html">Tutte le parrochie</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/sangiorgio">San Giorgio di Nogaro</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/marano">Marano</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/porpetto">Porpetto</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/castello">Castello</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/carlino">Carlino</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/corgnolo">Corgnolo</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/portonogaro">Porto Nogaro</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/villanova">Villanova</a>
+            <a class="card-link" href="https://www.cpsangiorgio.it/zellina">Zellina</a>
         </div>
     </nav>
-    <button class="mobile-menu-btn" aria-label="Toggle menu">
+    <button class="nav-toggle-btn" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>
     </button>`;
 
-    // Footer HTML
+    // Footer HTML with dynamic paths
     const footerHtml = `<footer>
         <div class="footer-content">
             <div class="social-section">
@@ -45,9 +70,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="footer-section">
                     <h3>Link Utili</h3>
                     <ul>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
-                        <li><a href="contatti.html">Contattaci</a></li>
-                        <li><a href="chi-siamo.html">Chi Siamo</a></li>
+                        <li><a href="${basePath}pages/privacy.html">Privacy Policy</a></li>
+                        <li><a href="${basePath}pages/contatti.html">Contattaci</a></li>
+                        <li><a href="${basePath}pages/chi-siamo.html">Chi Siamo</a></li>
                     </ul>
                 </div>
             </div>
@@ -66,7 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
         const navLinks = document.querySelectorAll('.nav-list a, .card-link');
         navLinks.forEach(link => {
-            if (link.getAttribute('href').split('/').pop() === currentPage) {
+            const linkPath = link.getAttribute('href');
+            if (linkPath && linkPath.split('/').pop() === currentPage) {
                 link.classList.add('active');
                 // Also highlight parent list item if exists
                 if (link.parentElement.tagName === 'LI') {
@@ -75,13 +101,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Mobile menu functionality
-        const menuBtn = document.querySelector('.mobile-menu-btn');
+        // Update toggle functionality for all screen sizes
+        const toggleBtn = document.querySelector('.nav-toggle-btn');
         const nav = document.querySelector('.main-nav');
-        if (menuBtn && nav) {
-            menuBtn.addEventListener('click', () => {
+        if (toggleBtn && nav) {
+            toggleBtn.addEventListener('click', () => {
                 nav.classList.toggle('active');
-                menuBtn.setAttribute('aria-expanded', nav.classList.contains('active'));
+                document.body.classList.toggle('nav-open');
+                toggleBtn.setAttribute('aria-expanded', nav.classList.contains('active'));
+                
+                // Change the icon based on state
+                const icon = toggleBtn.querySelector('i');
+                if (nav.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
             });
         }
     }
@@ -140,10 +177,16 @@ document.addEventListener('DOMContentLoaded', function() {
     navLinks.forEach(link => {
         link.addEventListener('click', () => {
             const nav = document.querySelector('.main-nav');
-            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const toggleBtn = document.querySelector('.nav-toggle-btn');
             if (nav && nav.classList.contains('active')) {
                 nav.classList.remove('active');
-                menuBtn.setAttribute('aria-expanded', 'false');
+                document.body.classList.remove('nav-open');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                
+                // Reset the icon
+                const icon = toggleBtn.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
             }
         });
     });

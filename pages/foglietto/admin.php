@@ -245,14 +245,5 @@ function uploadErrorToString($error) {
             <?php endif; ?>
         </div>
     </main>
-    
-    <!-- Mobile menu button -->
-    <button class="mobile-menu-btn">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <script>
-        // Your existing JavaScript here
-    </script>
 </body>
 </html>

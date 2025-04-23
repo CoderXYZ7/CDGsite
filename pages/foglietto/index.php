@@ -17,7 +17,7 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
     <link rel="icon" type="image/png" href="../../static/images/LogoNoBG.png" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PDF Viewer</title>
+    <title>Foglietto</title>
     <link rel="stylesheet" href="../../static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- PDF.js CSS -->
@@ -25,24 +25,14 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
     <link rel="stylesheet" href="../../static/css/stylesViewer.css">
 </head>
 <body>
-    <!-- Side Navigation -->
-    <nav class="main-nav">
-        <div class="logo">
-            <img src="../../static/images/LogoNoBG.png" alt="Logo">
-            <h1>PDF Viewer</h1>
-        </div>
-        
-        <ul class="nav-list">
-            <li><a href="index.php" class="active"><i class="fas fa-file-pdf"></i> Visualizzatore PDF</a></li>
-            <li><a href="admin.php"><i class="fas fa-lock"></i> Area Admin</a></li>
-        </ul>
-    </nav>
+    <!-- Navigation placeholder -->
+    <div id="nav-placeholder"></div>
 
     <main class="main-wrapper">
         <div class="content">
             <section class="hero">
-                <h1>Visualizzatore Documenti PDF</h1>
-                <p>Consulta i documenti in formato PDF</p>
+                <h1>Visualizza qui il Foglietto settimanale</h1>
+                <p>Consulta il foglietto di questa e delle settimane precedenti</p>
             </section>
 
             <?php if ($most_recent_pdf): ?>
@@ -132,6 +122,9 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
 
     <!-- PDF.js Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
+    <script src="../../static/js/components.js"></script>
+
     <script>
         // Set up PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
