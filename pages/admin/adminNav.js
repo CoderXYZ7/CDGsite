@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <nav class="main-nav admin-nav">
         <!-- Logo Section -->
         <div class="logo">
-            <img src="${basePath}static/images/LogoNoBG.png" alt="Admin Logo">
+            <img src="${basePath}../static/images/LogoNoBG.png" alt="Admin Logo">
             <h1>Admin Dashboard</h1>
         </div>
 
