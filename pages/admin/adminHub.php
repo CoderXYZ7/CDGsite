@@ -45,6 +45,9 @@ checkAuth();
     <div id="nav-placeholder"></div>
     <main class="main-wrapper">
         <h1>Welcome <?= htmlspecialchars($_SESSION['username']) ?></h1>
+        <div class="attention">
+            <p>Notice: Attualmente solo la pagina FOGLIETTO è disponibile.</p>
+        </div>
         <h2>Available Pages:</h2>
         <?php
         $stmt = $db->prepare("SELECT * FROM pages");
@@ -58,10 +61,6 @@ checkAuth();
             }
         }
         ?>
-        <!-- notice of partial functionality -->
-        <div class="attention">
-            <p>Notice: Attualmente solo la pagina FOGLIETTO è disponibile.</p>
-        </div>
         <a href="logout.php">Logout</a>
         <div id="admin-username" style="display: none;">
     </main>
