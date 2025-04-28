@@ -5,7 +5,7 @@ ini_set('display_errors', 1);
 
 // Configuration - move these to a separate config file in production
 define('ADMIN_PASSWORD_HASH', password_hash('yourSecurePassword123', PASSWORD_DEFAULT));
-define('PDF_UPLOAD_DIR', 'pdfs');
+define('PDF_UPLOAD_DIR', '../foglietto/pdfs');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 
 // Initialize variables
