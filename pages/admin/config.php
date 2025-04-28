@@ -1,9 +1,9 @@
 <?php
 session_start();
-$host = "localhost";
-$dbname = "tag_system";
-$username = "tag_user";
-$password = "secure_password";
+$host = "cpsangiorgio.com";
+$dbname = "ocpsange_login_system";
+$username = "ocpsange_login_user";
+$password = "vsHC2mK3BGYwx";
 
 try {
     $db = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
