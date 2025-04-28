@@ -40,8 +40,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <!-- Main Navigation Links -->
         <ul class="nav-list">
-            <li><a href="${basePath}admin/admin.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             <li><a href="${basePath}admin/adminHub.php"><i class="fas fa-cogs"></i> System Hub</a></li>
+            <li><a href="${basePath}admin/admin.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             <li><a href="${basePath}admin/adminFog.php"><i class="fas fa-file-pdf"></i> Foglietti</a></li>
             <li><a href="${basePath}admin/adminEve.php"><i class="fas fa-calendar-check"></i> Eventi</a></li>
             <li><a href="${basePath}admin/example1.php"><i class="fas fa-wrench"></i> Tools</a></li>
