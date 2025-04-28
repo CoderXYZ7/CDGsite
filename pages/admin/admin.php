@@ -1,7 +1,7 @@
 <?php
 include 'config.php';
-//checkAuth();
-//checkTag('admin');
+checkAuth();
+checkTag('admin');
 
 // Add User
 if (isset($_POST['add_user'])) {

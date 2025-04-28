@@ -103,12 +103,13 @@ function uploadErrorToString($error) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <div id="nav-placeholder"></div>
     <main class="main-wrapper">
         <div class="content">
             <section class="hero">
                 <h1>PDF Manager - Area Admin</h1>
                 <p>Caricamento e gestione dei file PDF</p>
-                <a href="hub.php" class="button secondary">Torna alla Hub</a>
+                <a href="adminHub.php" class="button secondary">Torna alla Hub</a>
             </section>
 
             <?php echo $message; ?>
@@ -175,5 +176,7 @@ function uploadErrorToString($error) {
             </section>
         </div>
     </main>
+    <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
+    <script src="adminNav.js"></script>
 </body>
 </html>
