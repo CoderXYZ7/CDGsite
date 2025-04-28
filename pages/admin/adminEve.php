@@ -286,6 +286,7 @@ checkTag('admin'); // Allowed tags
     </style>
 </head>
 <body>
+    <div id="nav-placeholder"></div>
     <h1>Event Scheduler</h1>
     
     <div class="section">
@@ -756,5 +757,7 @@ checkTag('admin'); // Allowed tags
             document.body.removeChild(link);
         }
     </script>
+    <div id="admin-username" style="display: none;">
+    <script src="adminNav.js"></script>
 </body>
 </html>

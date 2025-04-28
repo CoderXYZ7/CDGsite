@@ -8,6 +8,7 @@ checkAuth();
     <title>Hub</title>
 </head>
 <body>
+    <div id="nav-placeholder"></div>
     <h1>Welcome <?= htmlspecialchars($_SESSION['username']) ?></h1>
     <h2>Available Pages:</h2>
     <?php
@@ -23,5 +24,7 @@ checkAuth();
     }
     ?>
     <a href="logout.php">Logout</a>
+    <div id="admin-username" style="display: none;">
+    <script src="adminNav.js"></script>
 </body>
 </html>

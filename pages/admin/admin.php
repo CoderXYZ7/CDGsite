@@ -30,6 +30,7 @@ $users = $db->query("SELECT * FROM users")->fetchAll();
     <title>Admin Panel</title>
 </head>
 <body>
+    <div id="nav-placeholder"></div>
     <h1>Admin Panel</h1>
     
     <h2>Add User</h2>
@@ -58,5 +59,7 @@ $users = $db->query("SELECT * FROM users")->fetchAll();
     </form>
     
     <a href="hub.php">Back to Hub</a>
+    <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
+    <script src="adminNav.js"></script>
 </body>
 </html>
