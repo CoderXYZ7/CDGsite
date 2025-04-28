@@ -98,26 +98,6 @@ function uploadErrorToString($error) {
     </style>
 </head>
 <body>
-    <!-- Side Navigation -->
-    <nav class="main-nav">
-        <div class="logo">
-            <img src="../../static/images/LogoNoBG.png" alt="Logo">
-            <h1>PDF Manager</h1>
-        </div>
-        
-        <ul class="nav-list">
-            <li><a href="index.php"><i class="fas fa-file-pdf"></i> Visualizzatore Pubblico</a></li>
-            <li><a href="admin.php" class="active"><i class="fas fa-lock"></i> Area Admin</a></li>
-            <?php if ($is_authenticated): ?>
-                <li><a href="admin.php?logout=1"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            <?php endif; ?>
-        </ul>
-        
-        <div class="attention">
-            <p>Per assistenza contattare l'amministratore del sistema.</p>
-        </div>
-    </nav>
-
     <main class="main-wrapper">
         <div class="content">
             <section class="hero">
