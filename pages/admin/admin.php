@@ -28,6 +28,8 @@ $users = $db->query("SELECT * FROM users")->fetchAll();
 <html>
 <head>
     <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../static/css/styles.css">
 </head>
 <body>
     <div id="nav-placeholder"></div>

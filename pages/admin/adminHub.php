@@ -6,6 +6,8 @@ checkAuth();
 <html>
 <head>
     <title>Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../../static/css/styles.css">
 </head>
 <body>
     <div id="nav-placeholder"></div>

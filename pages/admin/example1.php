@@ -7,9 +7,7 @@ checkTag('admin,student'); // Allowed tags
 <html>
 <head>
     <title>Example Page 1</title>
-    <!-- Load Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Admin CSS (optional) -->
     <link rel="stylesheet" href="../../static/css/styles.css">
 </head>
 <body>
