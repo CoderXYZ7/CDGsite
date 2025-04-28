@@ -31,34 +31,36 @@ $users = $db->query("SELECT * FROM users")->fetchAll();
 </head>
 <body>
     <div id="nav-placeholder"></div>
-    <h1>Admin Panel</h1>
-    
-    <h2>Add User</h2>
-    <form method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <select name="tag">
-            <option value="admin">Admin</option>
-            <option value="student">Student</option>
-        </select>
-        <button type="submit" name="add_user">Add User</button>
-    </form>
+    <main class="main-wrapper">
+        <h1>Admin Panel</h1>
+        
+        <h2>Add User</h2>
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <select name="tag">
+                <option value="admin">Admin</option>
+                <option value="student">Student</option>
+            </select>
+            <button type="submit" name="add_user">Add User</button>
+        </form>
 
-    <h2>Manage Users</h2>
-    <form method="POST">
-        <?php foreach ($users as $user): ?>
-            <div>
-                <?= htmlspecialchars($user['username']) ?>
-                <select name="tags[<?= $user['id'] ?>]">
-                    <option value="admin" <?= $user['tag'] === 'admin' ? 'selected' : '' ?>>Admin</option>
-                    <option value="student" <?= $user['tag'] === 'student' ? 'selected' : '' ?>>Student</option>
-                </select>
-            </div>
-        <?php endforeach; ?>
-        <button type="submit" name="update_tags">Update Tags</button>
-    </form>
-    
-    <a href="hub.php">Back to Hub</a>
+        <h2>Manage Users</h2>
+        <form method="POST">
+            <?php foreach ($users as $user): ?>
+                <div>
+                    <?= htmlspecialchars($user['username']) ?>
+                    <select name="tags[<?= $user['id'] ?>]">
+                        <option value="admin" <?= $user['tag'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                        <option value="student" <?= $user['tag'] === 'student' ? 'selected' : '' ?>>Student</option>
+                    </select>
+                </div>
+            <?php endforeach; ?>
+            <button type="submit" name="update_tags">Update Tags</button>
+        </form>
+        
+        <a href="hub.php">Back to Hub</a>
+    </main>
     <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
     <script src="adminNav.js"></script>
 </body>
