@@ -7,14 +7,22 @@ checkTag('admin,student'); // Allowed tags
 <html>
 <head>
     <title>Example Page 1</title>
+    <!-- Load Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Admin CSS (optional) -->
+    <link rel="stylesheet" href="../static/css/admin.css">
 </head>
 <body>
     <div id="nav-placeholder"></div>
     <main class="main-wrapper">
         <h1>Example Page 1</h1>
-        <a href="hub.php">Back to Hub</a>
+        <a href="adminHub.php">Back to Hub</a>
     </main>
-    <div id="admin-username" style="display: none;">
+    
+    <!-- Hidden username element for JS -->
+    <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
+    
+    <!-- Load admin navigation script -->
     <script src="adminNav.js"></script>
 </body>
 </html>
