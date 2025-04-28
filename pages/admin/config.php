@@ -1,6 +1,6 @@
 <?php
 session_start();
-$host = "cpsangiorgio.com";
+$host = "www.cpsangiorgio.com";
 $dbname = "ocpsange_login_system";
 $username = "ocpsange_login_user";
 $password = "vsHC2mK3BGYwx";
