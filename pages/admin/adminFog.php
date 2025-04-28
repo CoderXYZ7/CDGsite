@@ -8,53 +8,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Configuration - move these to a separate config file in production
-define('ADMIN_PASSWORD_HASH', password_hash('yourSecurePassword123', PASSWORD_DEFAULT));
 define('PDF_UPLOAD_DIR', '../foglietto/pdfs');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 
-// Initialize variables
-$message = '';
-$is_authenticated = false;
-
-// Check authentication
-if (isset($_SESSION['is_authenticated']) && 
-    $_SESSION['is_authenticated'] && 
-    $_SESSION['ip'] === $_SERVER['REMOTE_ADDR']) {
-    $is_authenticated = true;
-}
-
-// Handle login
-if (isset($_POST['login'])) {
-    if (!empty($_POST['password']) && password_verify($_POST['password'], ADMIN_PASSWORD_HASH)) {
-        $_SESSION['is_authenticated'] = true;
-        $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
-        $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
-        $is_authenticated = true;
-        header('Location: admin.php');
-        exit;
-    } else {
-        $message = '<div class="alert alert-error">Password errata. Riprova.</div>';
-    }
-}
-
-// Handle logout
-if (isset($_GET['logout'])) {
-    session_unset();
-    session_destroy();
-    header('Location: admin.php');
-    exit;
-}
-
 // Handle file upload
-if ($is_authenticated && isset($_FILES['pdf_file'])) {
-    // Verify session consistency
-    if ($_SESSION['user_agent'] !== $_SERVER['HTTP_USER_AGENT']) {
-        session_unset();
-        session_destroy();
-        header('Location: admin.php');
-        exit;
-    }
-
+if (isset($_FILES['pdf_file'])) {
     // Create upload directory if it doesn't exist
     if (!file_exists(PDF_UPLOAD_DIR)) {
         if (!mkdir(PDF_UPLOAD_DIR, 0755, true)) {
