@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://cpsangiorgio.it/index.html</loc>
+  </url>
+  <url>
+    <loc>https://cpsangiorgio.it/home.html</loc>
+  </url>
+  <url>
+    <loc>https://cpsangiorgio.it/pages/index.html</loc>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://cpsangiorgio.it/pages/chi-siamo.html</loc>
+  </url>
+  <url>
+    <loc>https://cpsangiorgio.it/pages/contatti.html</loc>
+  </url>
+  <url>
+    <loc>https://cpsangiorgio.it/pages/eventi.html</loc>
+  </url>
+  <url>
+    <loc>https://cpsangiorgio.it/pages/privacy.html</loc>
+  </url>
+  <url>
+    <loc>https://cpsangiorgio.it/pages/work.html</loc>
+  </url>
+  <url>
+    <loc>https://cpsangiorgio.it/pages/foglietto/index.php</loc>
+    <priority>1.0</priority>
+  </url>
+</urlset>
