@@ -12,7 +12,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['user_tag'] = $user['tag'];
-        header("Location: hub.php");
+        header("Location: adminHub.php");
         exit();
     } else {
         $error = "Invalid credentials";
