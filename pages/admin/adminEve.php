@@ -1,3 +1,8 @@
+<?php
+include 'config.php';
+checkAuth();
+checkTag('admin'); // Allowed tags
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
