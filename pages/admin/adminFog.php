@@ -11,6 +11,8 @@ ini_set('display_errors', 1);
 define('PDF_UPLOAD_DIR', '../foglietto/pdfs');
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB
 
+$message = '';
+
 // Handle file upload
 if (isset($_FILES['pdf_file'])) {
     // Create upload directory if it doesn't exist
@@ -107,26 +109,9 @@ function uploadErrorToString($error) {
 
             <?php echo $message; ?>
 
-            <?php if (!$is_authenticated): ?>
-                <!-- Login Form -->
-                <section class="card main-card">
-                    <div class="card-content">
-                        <h3><i class="fas fa-lock"></i> Accesso Admin</h3>
-                        <form method="post" action="admin.php">
-                            <input type="hidden" name="login" value="1">
-                            <div class="form-group">
-                                <label for="password">Password:</label>
-                                <input type="password" id="password" name="password" required>
-                            </div>
-                            <button type="submit" class="button primary">Accedi</button>
-                        </form>
-                    </div>
-                </section>
-
-            <?php else: ?>
-                <!-- Upload Form -->
-                <section class="card main-card">
-                    <div class="card-content">
+            <!-- Upload Form -->
+            <section class="card main-card">
+                <div class="card-content">
                         <h3><i class="fas fa-upload"></i> Carica PDF</h3>
                         <form method="post" action="admin.php" enctype="multipart/form-data">
                             <div class="form-group">
@@ -184,7 +169,6 @@ function uploadErrorToString($error) {
                         <?php endif; ?>
                     </div>
                 </section>
-            <?php endif; ?>
         </div>
     </main>
 </body>
