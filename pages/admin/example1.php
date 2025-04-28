@@ -10,7 +10,7 @@ checkTag('admin,student'); // Allowed tags
     <!-- Load Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Admin CSS (optional) -->
-    <link rel="stylesheet" href="../static/css/admin.css">
+    <link rel="stylesheet" href="../../static/css/styles.css">
 </head>
 <body>
     <div id="nav-placeholder"></div>
