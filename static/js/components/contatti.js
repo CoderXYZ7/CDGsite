@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Form submitted with data:', data);
             
             // Show success message
-            alert('Grazie per averci contattato! Ti risponderemo il prima possibile.');
+            alert('Questo form non è attualmente funzionante, prova a scrivere direttamente alla mail fornita sulla pagina contatti.');
             
             // Reset form
             contactForm.reset();
