@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <li><a href="${basePath}pages/foglietto/index.php"><i class="fas fa-file"></i>Foglietto</a></li>
             <li><a href="${basePath}pages/eventi.html"><i class="fas fa-calendar"></i>Eventi</a></li>
             <li><a href="${basePath}pages/chi-siamo.html"><i class="fas fa-users"></i>Chi Siamo</a></li>
+            <li><a href="${basePath}pages/segreteria.html"><i class="fas fa-address-book"></i>Segreteria</a></li>
             <li><a href="${basePath}pages/contatti.html"><i class="fas fa-envelope"></i>Contatti</a></li>
         </ul>
         <a class="collapsible-list"><i class="fas fa-chevron-right collapsible-icon"></i>Parrochie</a>
