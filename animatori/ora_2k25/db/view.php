@@ -142,6 +142,18 @@ foreach ($animatori_responsabili as $rel) {
                     </select>
                 </div>
             </div>
+            <div class="stat-card">
+                    <h3><?= $stats['total_responsabili'] ?></h3>
+                    <p>Responsabili</p>
+                </div>
+                <div class="stat-card">
+                    <h3><?= $stats['total_animatori'] ?></h3>
+                    <p>Animatori</p>
+                </div>
+                <div class="stat-card">
+                    <h3><?= $stats['fascia_a'] ?> / <?= $stats['fascia_d'] ?></h3>
+                    <p>Fascia A / Fascia D</p>
+                </div>
         </div>
 
         <!-- Animatori per Laboratorio -->
@@ -346,42 +358,6 @@ foreach ($animatori_responsabili as $rel) {
     </script>
 </body>
 </html>
-                <div class="stat-card">
-                    <h3><?= $stats['total_responsabili'] ?></h3>
-                    <p>Responsabili</p>
-                </div>
-                <div class="stat-card">
-                    <h3><?= $stats['total_animatori'] ?></h3>
-                    <p>Animatori</p>
-                </div>
-                <div class="stat-card">
-                    <h3><?= $stats['fascia_a'] ?> / <?= $stats['fascia_d'] ?></h3>
-                    <p>Fascia A / Fascia D</p>
-                </div>
-            </div>
-            
-            <h3>Distribuzione Colori</h3>
-            <div class="color-legend">
-                <div class="legend-item">
-                    <span class="badge badge-colore-b">Blu</span>
-                    <span><?= $stats['colore_b'] ?> animatori</span>
-                </div>
-                <div class="legend-item">
-                    <span class="badge badge-colore-r">Rosso</span>
-                    <span><?= $stats['colore_r'] ?> animatori</span>
-                </div>
-                <div class="legend-item">
-                    <span class="badge badge-colore-g">Giallo</span>
-                    <span><?= $stats['colore_g'] ?> animatori</span>
-                </div>
-                <div class="legend-item">
-                    <span class="badge badge-colore-a">Arancione</span>
-                    <span><?= $stats['colore_a'] ?> animatori</span>
-                </div>
-                <div class="legend-item">
-                    <span class="badge badge-gray">Non assegnato</span>
-                    <span><?= $stats['no_colore'] ?> animatori</span>
-                </div>
             </div>
         </div>
 
