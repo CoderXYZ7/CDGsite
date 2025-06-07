@@ -991,9 +991,6 @@ foreach ($animatori_responsabili as $rel) {
                         </div>
                         <?php endforeach; ?>
                     </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
             
             <div id="no-results" class="empty-state" style="display: none;">
                 <i class="fas fa-search"></i>
@@ -1063,7 +1060,7 @@ foreach ($animatori_responsabili as $rel) {
                         data-m="<?= $anim['M'] ?>" 
                         data-j="<?= $anim['J'] ?>" 
                         data-s="<?= $anim['S'] ?>"
-                        data-search="<?=                        data-search="<?= htmlspecialchars(strtolower($anim['Nome'] . ' ' . $anim['Cognome'] . ' ' . $anim['LaboratorioNome'])) ?>">
+                        data-search="<?= htmlspecialchars(strtolower($anim['Nome'] . ' ' . $anim['Cognome'] . ' ' . $anim['LaboratorioNome'])) ?>">
                         <td><?= htmlspecialchars($anim['Nome']) ?></td>
                         <td><?= htmlspecialchars($anim['Cognome']) ?></td>
                         <td><?= htmlspecialchars($anim['LaboratorioNome']) ?></td>
