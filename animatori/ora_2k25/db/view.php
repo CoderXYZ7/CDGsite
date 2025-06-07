@@ -132,17 +132,7 @@ foreach ($animatori_responsabili as $rel) {
                     <h3><?= $stats['total_laboratori'] ?></h3>
                     <p>Laboratori</p>
                 </div>
-                <div class="filter-group">
-                    <label>Categoria:</label>
-                    <select id="filter-categoria">
-                        <option value="">Tutte</option>
-                        <option value="M">Mini</option>
-                        <option value="J">Juniores</option>
-                        <option value="S">Seniores</option>
-                    </select>
-                </div>
-            </div>
-            <div class="stat-card">
+                <div class="stat-card">
                     <h3><?= $stats['total_responsabili'] ?></h3>
                     <p>Responsabili</p>
                 </div>
@@ -154,6 +144,7 @@ foreach ($animatori_responsabili as $rel) {
                     <h3><?= $stats['fascia_a'] ?> / <?= $stats['fascia_d'] ?></h3>
                     <p>Fascia A / Fascia D</p>
                 </div>
+            </div>
         </div>
 
         <!-- Animatori per Laboratorio -->
