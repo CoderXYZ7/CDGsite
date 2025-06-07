@@ -416,3 +416,18 @@ foreach ($animatori_responsabili as $rel) {
                         <option value="A">Arancione</option>
                         <option value="X">Non assegnato</option>
                     </select>
+                </div>
+                <div class="filter-group">
+                    <label>Categoria:</label>
+                    <select id="filter-categoria">
+                        <option value="">Tutte</option>
+                        <option value="M">M</option>
+                        <option value="J">J</option>
+                        <option value="S">S</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
