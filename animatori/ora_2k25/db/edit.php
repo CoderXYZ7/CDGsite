@@ -56,7 +56,7 @@ if ($_POST) {
         
         // Delete operations
         if (isset($_POST['delete_lab'])) {
-            $stmt = $pdo->prepare("DELETE FROM Laboratori WHERE ID = ? AND ID != 0");
+            $stmt = $pdo->prepare("DELETE FROM Laboratori WHERE ID = ? AND ID != 13");
             $stmt->execute([$_POST['lab_id']]);
             $success = "Laboratorio eliminato!";
         }
@@ -179,7 +179,7 @@ $animatori = $pdo->query("
                         <td><?= htmlspecialchars($lab['Nome']) ?></td>
                         <td><?= htmlspecialchars($lab['Descrizione']) ?></td>
                         <td>
-                            <?php if ($lab['ID'] != 0): ?>
+                            <?php if ($lab['ID'] != 13): ?>
                             <form method="POST" style="display: inline;">
                                 <input type="hidden" name="lab_id" value="<?= $lab['ID'] ?>">
                                 <button type="submit" name="delete_lab" class="btn btn-danger" onclick="return confirm('Sei sicuro?')">Elimina</button>
@@ -268,7 +268,7 @@ $animatori = $pdo->query("
                             <option value="X">X (Non assegnato)</option>
                             <option value="B">B (Blu)</option>
                             <option value="R">R (Rosso)</option>
-                            <option value="G">G (Verde)</option>
+                            <option value="G">G (Giallo)</option>
                             <option value="A">A (Arancione)</option>
                         </select>
                     </div>
@@ -277,15 +277,15 @@ $animatori = $pdo->query("
                         <div class="checkbox-group">
                             <div class="checkbox-item">
                                 <input type="checkbox" name="anim_m" value="M" id="m">
-                                <label for="m">Martedì</label>
+                                <label for="m">Mini (M)</label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" name="anim_j" value="J" id="j">
-                                <label for="j">Giovedì</label>
+                                <label for="j">Juniores (J)</label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" name="anim_s" value="S" id="s">
-                                <label for="s">Sabato</label>
+                                <label for="s">Seniores (S)</label>
                             </div>
                         </div>
                     </div>
@@ -313,7 +313,7 @@ $animatori = $pdo->query("
                         <th>Laboratorio</th>
                         <th>Fascia</th>
                         <th>Colore</th>
-                        <th>Giorni</th>
+                        <th>Categorie</th>
                         <th>Azioni</th>
                     </tr>
                 </thead>
@@ -332,11 +332,11 @@ $animatori = $pdo->query("
                         </td>
                         <td>
                             <?php 
-                            $giorni = [];
-                            if ($anim['M'] == 'M') $giorni[] = 'Mar';
-                            if ($anim['J'] == 'J') $giorni[] = 'Gio';
-                            if ($anim['S'] == 'S') $giorni[] = 'Sab';
-                            echo implode(', ', $giorni) ?: 'Nessuno';
+                            $categorie = [];
+                            if ($anim['M'] == 'M') $categorie[] = 'Mini';
+                            if ($anim['J'] == 'J') $categorie[] = 'Juniores';
+                            if ($anim['S'] == 'S') $categorie[] = 'Seniores';
+                            echo implode(', ', $categorie) ?: 'Nessuna';
                             ?>
                         </td>
                         <td>
