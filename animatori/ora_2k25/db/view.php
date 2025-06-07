@@ -1,673 +1,298 @@
+<?php
+// Database configuration
+$host = 'localhost';
+$dbname = 'ora_2k25';
+$username = 'lettore';
+$password = 'password_lettore';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
+// Fetch all data with relationships
+$laboratori = $pdo->query("
+    SELECT l.*, COUNT(a.ID) as NumAnimatori 
+    FROM Laboratori l 
+    LEFT JOIN Animatori a ON l.ID = a.Laboratorio 
+    GROUP BY l.ID 
+    ORDER BY l.Nome
+")->fetchAll();
+
+$responsabili = $pdo->query("
+    SELECT r.*, COUNT(ar.AnimatoreID) as NumAnimatori 
+    FROM Responsabili r 
+    LEFT JOIN Animatori_Responsabili ar ON r.ID = ar.ResponsabileID 
+    GROUP BY r.ID 
+    ORDER BY r.Nome
+")->fetchAll();
+
+$animatori = $pdo->query("
+    SELECT a.*, l.Nome as LaboratorioNome 
+    FROM Animatori a 
+    JOIN Laboratori l ON a.Laboratorio = l.ID 
+    ORDER BY a.Cognome, a.Nome
+")->fetchAll();
+
+// Get animator-responsible relationships
+$animatori_responsabili = $pdo->query("
+    SELECT ar.*, a.Nome as AnimatoreNome, a.Cognome as AnimatoreCognome, r.Nome as ResponsabileNome
+    FROM Animatori_Responsabili ar
+    JOIN Animatori a ON ar.AnimatoreID = a.ID
+    JOIN Responsabili r ON ar.ResponsabileID = r.ID
+    ORDER BY a.Cognome, a.Nome
+")->fetchAll();
+
+// Statistics
+$stats = [
+    'total_laboratori' => count($laboratori),
+    'total_responsabili' => count($responsabili),
+    'total_animatori' => count($animatori),
+    'fascia_a' => count(array_filter($animatori, fn($a) => $a['Fascia'] == 'A')),
+    'fascia_d' => count(array_filter($animatori, fn($a) => $a['Fascia'] == 'D')),
+    'colore_b' => count(array_filter($animatori, fn($a) => $a['Colore'] == 'B')),
+    'colore_r' => count(array_filter($animatori, fn($a) => $a['Colore'] == 'R')),
+    'colore_g' => count(array_filter($animatori, fn($a) => $a['Colore'] == 'G')),
+    'colore_a' => count(array_filter($animatori, fn($a) => $a['Colore'] == 'A')),
+    'no_colore' => count(array_filter($animatori, fn($a) => $a['Colore'] == 'X'))
+];
+
+// Group animators by laboratory
+$animatori_per_laboratorio = [];
+foreach ($animatori as $anim) {
+    $animatori_per_laboratorio[$anim['LaboratorioNome']][] = $anim;
+}
+
+// Group animators by responsible
+$animatori_per_responsabile = [];
+foreach ($animatori_responsabili as $rel) {
+    $animatori_per_responsabile[$rel['ResponsabileNome']][] = $rel;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ORA 2025 - Database Viewer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <title>Visualizzazione Database ORA 2025</title>
     <style>
-        :root {
-            --primary: #3498db;
-            --secondary: #2ecc71;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --info: #1abc9c;
-            --light: #f8f9fa;
-            --dark: #343a40;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
-        }
-        
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.5rem;
-        }
-        
-        .dashboard-card {
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-        }
-        
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .card-icon {
-            font-size: 2rem;
-            opacity: 0.8;
-        }
-        
-        .section-header {
-            border-left: 5px solid var(--primary);
-            padding-left: 15px;
-            margin-bottom: 25px;
-        }
-        
-        .badge-fascia-a { background-color: var(--secondary); }
-        .badge-fascia-d { background-color: var(--info); }
-        .badge-colore-b { background-color: #3498db; }
-        .badge-colore-r { background-color: var(--danger); }
-        .badge-colore-g { background-color: #f1c40f; }
-        .badge-colore-a { background-color: var(--warning); }
-        
-        .animator-card {
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            transition: all 0.2s ease;
-            border: 1px solid #e9ecef;
-        }
-        
-        .animator-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary);
-        }
-        
-        .laboratory-header {
-            background-color: rgba(52, 152, 219, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .responsabile-header {
-            background-color: rgba(46, 204, 113, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .table-responsive {
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-        
-        .filter-section {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .legend-item {
-            display: inline-flex;
-            align-items: center;
-            margin-right: 15px;
-            margin-bottom: 5px;
-        }
-        
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-            margin-right: 5px;
-            display: inline-block;
-        }
-        
-        .category-badge {
-            font-size: 0.75rem;
-            margin-right: 3px;
-        }
-        
-        .nav-pills .nav-link.active {
-            background-color: var(--primary);
-        }
-        
-        .tab-content {
-            background-color: white;
-            border-radius: 0 0 8px 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        @media (max-width: 768px) {
-            .dashboard-card {
-                margin-bottom: 15px;
-            }
-        }
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .section { background: white; margin: 20px 0; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .section h2 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-top: 0; }
+        .section h3 { color: #555; margin-top: 25px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+        .stat-card h3 { margin: 0; font-size: 2em; }
+        .stat-card p { margin: 5px 0 0 0; opacity: 0.9; }
+        .table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        .table th { background-color: #f8f9fa; font-weight: bold; }
+        .table tr:hover { background-color: #f5f5f5; }
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; white-space: nowrap; }
+        .badge-fascia-a { background-color: #28a745; color: white; }
+        .badge-fascia-d { background-color: #17a2b8; color: white; }
+        .badge-colore-b { background-color: #007bff; color: white; }
+        .badge-colore-r { background-color: #dc3545; color: white; }
+        .badge-colore-g { background-color: #ffd700; color: black; }
+        .badge-colore-a { background-color: #ffc107; color: black; }
+        .badge-gray { background-color: #6c757d; color: white; }
+        .nav { display: flex; gap: 20px; margin-bottom: 30px; }
+        .nav a { text-decoration: none; color: #007bff; font-weight: bold; }
+        .nav a:hover { text-decoration: underline; }
+        .lab-section { margin: 20px 0; padding: 15px; border-left: 4px solid #007bff; background-color: #f8f9fa; }
+        .resp-section { margin: 20px 0; padding: 15px; border-left: 4px solid #28a745; background-color: #f0f8f0; }
+        .animator-card { display: inline-block; margin: 5px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; background: white; min-width: 200px; }
+        .giorni-disponibili { font-size: 12px; color: #666; margin-top: 5px; }
+        .filters { display: flex; gap: 15px; margin: 20px 0; flex-wrap: wrap; align-items: center; }
+        .filter-group { display: flex; align-items: center; gap: 5px; }
+        .filter-group label { font-weight: bold; }
+        .filter-group select { padding: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        .color-legend { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <i class="bi bi-people-fill me-2"></i>
-                ORA 2025
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#"><i class="bi bi-eye-fill me-1"></i> Visualizza</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="edit.php"><i class="bi bi-pencil-fill me-1"></i> Modifica</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container mb-5">
-        <!-- Dashboard Stats -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card dashboard-card text-white bg-primary">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2">Laboratori</h6>
-                                <h2 class="card-title mb-0"><?= $stats['total_laboratori'] ?></h2>
-                            </div>
-                            <i class="bi bi-house-door card-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card dashboard-card text-white bg-success">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2">Responsabili</h6>
-                                <h2 class="card-title mb-0"><?= $stats['total_responsabili'] ?></h2>
-                            </div>
-                            <i class="bi bi-person-badge card-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card dashboard-card text-white bg-info">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2">Animatori</h6>
-                                <h2 class="card-title mb-0"><?= $stats['total_animatori'] ?></h2>
-                            </div>
-                            <i class="bi bi-people card-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card dashboard-card text-white bg-warning">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="card-subtitle mb-2">Fasce</h6>
-                                <h2 class="card-title mb-0"><?= $stats['fascia_a'] ?> / <?= $stats['fascia_d'] ?></h2>
-                                <small>A / D</small>
-                            </div>
-                            <i class="bi bi-tags card-icon"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="container">
+        <h1>Visualizzazione Database ORA 2025</h1>
+        
+        <div class="nav">
+            <a href="edit.php">Modifica</a>
+            <a href="view.php">Visualizza</a>
         </div>
 
-        <!-- Filters Section -->
-        <div class="filter-section mb-4">
-            <h4 class="section-header">Filtri</h4>
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Laboratorio</label>
-                    <select class="form-select" id="filter-lab">
-                        <option value="">Tutti</option>
-                        <?php foreach ($laboratori as $lab): ?>
-                        <option value="<?= htmlspecialchars($lab['Nome']) ?>"><?= htmlspecialchars($lab['Nome']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
+        <!-- Statistics Section -->
+        <div class="section">
+            <h2>Statistiche Generali</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3><?= $stats['total_laboratori'] ?></h3>
+                    <p>Laboratori</p>
                 </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label">Fascia</label>
-                    <select class="form-select" id="filter-fascia">
-                        <option value="">Tutte</option>
-                        <option value="A">Fascia A</option>
-                        <option value="D">Fascia D</option>
-                    </select>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label">Colore</label>
-                    <select class="form-select" id="filter-colore">
-                        <option value="">Tutti</option>
-                        <option value="B">Blu</option>
-                        <option value="R">Rosso</option>
-                        <option value="G">Giallo</option>
-                        <option value="A">Arancione</option>
-                        <option value="X">Non assegnato</option>
-                    </select>
-                </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label">Categoria</label>
-                    <select class="form-select" id="filter-categoria">
+                <div class="filter-group">
+                    <label>Categoria:</label>
+                    <select id="filter-categoria">
                         <option value="">Tutte</option>
                         <option value="M">Mini</option>
                         <option value="J">Juniores</option>
                         <option value="S">Seniores</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3 d-flex align-items-end">
-                    <button class="btn btn-outline-secondary w-100" id="reset-filters">
-                        <i class="bi bi-arrow-counterclockwise me-1"></i> Resetta filtri
-                    </button>
-                </div>
-            </div>
-            
-            <div class="mt-3">
-                <h5 class="mb-3">Legenda colori:</h5>
-                <div>
-                    <span class="legend-item"><span class="legend-color bg-primary"></span> Blu (<?= $stats['colore_b'] ?>)</span>
-                    <span class="legend-item"><span class="legend-color bg-danger"></span> Rosso (<?= $stats['colore_r'] ?>)</span>
-                    <span class="legend-item"><span class="legend-color" style="background-color: #f1c40f;"></span> Giallo (<?= $stats['colore_g'] ?>)</span>
-                    <span class="legend-item"><span class="legend-color bg-warning"></span> Arancione (<?= $stats['colore_a'] ?>)</span>
-                    <span class="legend-item"><span class="legend-color bg-secondary"></span> Non assegnato (<?= $stats['no_colore'] ?>)</span>
-                </div>
             </div>
         </div>
 
-        <!-- Main Content Tabs -->
-        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="pills-animatori-tab" data-bs-toggle="pill" data-bs-target="#pills-animatori" type="button">
-                    <i class="bi bi-people me-1"></i> Animatori
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-laboratori-tab" data-bs-toggle="pill" data-bs-target="#pills-laboratori" type="button">
-                    <i class="bi bi-house-door me-1"></i> Laboratori
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="pills-responsabili-tab" data-bs-toggle="pill" data-bs-target="#pills-responsabili" type="button">
-                    <i class="bi bi-person-badge me-1"></i> Responsabili
-                </button>
-            </li>
-        </ul>
-        
-        <div class="tab-content" id="pills-tabContent">
-            <!-- Animatori Tab -->
-            <div class="tab-pane fade show active" id="pills-animatori" role="tabpanel">
-                <div class="mb-5">
-                    <h4 class="section-header">Per Laboratorio</h4>
-                    <?php foreach ($animatori_per_laboratorio as $lab_nome => $animatori_lab): ?>
-                    <div class="laboratory-header" data-lab="<?= htmlspecialchars($lab_nome) ?>">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">
-                                <?= htmlspecialchars($lab_nome) ?>
-                                <span class="badge bg-primary rounded-pill"><?= count($animatori_lab) ?> animatori</span>
-                            </h5>
-                            <small class="text-muted"><?= $laboratori[array_search($lab_nome, array_column($laboratori, 'Nome'))]['Descrizione'] ?? '' ?></small>
+        <!-- Animatori per Laboratorio -->
+        <div class="section">
+            <h2>Animatori per Laboratorio</h2>
+            <?php foreach ($animatori_per_laboratorio as $lab_nome => $animatori_lab): ?>
+            <div class="lab-section">
+                <h3><?= htmlspecialchars($lab_nome) ?> (<?= count($animatori_lab) ?> animatori)</h3>
+                <div>
+                    <?php foreach ($animatori_lab as $anim): ?>
+                    <div class="animator-card" data-lab="<?= htmlspecialchars($lab_nome) ?>" data-fascia="<?= $anim['Fascia'] ?>" data-colore="<?= $anim['Colore'] ?>" data-m="<?= $anim['M'] ?>" data-j="<?= $anim['J'] ?>" data-s="<?= $anim['S'] ?>">
+                        <strong><?= htmlspecialchars($anim['Nome'] . ' ' . $anim['Cognome']) ?></strong><br>
+                        <span class="badge badge-fascia-<?= strtolower($anim['Fascia']) ?>"><?= $anim['Fascia'] ?></span>
+                        <?php if ($anim['Colore'] != 'X'): ?>
+                        <span class="badge badge-colore-<?= strtolower($anim['Colore']) ?>"><?= $anim['Colore'] ?></span>
+                        <?php else: ?>
+                        <span class="badge badge-gray">No colore</span>
+                        <?php endif; ?>
+                        <div class="giorni-disponibili">
+                            <?php 
+                            $categorie = [];
+                            if ($anim['M'] == 'M') $categorie[] = 'Mini';
+                            if ($anim['J'] == 'J') $categorie[] = 'Juniores';
+                            if ($anim['S'] == 'S') $categorie[] = 'Seniores';
+                            echo 'Categorie: ' . (implode(', ', $categorie) ?: 'Nessuna');
+                            ?>
                         </div>
-                    </div>
-                    
-                    <div class="row">
-                        <?php foreach ($animatori_lab as $anim): ?>
-                        <div class="col-md-4 mb-3 animator-card" 
-                             data-lab="<?= htmlspecialchars($lab_nome) ?>" 
-                             data-fascia="<?= $anim['Fascia'] ?>" 
-                             data-colore="<?= $anim['Colore'] ?>" 
-                             data-m="<?= $anim['M'] ?>" 
-                             data-j="<?= $anim['J'] ?>" 
-                             data-s="<?= $anim['S'] ?>">
-                            <div class="card h-100">
-                                <div class="card-body">
-                                    <h5 class="card-title">
-                                        <?= htmlspecialchars($anim['Nome'] . ' ' . $anim['Cognome']) ?>
-                                    </h5>
-                                    <div class="mb-2">
-                                        <span class="badge <?= $anim['Fascia'] == 'A' ? 'bg-success' : 'bg-info' ?> me-1">
-                                            Fascia <?= $anim['Fascia'] ?>
-                                        </span>
-                                        <?php if ($anim['Colore'] != 'X'): ?>
-                                        <span class="badge <?= 
-                                            $anim['Colore'] == 'B' ? 'bg-primary' : 
-                                            ($anim['Colore'] == 'R' ? 'bg-danger' : 
-                                            ($anim['Colore'] == 'G' ? 'text-dark bg-warning' : 'bg-warning')) ?>">
-                                            <?= $anim['Colore'] ?>
-                                        </span>
-                                        <?php else: ?>
-                                        <span class="badge bg-secondary">No colore</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="mb-2">
-                                        <?php if ($anim['M'] == 'M'): ?>
-                                        <span class="badge category-badge bg-info text-dark">Mini</span>
-                                        <?php endif; ?>
-                                        <?php if ($anim['J'] == 'J'): ?>
-                                        <span class="badge category-badge bg-success">Juniores</span>
-                                        <?php endif; ?>
-                                        <?php if ($anim['S'] == 'S'): ?>
-                                        <span class="badge category-badge bg-primary">Seniores</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <?php
-                                    $resp_animatore = array_filter($animatori_responsabili, fn($r) => 
-                                        $r['AnimatoreNome'] == $anim['Nome'] && $r['AnimatoreCognome'] == $anim['Cognome']);
-                                    if (!empty($resp_animatore)): ?>
-                                    <div class="mt-2">
-                                        <small class="text-muted">Responsabili:</small>
-                                        <div>
-                                            <?php foreach ($resp_animatore as $rel): ?>
-                                            <span class="badge bg-light text-dark"><?= $rel['ResponsabileNome'] ?></span>
-                                            <?php endforeach; ?>
-                                        </div>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
                     </div>
                     <?php endforeach; ?>
                 </div>
-                
-                <?php if (!empty($animatori_per_responsabile)): ?>
-                <div class="mb-5">
-                    <h4 class="section-header">Per Responsabile</h4>
-                    <?php foreach ($animatori_per_responsabile as $resp_nome => $animatori_resp): ?>
-                    <div class="responsabile-header">
-                        <h5><?= htmlspecialchars($resp_nome) ?> <span class="badge bg-success rounded-pill"><?= count($animatori_resp) ?> animatori</span></h5>
-                    </div>
-                    
-                    <div class="row">
-                        <?php foreach ($animatori_resp as $rel): ?>
-                        <div class="col-md-3 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">
-                                        <?= htmlspecialchars($rel['AnimatoreNome'] . ' ' . $rel['AnimatoreCognome']) ?>
-                                    </h6>
-                                    <small class="text-muted">
-                                        <?= $animatori[array_search($rel['AnimatoreID'], array_column($animatori, 'ID'))]['LaboratorioNome'] ?? '' ?>
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Animatori per Responsabile -->
+        <?php if (!empty($animatori_per_responsabile)): ?>
+        <div class="section">
+            <h2>Animatori per Responsabile</h2>
+            <?php foreach ($animatori_per_responsabile as $resp_nome => $animatori_resp): ?>
+            <div class="resp-section">
+                <h3><?= htmlspecialchars($resp_nome) ?> (<?= count($animatori_resp) ?> animatori)</h3>
+                <div>
+                    <?php foreach ($animatori_resp as $rel): ?>
+                    <span class="animator-card">
+                        <?= htmlspecialchars($rel['AnimatoreNome'] . ' ' . $rel['AnimatoreCognome']) ?>
+                    </span>
                     <?php endforeach; ?>
                 </div>
-                <?php endif; ?>
-                
-                <div>
-                    <h4 class="section-header">Elenco Completo</h4>
-                    <div class="table-responsive">
-                        <table class="table table-hover" id="animatori-table">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Cognome</th>
-                                    <th>Laboratorio</th>
-                                    <th>Fascia</th>
-                                    <th>Colore</th>
-                                    <th>Categorie</th>
-                                    <th>Responsabili</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($animatori as $anim): ?>
-                                <tr data-lab="<?= htmlspecialchars($anim['LaboratorioNome']) ?>" 
-                                    data-fascia="<?= $anim['Fascia'] ?>" 
-                                    data-colore="<?= $anim['Colore'] ?>" 
-                                    data-m="<?= $anim['M'] ?>" 
-                                    data-j="<?= $anim['J'] ?>" 
-                                    data-s="<?= $anim['S'] ?>">
-                                    <td><?= htmlspecialchars($anim['Nome']) ?></td>
-                                    <td><?= htmlspecialchars($anim['Cognome']) ?></td>
-                                    <td><?= htmlspecialchars($anim['LaboratorioNome']) ?></td>
-                                    <td>
-                                        <span class="badge <?= $anim['Fascia'] == 'A' ? 'bg-success' : 'bg-info' ?>">
-                                            <?= $anim['Fascia'] ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <?php if ($anim['Colore'] != 'X'): ?>
-                                        <span class="badge <?= 
-                                            $anim['Colore'] == 'B' ? 'bg-primary' : 
-                                            ($anim['Colore'] == 'R' ? 'bg-danger' : 
-                                            ($anim['Colore'] == 'G' ? 'text-dark bg-warning' : 'bg-warning')) ?>">
-                                            <?= $anim['Colore'] ?>
-                                        </span>
-                                        <?php else: ?>
-                                        <span class="badge bg-secondary">Non assegnato</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <?php 
-                                        $categorie = [];
-                                        if ($anim['M'] == 'M') $categorie[] = '<span class="badge bg-info text-dark">Mini</span>';
-                                        if ($anim['J'] == 'J') $categorie[] = '<span class="badge bg-success">Juniores</span>';
-                                        if ($anim['S'] == 'S') $categorie[] = '<span class="badge bg-primary">Seniores</span>';
-                                        echo implode(' ', $categorie) ?: '<span class="badge bg-light text-dark">Nessuna</span>';
-                                        ?>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        $resp_animatore = array_filter($animatori_responsabili, fn($r) => 
-                                            $r['AnimatoreNome'] == $anim['Nome'] && $r['AnimatoreCognome'] == $anim['Cognome']);
-                                        $nomi_resp = array_map(fn($r) => '<span class="badge bg-light text-dark">'.$r['ResponsabileNome'].'</span>', $resp_animatore);
-                                        echo implode(' ', $nomi_resp) ?: '<span class="badge bg-light text-dark">Nessuno</span>';
-                                        ?>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
-            
-            <!-- Laboratori Tab -->
-            <div class="tab-pane fade" id="pills-laboratori" role="tabpanel">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nome</th>
-                                <th>Descrizione</th>
-                                <th>Animatori</th>
-                                <th>Dettagli</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($laboratori as $lab): ?>
-                            <tr>
-                                <td><strong><?= htmlspecialchars($lab['Nome']) ?></strong></td>
-                                <td><?= htmlspecialchars($lab['Descrizione']) ?></td>
-                                <td>
-                                    <span class="badge bg-primary rounded-pill"><?= $lab['NumAnimatori'] ?></span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#labModal<?= $lab['ID'] ?>">
-                                        <i class="bi bi-eye"></i> Visualizza
-                                    </button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- Responsabili Tab -->
-            <div class="tab-pane fade" id="pills-responsabili" role="tabpanel">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Nome</th>
-                                <th>Descrizione</th>
-                                <th>Animatori</th>
-                                <th>Dettagli</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($responsabili as $resp): ?>
-                            <tr>
-                                <td><strong><?= htmlspecialchars($resp['Nome']) ?></strong></td>
-                                <td><?= htmlspecialchars($resp['Descrizione']) ?></td>
-                                <td>
-                                    <span class="badge bg-success rounded-pill"><?= $resp['NumAnimatori'] ?></span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#respModal<?= $resp['ID'] ?>">
-                                        <i class="bi bi-eye"></i> Visualizza
-                                    </button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+
+        <!-- Tabella Completa Animatori -->
+        <div class="section">
+            <h2>Elenco Completo Animatori</h2>
+            <table class="table" id="animatori-table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Cognome</th>
+                        <th>Laboratorio</th>
+                        <th>Fascia</th>
+                        <th>Colore</th>
+                        <th>Categorie</th>
+                        <th>Responsabili</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($animatori as $anim): ?>
+                    <tr data-lab="<?= htmlspecialchars($anim['LaboratorioNome']) ?>" data-fascia="<?= $anim['Fascia'] ?>" data-colore="<?= $anim['Colore'] ?>" data-m="<?= $anim['M'] ?>" data-j="<?= $anim['J'] ?>" data-s="<?= $anim['S'] ?>">
+                        <td><?= htmlspecialchars($anim['Nome']) ?></td>
+                        <td><?= htmlspecialchars($anim['Cognome']) ?></td>
+                        <td><?= htmlspecialchars($anim['LaboratorioNome']) ?></td>
+                        <td><span class="badge badge-fascia-<?= strtolower($anim['Fascia']) ?>"><?= $anim['Fascia'] ?></span></td>
+                        <td>
+                            <?php if ($anim['Colore'] != 'X'): ?>
+                            <span class="badge badge-colore-<?= strtolower($anim['Colore']) ?>"><?= $anim['Colore'] ?></span>
+                            <?php else: ?>
+                            <span class="badge badge-gray">Non assegnato</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php 
+                            $categorie = [];
+                            if ($anim['M'] == 'M') $categorie[] = 'Mini';
+                            if ($anim['J'] == 'J') $categorie[] = 'Juniores';
+                            if ($anim['S'] == 'S') $categorie[] = 'Seniores';
+                            echo implode(', ', $categorie) ?: 'Nessuna';
+                            ?>
+                        </td>
+                        <td>
+                            <?php
+                            $resp_animatore = array_filter($animatori_responsabili, fn($r) => $r['AnimatoreNome'] == $anim['Nome'] && $r['AnimatoreCognome'] == $anim['Cognome']);
+                            $nomi_resp = array_map(fn($r) => $r['ResponsabileNome'], $resp_animatore);
+                            echo implode(', ', $nomi_resp) ?: 'Nessuno';
+                            ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tabella Laboratori -->
+        <div class="section">
+            <h2>Laboratori</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrizione</th>
+                        <th>Numero Animatori</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($laboratori as $lab): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($lab['Nome']) ?></td>
+                        <td><?= htmlspecialchars($lab['Descrizione']) ?></td>
+                        <td><?= $lab['NumAnimatori'] ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Tabella Responsabili -->
+        <div class="section">
+            <h2>Responsabili</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrizione</th>
+                        <th>Numero Animatori</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($responsabili as $resp): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($resp['Nome']) ?></td>
+                        <td><?= htmlspecialchars($resp['Descrizione']) ?></td>
+                        <td><?= $resp['NumAnimatori'] ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <!-- Laboratori Modals -->
-    <?php foreach ($laboratori as $lab): ?>
-    <div class="modal fade" id="labModal<?= $lab['ID'] ?>" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><?= htmlspecialchars($lab['Nome']) ?></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p><?= htmlspecialchars($lab['Descrizione']) ?></p>
-                    
-                    <h6 class="mt-4">Animatori (<?= $lab['NumAnimatori'] ?>)</h6>
-                    <?php if ($lab['NumAnimatori'] > 0): ?>
-                    <div class="row">
-                        <?php 
-                        $lab_animatori = array_filter($animatori, fn($a) => $a['Laboratorio'] == $lab['ID']);
-                        foreach ($lab_animatori as $anim): ?>
-                        <div class="col-md-6 mb-2">
-                            <div class="card animator-card">
-                                <div class="card-body py-2">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong><?= htmlspecialchars($anim['Nome'] . ' ' . $anim['Cognome']) ?></strong>
-                                            <div>
-                                                <span class="badge <?= $anim['Fascia'] == 'A' ? 'bg-success' : 'bg-info' ?> me-1">
-                                                    <?= $anim['Fascia'] ?>
-                                                </span>
-                                                <?php if ($anim['Colore'] != 'X'): ?>
-                                                <span class="badge <?= 
-                                                    $anim['Colore'] == 'B' ? 'bg-primary' : 
-                                                    ($anim['Colore'] == 'R' ? 'bg-danger' : 
-                                                    ($anim['Colore'] == 'G' ? 'text-dark bg-warning' : 'bg-warning')) ?>">
-                                                    <?= $anim['Colore'] ?>
-                                                </span>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                        <div class="text-end">
-                                            <?php 
-                                            $categorie = [];
-                                            if ($anim['M'] == 'M') $categorie[] = '<span class="badge bg-info text-dark">Mini</span>';
-                                            if ($anim['J'] == 'J') $categorie[] = '<span class="badge bg-success">Juniores</span>';
-                                            if ($anim['S'] == 'S') $categorie[] = '<span class="badge bg-primary">Seniores</span>';
-                                            echo implode(' ', $categorie);
-                                            ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php else: ?>
-                    <div class="alert alert-info">Nessun animatore assegnato a questo laboratorio.</div>
-                    <?php endif; ?>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endforeach; ?>
-    
-    <!-- Responsabili Modals -->
-    <?php foreach ($responsabili as $resp): ?>
-    <div class="modal fade" id="respModal<?= $resp['ID'] ?>" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><?= htmlspecialchars($resp['Nome']) ?></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p><?= htmlspecialchars($resp['Descrizione']) ?></p>
-                    
-                    <h6 class="mt-4">Animatori (<?= $resp['NumAnimatori'] ?>)</h6>
-                    <?php if ($resp['NumAnimatori'] > 0): ?>
-                    <div class="row">
-                        <?php 
-                        $resp_animatori = array_filter($animatori_responsabili, fn($r) => $r['ResponsabileID'] == $resp['ID']);
-                        foreach ($resp_animatori as $rel): 
-                            $anim = $animatori[array_search($rel['AnimatoreID'], array_column($animatori, 'ID'))];
-                        ?>
-                        <div class="col-md-6 mb-2">
-                            <div class="card animator-card">
-                                <div class="card-body py-2">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong><?= htmlspecialchars($rel['AnimatoreNome'] . ' ' . $rel['AnimatoreCognome']) ?></strong>
-                                            <div>
-                                                <span class="text-muted"><?= $anim['LaboratorioNome'] ?? '' ?></span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <span class="badge <?= $anim['Fascia'] == 'A' ? 'bg-success' : 'bg-info' ?> me-1">
-                                                <?= $anim['Fascia'] ?>
-                                            </span>
-                                            <?php if ($anim['Colore'] != 'X'): ?>
-                                            <span class="badge <?= 
-                                                $anim['Colore'] == 'B' ? 'bg-primary' : 
-                                                ($anim['Colore'] == 'R' ? 'bg-danger' : 
-                                                ($anim['Colore'] == 'G' ? 'text-dark bg-warning' : 'bg-warning')) ?>">
-                                                <?= $anim['Colore'] ?>
-                                            </span>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php else: ?>
-                    <div class="alert alert-info">Nessun animatore assegnato a questo responsabile.</div>
-                    <?php endif; ?>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <?php endforeach; ?>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Filter functionality
         function applyFilters() {
@@ -688,7 +313,7 @@
                     if (!hasCategoria) show = false;
                 }
                 
-                card.style.display = show ? '' : 'none';
+                card.style.display = show ? 'inline-block' : 'none';
             });
             
             // Filter table rows
@@ -707,31 +332,87 @@
             });
             
             // Update lab section visibility
-            document.querySelectorAll('.laboratory-header').forEach(section => {
-                const labName = section.dataset.lab;
-                const visibleCards = document.querySelectorAll(`.animator-card[data-lab="${labName}"][style*="block"], 
-                                                              .animator-card[data-lab="${labName}"]:not([style*="none"])`).length;
-                section.style.display = visibleCards > 0 ? '' : 'none';
+            document.querySelectorAll('.lab-section').forEach(section => {
+                const visibleCards = section.querySelectorAll('.animator-card[style*="inline-block"], .animator-card:not([style*="none"])').length;
+                section.style.display = visibleCards > 0 ? 'block' : 'none';
             });
         }
-        
-        // Reset filters
-        document.getElementById('reset-filters').addEventListener('click', function() {
-            document.getElementById('filter-lab').value = '';
-            document.getElementById('filter-fascia').value = '';
-            document.getElementById('filter-colore').value = '';
-            document.getElementById('filter-categoria').value = '';
-            applyFilters();
-        });
         
         // Add event listeners to filters
         document.getElementById('filter-lab').addEventListener('change', applyFilters);
         document.getElementById('filter-fascia').addEventListener('change', applyFilters);
         document.getElementById('filter-colore').addEventListener('change', applyFilters);
         document.getElementById('filter-categoria').addEventListener('change', applyFilters);
-        
-        // Initialize filters
-        applyFilters();
     </script>
 </body>
 </html>
+                <div class="stat-card">
+                    <h3><?= $stats['total_responsabili'] ?></h3>
+                    <p>Responsabili</p>
+                </div>
+                <div class="stat-card">
+                    <h3><?= $stats['total_animatori'] ?></h3>
+                    <p>Animatori</p>
+                </div>
+                <div class="stat-card">
+                    <h3><?= $stats['fascia_a'] ?> / <?= $stats['fascia_d'] ?></h3>
+                    <p>Fascia A / Fascia D</p>
+                </div>
+            </div>
+            
+            <h3>Distribuzione Colori</h3>
+            <div class="color-legend">
+                <div class="legend-item">
+                    <span class="badge badge-colore-b">Blu</span>
+                    <span><?= $stats['colore_b'] ?> animatori</span>
+                </div>
+                <div class="legend-item">
+                    <span class="badge badge-colore-r">Rosso</span>
+                    <span><?= $stats['colore_r'] ?> animatori</span>
+                </div>
+                <div class="legend-item">
+                    <span class="badge badge-colore-g">Giallo</span>
+                    <span><?= $stats['colore_g'] ?> animatori</span>
+                </div>
+                <div class="legend-item">
+                    <span class="badge badge-colore-a">Arancione</span>
+                    <span><?= $stats['colore_a'] ?> animatori</span>
+                </div>
+                <div class="legend-item">
+                    <span class="badge badge-gray">Non assegnato</span>
+                    <span><?= $stats['no_colore'] ?> animatori</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="section">
+            <h2>Filtri di Visualizzazione</h2>
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Laboratorio:</label>
+                    <select id="filter-lab">
+                        <option value="">Tutti</option>
+                        <?php foreach ($laboratori as $lab): ?>
+                        <option value="<?= htmlspecialchars($lab['Nome']) ?>"><?= htmlspecialchars($lab['Nome']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Fascia:</label>
+                    <select id="filter-fascia">
+                        <option value="">Tutte</option>
+                        <option value="A">Fascia A</option>
+                        <option value="D">Fascia D</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Colore:</label>
+                    <select id="filter-colore">
+                        <option value="">Tutti</option>
+                        <option value="B">Blu</option>
+                        <option value="R">Rosso</option>
+                        <option value="G">Giallo</option>
+                        <option value="A">Arancione</option>
+                        <option value="X">Non assegnato</option>
+                    </select>
