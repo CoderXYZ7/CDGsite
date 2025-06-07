@@ -147,11 +147,58 @@ foreach ($animatori_responsabili as $rel) {
             </div>
         </div>
 
+        <!-- Filters -->
+        <div class="section">
+            <h2>Filtri di Visualizzazione</h2>
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Laboratorio:</label>
+                    <select id="filter-lab">
+                        <option value="">Tutti</option>
+                        <?php foreach ($laboratori as $lab): ?>
+                        <option value="<?= htmlspecialchars($lab['Nome']) ?>"><?= htmlspecialchars($lab['Nome']) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Fascia:</label>
+                    <select id="filter-fascia">
+                        <option value="">Tutte</option>
+                        <option value="A">Fascia A</option>
+                        <option value="D">Fascia D</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Colore:</label>
+                    <select id="filter-colore">
+                        <option value="">Tutti</option>
+                        <option value="B">Blu</option>
+                        <option value="R">Rosso</option>
+                        <option value="G">Giallo</option>
+                        <option value="A">Arancione</option>
+                        <option value="X">Non assegnato</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Categoria:</label>
+                    <select id="filter-categoria">
+                        <option value="">Tutte</option>
+                        <option value="M">Mini</option>
+                        <option value="J">Juniores</option>
+                        <option value="S">Seniores</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button onclick="clearFilters()" style="padding: 5px 10px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Pulisci Filtri</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Animatori per Laboratorio -->
         <div class="section">
             <h2>Animatori per Laboratorio</h2>
             <?php foreach ($animatori_per_laboratorio as $lab_nome => $animatori_lab): ?>
-            <div class="lab-section">
+            <div class="lab-section" data-lab="<?= htmlspecialchars($lab_nome) ?>">
                 <h3><?= htmlspecialchars($lab_nome) ?> (<?= count($animatori_lab) ?> animatori)</h3>
                 <div>
                     <?php foreach ($animatori_lab as $anim): ?>
@@ -304,6 +351,8 @@ foreach ($animatori_responsabili as $rel) {
             const filterColore = document.getElementById('filter-colore').value;
             const filterCategoria = document.getElementById('filter-categoria').value;
             
+            console.log('Applying filters:', { filterLab, filterFascia, filterColore, filterCategoria });
+            
             // Filter animator cards
             document.querySelectorAll('.animator-card').forEach(card => {
                 let show = true;
@@ -336,65 +385,32 @@ foreach ($animatori_responsabili as $rel) {
             
             // Update lab section visibility
             document.querySelectorAll('.lab-section').forEach(section => {
-                const visibleCards = section.querySelectorAll('.animator-card[style*="inline-block"], .animator-card:not([style*="none"])').length;
-                section.style.display = visibleCards > 0 ? 'block' : 'none';
+                const visibleCards = section.querySelectorAll('.animator-card').length;
+                const hiddenCards = section.querySelectorAll('.animator-card[style*="none"]').length;
+                const hasVisibleCards = (visibleCards - hiddenCards) > 0;
+                section.style.display = hasVisibleCards ? 'block' : 'none';
             });
         }
         
-        // Add event listeners to filters
-        document.getElementById('filter-lab').addEventListener('change', applyFilters);
-        document.getElementById('filter-fascia').addEventListener('change', applyFilters);
-        document.getElementById('filter-colore').addEventListener('change', applyFilters);
-        document.getElementById('filter-categoria').addEventListener('change', applyFilters);
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('filter-lab').value = '';
+            document.getElementById('filter-fascia').value = '';
+            document.getElementById('filter-colore').value = '';
+            document.getElementById('filter-categoria').value = '';
+            applyFilters();
+        }
+        
+        // Wait for DOM to be fully loaded before attaching event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners to filters
+            document.getElementById('filter-lab').addEventListener('change', applyFilters);
+            document.getElementById('filter-fascia').addEventListener('change', applyFilters);
+            document.getElementById('filter-colore').addEventListener('change', applyFilters);
+            document.getElementById('filter-categoria').addEventListener('change', applyFilters);
+            
+            console.log('Filter event listeners attached successfully');
+        });
     </script>
-</body>
-</html>
-            </div>
-        </div>
-
-        <!-- Filters -->
-        <div class="section">
-            <h2>Filtri di Visualizzazione</h2>
-            <div class="filters">
-                <div class="filter-group">
-                    <label>Laboratorio:</label>
-                    <select id="filter-lab">
-                        <option value="">Tutti</option>
-                        <?php foreach ($laboratori as $lab): ?>
-                        <option value="<?= htmlspecialchars($lab['Nome']) ?>"><?= htmlspecialchars($lab['Nome']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Fascia:</label>
-                    <select id="filter-fascia">
-                        <option value="">Tutte</option>
-                        <option value="A">Fascia A</option>
-                        <option value="D">Fascia D</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Colore:</label>
-                    <select id="filter-colore">
-                        <option value="">Tutti</option>
-                        <option value="B">Blu</option>
-                        <option value="R">Rosso</option>
-                        <option value="G">Giallo</option>
-                        <option value="A">Arancione</option>
-                        <option value="X">Non assegnato</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Categoria:</label>
-                    <select id="filter-categoria">
-                        <option value="">Tutte</option>
-                        <option value="M">M</option>
-                        <option value="J">J</option>
-                        <option value="S">S</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
