@@ -90,7 +90,7 @@ foreach ($Animatori as $person) {
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 95%;
             margin: 0 auto;
         }
         
