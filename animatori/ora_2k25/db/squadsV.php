@@ -240,7 +240,7 @@ foreach ($Animatori as $person) {
 </head>
 <body>
     <div class="container">
-        <h1>Squad Management System</h1>
+        <h1>Squadre oratorio 2k25</h1>
         
         <div class="squads-container">
             <?php foreach ($squads as $squadName => $sections): ?>
@@ -248,7 +248,7 @@ foreach ($Animatori as $person) {
                 <div class="squad-header">
                     Squad <?php echo $squadName; ?> 
                     <?php 
-                    $squadColors = ['R' => '(Red)', 'B' => '(Blue)', 'A' => '(Orange)', 'G' => '(Yellow)'];
+                    $squadColors = ['R' => '(Rosso)', 'B' => '(Blu)', 'A' => '(Arancione)', 'G' => '(Giallo)'];
                     echo isset($squadColors[$squadName]) ? $squadColors[$squadName] : '';
                     ?>
                 </div>
