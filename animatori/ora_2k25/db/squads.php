@@ -27,11 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $section = $input['section'];
                 
                 // Reset all sections first
-                $stmt = $pdo->prepare("UPDATE people SET M='X', J='X', S='X' WHERE ID = ?");
+                $stmt = $pdo->prepare("UPDATE Animatori SET M='X', J='X', S='X' WHERE ID = ?");
                 $stmt->execute([$id]);
                 
                 // Update color
-                $stmt = $pdo->prepare("UPDATE people SET Colore = ? WHERE ID = ?");
+                $stmt = $pdo->prepare("UPDATE Animatori SET Colore = ? WHERE ID = ?");
                 $stmt->execute([$colore, $id]);
                 
                 // Set the specific section if not unassigned
@@ -46,15 +46,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch all people
-$stmt = $pdo->query("SELECT ID, Nome, Cognome, Fascia, Colore, M, J, S FROM people ORDER BY Nome, Cognome");
-$people = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch all Animatori
+$stmt = $pdo->query("SELECT ID, Nome, Cognome, Fascia, Colore, M, J, S FROM Animatori ORDER BY Nome, Cognome");
+$Animatori = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Organize people by squad and section
+// Organize Animatori by squad and section
 $squads = [];
 $unassigned = [];
 
-foreach ($people as $person) {
+foreach ($Animatori as $person) {
     if ($person['Colore'] === 'X') {
         $unassigned[] = $person;
     } else {
@@ -286,7 +286,7 @@ foreach ($people as $person) {
     <script>
         let draggedElement = null;
         
-        // Add event listeners to all people
+        // Add event listeners to all Animatori
         document.querySelectorAll('.person').forEach(person => {
             person.addEventListener('dragstart', handleDragStart);
             person.addEventListener('dragend', handleDragEnd);
