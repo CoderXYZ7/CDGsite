@@ -103,7 +103,7 @@ foreach ($Animatori as $person) {
         .squads-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            gap: 5px;
             margin-bottom: 30px;
         }
         
@@ -111,7 +111,7 @@ foreach ($Animatori as $person) {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
+            padding: 5px;
         }
         
         .squad-header {
@@ -131,7 +131,7 @@ foreach ($Animatori as $person) {
         
         .sections {
             display: flex;
-            gap: 10px;
+            gap: 5px;
         }
         
         .section {
