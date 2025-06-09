@@ -1,0 +1,59 @@
+{
+    "orari": [
+        {
+            "orario": "07:00",
+            "attivita": "Ritrovo e Colazione",
+            "descrizione": "Ritrovo degli animatori e colazione insieme"
+        },
+        {
+            "orario": "07:30",
+            "attivita": "Lodi - Apertura Preaccoglienza",
+            "descrizione": "Preghiera delle Lodi mattutine e preparazione all'accoglienza"
+        },
+        {
+            "orario": "08:00",
+            "attivita": "Apertura Cancelli",
+            "descrizione": "Inizio dell'accoglienza dei ragazzi"
+        },
+        {
+            "orario": "08:30",
+            "attivita": "Inizio Formativo",
+            "descrizione": "Momento di formazione e riflessione"
+        },
+        {
+            "orario": "09:30",
+            "attivita": "Inizio Laboratori",
+            "descrizione": "Attività creative e manuali"
+        },
+        {
+            "orario": "10:30",
+            "attivita": "Inizio Merenda",
+            "descrizione": "Pausa per la merenda"
+        },
+        {
+            "orario": "10:45",
+            "attivita": "Inizio Giochi",
+            "descrizione": "Giochi di gruppo e attività ricreative"
+        },
+        {
+            "orario": "12:00",
+            "attivita": "Saluti",
+            "descrizione": "Momento di congedo mattutino"
+        },
+        {
+            "orario": "12:30",
+            "attivita": "Apertura Cancelli - Riunione Animatori",
+            "descrizione": "Uscita dei ragazzi e inizio riunione per gli animatori"
+        },
+        {
+            "orario": "13:00 circa",
+            "attivita": "Fine riunione animatori",
+            "descrizione": "Termine della riunione mattutina"
+        },
+        {
+            "orario": "15:30",
+            "attivita": "Fine Pomeriggio - Riunione Animatori",
+            "descrizione": "Termine delle attività e riunione conclusiva"
+        }
+    ]
+}
