@@ -120,12 +120,10 @@ foreach ($people as $person) {
             color: white;
         }
         
-        .squad-A .squad-header { background-color: #e74c3c; }
+        .squad-R .squad-header { background-color: #e74c3c; }
         .squad-B .squad-header { background-color: #3498db; }
-        .squad-C .squad-header { background-color: #2ecc71; }
-        .squad-D .squad-header { background-color: #f39c12; }
-        .squad-E .squad-header { background-color: #9b59b6; }
-        .squad-F .squad-header { background-color: #1abc9c; }
+        .squad-A .squad-header { background-color: #ff8c00; }
+        .squad-G .squad-header { background-color: #ffd700; color: #333; }
         
         .sections {
             display: flex;
@@ -242,7 +240,13 @@ foreach ($people as $person) {
         <div class="squads-container">
             <?php foreach ($squads as $squadName => $sections): ?>
             <div class="squad squad-<?php echo $squadName; ?>">
-                <div class="squad-header">Squad <?php echo $squadName; ?></div>
+                <div class="squad-header">
+                    Squad <?php echo $squadName; ?> 
+                    <?php 
+                    $squadColors = ['R' => '(Red)', 'B' => '(Blue)', 'A' => '(Orange)', 'G' => '(Yellow)'];
+                    echo isset($squadColors[$squadName]) ? $squadColors[$squadName] : '';
+                    ?>
+                </div>
                 <div class="sections">
                     <?php foreach (['M', 'J', 'S'] as $sectionName): ?>
                     <div class="section" data-squad="<?php echo $squadName; ?>" data-section="<?php echo $sectionName; ?>">
