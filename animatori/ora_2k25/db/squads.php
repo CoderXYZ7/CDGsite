@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Set the specific section if not unassigned
                 if ($colore !== 'X' && $section !== '') {
-                    $stmt = $pdo->prepare("UPDATE your_table_name SET $section = ? WHERE ID = ?");
+                    $stmt = $pdo->prepare("UPDATE Animatori SET $section = ? WHERE ID = ?");
                     $stmt->execute([$section, $id]);
                 }
                 
