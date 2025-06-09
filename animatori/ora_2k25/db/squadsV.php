@@ -246,7 +246,7 @@ foreach ($Animatori as $person) {
             <?php foreach ($squads as $squadName => $sections): ?>
             <div class="squad squad-<?php echo $squadName; ?>">
                 <div class="squad-header">
-                    Squad <?php echo $squadName; ?> 
+                    Squadra <?php echo $squadName; ?> 
                     <?php 
                     $squadColors = ['R' => '(Rosso)', 'B' => '(Blu)', 'A' => '(Arancione)', 'G' => '(Giallo)'];
                     echo isset($squadColors[$squadName]) ? $squadColors[$squadName] : '';
