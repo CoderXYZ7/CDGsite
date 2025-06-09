@@ -3,6 +3,58 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Simple password authentication
+session_start();
+$correct_password = 'ora_2k25_psw'; // Change this to your desired password
+
+if ($_POST['password'] ?? null) {
+    if ($_POST['password'] === $correct_password) {
+        $_SESSION['authenticated'] = true;
+    } else {
+        $error_message = 'Incorrect password';
+    }
+}
+
+if ($_GET['logout'] ?? null) {
+    session_destroy();
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+if (!($_SESSION['authenticated'] ?? false)) {
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Login - Squad Management</title>
+        <style>
+            body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+            .login-form { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
+            .login-form h2 { margin-bottom: 20px; color: #333; }
+            .login-form input[type="password"] { width: 200px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin: 10px; }
+            .login-form input[type="submit"] { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+            .login-form input[type="submit"]:hover { background: #0056b3; }
+            .error { color: #e74c3c; margin-top: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="login-form">
+            <h2>Squad Management Login</h2>
+            <form method="post">
+                <input type="password" name="password" placeholder="Enter password" required>
+                <br>
+                <input type="submit" value="Login">
+            </form>
+            <?php if (isset($error_message)): ?>
+                <div class="error"><?php echo $error_message; ?></div>
+            <?php endif; ?>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
 $host = 'localhost';
 $dbname = 'ora_2k25';
 $username = 'editor';
