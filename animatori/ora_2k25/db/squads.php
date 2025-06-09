@@ -1,8 +1,12 @@
 <?php
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $host = 'localhost';
 $dbname = 'ora_2k25';
-$username = 'lettore';
-$password = 'password_lettore';
+$username = 'editor';
+$password = 'password_editor';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
@@ -23,11 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $section = $input['section'];
                 
                 // Reset all sections first
-                $stmt = $pdo->prepare("UPDATE your_table_name SET M='X', J='X', S='X' WHERE ID = ?");
+                $stmt = $pdo->prepare("UPDATE people SET M='X', J='X', S='X' WHERE ID = ?");
                 $stmt->execute([$id]);
                 
                 // Update color
-                $stmt = $pdo->prepare("UPDATE your_table_name SET Colore = ? WHERE ID = ?");
+                $stmt = $pdo->prepare("UPDATE people SET Colore = ? WHERE ID = ?");
                 $stmt->execute([$colore, $id]);
                 
                 // Set the specific section if not unassigned
@@ -43,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch all people
-$stmt = $pdo->query("SELECT ID, Nome, Cognome, Fascia, Colore, M, J, S FROM your_table_name ORDER BY Nome, Cognome");
+$stmt = $pdo->query("SELECT ID, Nome, Cognome, Fascia, Colore, M, J, S FROM people ORDER BY Nome, Cognome");
 $people = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Organize people by squad and section
