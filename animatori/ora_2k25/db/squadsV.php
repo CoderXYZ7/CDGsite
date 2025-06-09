@@ -270,7 +270,7 @@ foreach ($Animatori as $person) {
         </div>
         
         <div class="unassigned-container">
-            <div class="unassigned-header">Unassigned People</div>
+            <div class="unassigned-header">Persone non assegnate</div>
             <div class="unassigned-area" data-squad="X" data-section="">
                 <?php foreach ($unassigned as $person): ?>
                 <div class="person" draggable="true" data-id="<?php echo $person['ID']; ?>">
