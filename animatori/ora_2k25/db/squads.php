@@ -1,8 +1,8 @@
 <?php
 $host = 'localhost';
 $dbname = 'ora_2k25';
-$username = 'editor';
-$password = 'password_editor';
+$username = 'lettore';
+$password = 'password_lettore';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);

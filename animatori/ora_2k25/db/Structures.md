@@ -1,4 +1,5 @@
-Animatori
+# Animatori
+
 - ID            |id animatore, non null, auto incrementale
 - Nome          |nome animatore, non null
 - Cognome       |cognome animatore, non null
@@ -9,11 +10,13 @@ Animatori
 - M,J,S         |M = mini, J = juniores, S = seniores, se vuoto allora = X, non null
 
 Laboratori
+
 - ID            |id laboratorio, non null auto incrementale
 - Nome          |nome laboratorio, non null
 - Descrizione   |descrizione
 
 Responsabili
+
 - ID            |id responsabilità, non null, auto incrementing
 - Nome          |nome responsabilità, non null
 - Descrizione   |descrizione
