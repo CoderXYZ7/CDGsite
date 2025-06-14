@@ -132,7 +132,7 @@ header h1 {
 }
 
 .contenuto {
-    padding: 20px;
+    padding: 5px;
     background-color: white;
     position: relative;
     border-radius: 6px;
@@ -142,13 +142,13 @@ header h1 {
 
 .contenuto h3 {
     color: var(--primary-color);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.1rem;
 }
 
 .orario {
     font-weight: bold;
     color: var(--accent-color);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.1rem;
 }
 
 .loader {
