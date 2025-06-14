@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         events.forEach((event, index) => {
             const eventElement = document.createElement('div');
-            eventElement.className = `evento ${index % 2 === 0 ? 'left' : 'right'}`;
+            eventElement.className = `evento ${index % 2 === 0 ? 'left' : 'left'}`;
             
             eventElement.innerHTML = `
                 <div class="contenuto">
