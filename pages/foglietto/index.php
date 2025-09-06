@@ -115,10 +115,8 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         </div>
     </main>
     
-    <!-- Mobile menu button -->
-    <button class="mobile-menu-btn">
-        <i class="fas fa-bars"></i>
-    </button>
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
 
     <!-- PDF.js Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
@@ -595,11 +593,6 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             }
         });
 
-        // Mobile menu toggle
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            document.querySelector('.main-nav').classList.toggle('active');
-        });
-        
         // Handle keyboard events for navigation
         document.addEventListener('keydown', function(e) {
             if (!pdfDoc) return;

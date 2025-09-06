@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     const basePath = calculateBasePath();
-    console.log('Calculated base path:', basePath);
+    
 
     // Navigation HTML with dynamic paths
     const navHtml = `<nav class="main-nav">
@@ -40,16 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
         </ul>
         <a class="collapsible-list"><i class="fas fa-chevron-right collapsible-icon"></i>Parrochie</a>
         <div class="collapsible-content">
-            <a class="card-link" href="https://www.cpsangiorgio.it/home.html">Tutte le parrochie</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/sangiorgio">San Giorgio di Nogaro</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/marano">Marano</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/porpetto">Porpetto</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/castello">Castello</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/carlino">Carlino</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/corgnolo">Corgnolo</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/portonogaro">Porto Nogaro</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/villanova">Villanova</a>
-            <a class="card-link" href="https://www.cpsangiorgio.it/zellina">Zellina</a>
+            <a class="card-link" href="${basePath}pages/tutteLeParrocchie.html">Tutte le parrochie</a>
+            <a class="card-link" href="${basePath}pages/sangiorgio.html">San Giorgio di Nogaro</a>
+            <a class="card-link" href="${basePath}pages/marano.html">Marano</a>
+            <a class="card-link" href="${basePath}pages/porpetto.html">Porpetto</a>
+            <a class="card-link" href="${basePath}pages/castello.html">Castello</a>
+            <a class="card-link" href="${basePath}pages/carlino.html">Carlino</a>
+            <a class="card-link" href="${basePath}pages/corgnolo.html">Corgnolo</a>
+            <a class="card-link" href="${basePath}pages/portonogaro.html">Porto Nogaro</a>
+            <a class="card-link" href="${basePath}pages/villanova.html">Villanova</a>
+            <a class="card-link" href="${basePath}pages/zellina.html">Zellina</a>
         </div>
     </nav>
     <button class="nav-toggle-btn" aria-label="Toggle menu">
