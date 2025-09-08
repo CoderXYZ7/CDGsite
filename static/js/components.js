@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <h1>Collaborazione Pastorale</h1>
         </div>
         <ul class="nav-list">
-            <li><a href="${basePath}pages/index.html"><i class="fas fa-home"></i>Home</a></li>
+            <li><a href="${basePath}index.html"><i class="fas fa-home"></i>Home</a></li>
             <li><a href="${basePath}pages/foglietto/index.php"><i class="fas fa-file"></i>Foglietto</a></li>
             <li><a href="${basePath}pages/eventi.html"><i class="fas fa-calendar"></i>Eventi</a></li>
             <li><a href="${basePath}pages/chi-siamo.html"><i class="fas fa-users"></i>Chi Siamo</a></li>
