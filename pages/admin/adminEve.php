@@ -59,8 +59,177 @@ checkTag('admin'); // Allowed tags
             background-color: var(--light-gray);
             margin: 0;
             padding: var(--space-xl);
-            max-width: 1200px;
-            margin: 0 auto;
+            margin-left: 280px;
+            max-width: calc(100vw - 280px);
+            box-sizing: border-box;
+        }
+
+        /* Sidebar Navigation Styles */
+        .main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background-color: #2c3e50;
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .main-nav .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #34495e;
+        }
+
+        .main-nav .logo img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
+        .main-nav .logo h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: white;
+        }
+
+        .main-nav .admin-user-info {
+            padding: 15px 20px;
+            border-bottom: 1px solid #34495e;
+            background-color: #34495e;
+        }
+
+        .main-nav .welcome-msg {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .main-nav .logout-btn {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e74c3c;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            transition: background-color 0.3s;
+        }
+
+        .main-nav .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        .main-nav .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .main-nav .nav-list li {
+            border-bottom: 1px solid #34495e;
+        }
+
+        .main-nav .nav-list a {
+            display: block;
+            padding: 15px 20px;
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .main-nav .nav-list a:hover {
+            background-color: #34495e;
+            padding-left: 25px;
+        }
+
+        .main-nav .nav-list a.active {
+            background-color: #3498db;
+            border-left: 4px solid #2980b9;
+        }
+
+        .main-nav .nav-list i {
+            margin-right: 10px;
+            width: 16px;
+        }
+
+        /* Mobile Navigation */
+        .nav-toggle-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .nav-toggle-btn {
+                display: block;
+            }
+
+            .main-nav {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-nav.active {
+                transform: translateX(0);
+            }
+
+            body {
+                margin-left: 0;
+                max-width: 100vw;
+                padding: var(--space-md);
+            }
+
+            body.nav-open {
+                overflow: hidden;
+            }
+
+            .main-nav .admin-quick-actions {
+                display: block;
+                padding: 15px 20px;
+                border-top: 1px solid #34495e;
+            }
+
+            .main-nav .quick-actions-btn {
+                width: 100%;
+                padding: 10px;
+                background: #34495e;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.9rem;
+            }
+
+            .main-nav .quick-actions-menu {
+                display: none;
+                background: #34495e;
+                border-radius: 4px;
+                margin-top: 5px;
+                overflow: hidden;
+            }
+
+            .main-nav .quick-actions-menu a {
+                display: block;
+                padding: 10px 15px;
+                color: white;
+                border-bottom: 1px solid #2c3e50;
+                font-size: 0.85rem;
+            }
         }
         
         h1, h2, h3 {
@@ -288,6 +457,11 @@ checkTag('admin'); // Allowed tags
     </style>
 </head>
 <body>
+    <!-- Mobile Menu Toggle -->
+    <button class="nav-toggle-btn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+
     <div id="nav-placeholder"></div>
     <main class="main-wrapper">
         <h1>Event Scheduler</h1>
