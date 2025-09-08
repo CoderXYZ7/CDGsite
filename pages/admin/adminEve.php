@@ -308,7 +308,7 @@ checkTag('admin'); // Allowed tags
                     <button onclick="showCustomDateDialog()" class="secondary">Custom Date</button>
                 </div>
                 <div class="form-group">
-                    <label for="event-time">Time (24h format):</label>
+                    <label for="event-time">Time:</label>
                     <input type="time" id="event-time">
                 </div>
                 <div class="form-row">
