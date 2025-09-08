@@ -39,111 +39,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 <html>
 <head>
     <title>Login</title>
-    <style>
-        :root {
-            --primary-blue: #1a365d;
-            --accent-red: #e53e3e;
-            --light-gray: #f8f9fa;
-            --dark-gray: #333;
-            --white: #ffffff;
-        }
-        
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 2rem;
-        }
-        
-        .login-container {
-            background: var(--white);
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 2rem;
-            width: 100%;
-            max-width: 400px;
-        }
-        
-        h1 {
-            color: var(--primary-blue);
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2rem;
-        }
-        
-        .error {
-            color: var(--accent-red);
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--primary-blue);
-        }
-        
-        input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-        
-        .password-container {
-            position: relative;
-        }
-        
-        .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--primary-blue);
-            cursor: pointer;
-        }
-        
-        .button {
-            background-color: var(--accent-red);
-            color: var(--white);
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 4px;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        
-        .remember-me input {
-            width: auto;
-            margin-right: 0.5rem;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/login.css">
 </head>
 <body>
     <div class="login-container">
@@ -178,14 +74,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         </form>
     </div>
     
-    <script>
-        // Toggle password visibility
-        document.querySelector('.toggle-password').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'password' ? '👁️' : '🔒';
-        });
-    </script>
+    <script src="assets/login.js"></script>
 </body>
 </html>

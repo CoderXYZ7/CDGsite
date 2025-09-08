@@ -177,6 +177,6 @@ function uploadErrorToString($error) {
         </div>
     </main>
     <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
-    <script src="adminNav.js"></script>
+    <script src="assets/adminNav.js"></script>
 </body>
 </html>

@@ -8,45 +8,14 @@ checkAuth();
     <title>Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../static/css/styles.css">
-    <style>
-        :root {
-            --primary-color: #1a365d;
-            --accent-color: #e53e3e;
-            --nav-width: 280px;
-            --attention-color1: #e53e3e;
-            --attention-color2: #ff6a3d;
-        }
-
-        .attention {
-            color: white;
-            width: 90%;
-            padding: 10px;
-            margin-right: 8px;
-            border-radius: 8px;
-            margin: 10px auto 2rem;
-            background-color: var(--attention-color1);
-            animation: pulse 2s infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% {
-                background-color: var(--attention-color1);
-            }
-            50% {
-                background-color: var(--attention-color2);
-            }
-            100% {
-                background-color: var(--attention-color1);
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/adminHub.css">
 </head>
 <body>
     <div id="nav-placeholder"></div>
     <main class="main-wrapper">
         <h1>Welcome <?= htmlspecialchars($_SESSION['username']) ?></h1>
         <div class="attention">
-            <p>Notice: Attualmente solo la pagina FOGLIETTO è disponibile.</p>
+            <p>Notice: Le pagine Foglietto e Eventi sono ora disponibili.</p>
         </div>
         <h2>Available Pages:</h2>
         <?php
@@ -64,6 +33,6 @@ checkAuth();
         <a href="logout.php">Logout</a>
         <div id="admin-username" style="display: none;">
     </main>
-    <script src="adminNav.js"></script>
+    <script src="assets/adminNav.js"></script>
 </body>
 </html>

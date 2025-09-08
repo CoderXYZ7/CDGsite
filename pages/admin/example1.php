@@ -21,6 +21,6 @@ checkTag('admin,student'); // Allowed tags
     <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
     
     <!-- Load admin navigation script -->
-    <script src="adminNav.js"></script>
+    <script src="assets/adminNav.js"></script>
 </body>
 </html>

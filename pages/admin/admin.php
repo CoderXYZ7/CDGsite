@@ -64,6 +64,6 @@ $users = $db->query("SELECT * FROM users")->fetchAll();
         <a href="hub.php">Back to Hub</a>
     </main>
     <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
-    <script src="adminNav.js"></script>
+    <script src="assets/adminNav.js"></script>
 </body>
 </html>
