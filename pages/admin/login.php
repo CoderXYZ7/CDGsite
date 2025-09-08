@@ -1,9 +1,4 @@
 <?php include '../../config.php';
-// Start session securely
-session_start([
-    'cookie_secure' => true,
-    'cookie_httponly' => true
-]);
 
 // Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {

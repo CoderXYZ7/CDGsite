@@ -1,5 +1,11 @@
 <?php
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
+
+// Login database (MySQL)
 $host = "cpsangiorgio.it";
 $dbname = "ocpsange_login_system";
 $username = "ocpsange_login_user";
@@ -10,6 +16,22 @@ try {
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
     die("Connection failed: " . $e->getMessage());
+}
+
+// Events database (SQLite for now, can be switched to MySQL later)
+$events_db_type = "sqlite"; // Change to "mysql" for remote DB
+
+if ($events_db_type === "mysql") {
+    // Use same MySQL for events
+    $events_db = $db;
+} elseif ($events_db_type === "sqlite") {
+    $db_file = __DIR__ . "/events.db";
+    try {
+        $events_db = new PDO("sqlite:$db_file");
+        $events_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch(PDOException $e) {
+        die("Events database connection failed: " . $e->getMessage());
+    }
 }
 
 function checkAuth() {
