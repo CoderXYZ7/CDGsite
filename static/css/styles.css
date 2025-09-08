@@ -623,22 +623,21 @@ body {
     margin-bottom: 0.5rem;
 }
 
-/* Modern Timeline Styles */
+/* Modern Timeline Styles - Mobile Layout for All Devices */
 .timeline-container {
     position: relative;
     max-width: 900px;
     margin: 3rem auto;
-    padding: 2rem 0;
+    padding: 2rem 1rem;
 }
 
 .timeline-line {
     position: absolute;
-    left: 50%;
+    left: 30px;
     top: 0;
     bottom: 0;
-    width: 3px;
+    width: 2px;
     background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
-    transform: translateX(-50%);
     border-radius: 2px;
     z-index: 1;
 }
@@ -650,27 +649,16 @@ body {
 
 .timeline-item {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     margin: 3rem 0;
     position: relative;
 }
 
-.timeline-item:nth-child(even) .timeline-content {
-    flex-direction: row-reverse;
-    text-align: right;
-}
-
-.timeline-item:nth-child(even) .timeline-content h3,
-.timeline-item:nth-child(even) .timeline-content p {
-    text-align: right;
-}
-
 .timeline-marker {
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    left: 0;
+    top: 20px;
     width: 60px;
     height: 60px;
     background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
@@ -686,22 +674,24 @@ body {
 }
 
 .timeline-marker:hover {
-    transform: translate(-50%, -50%) scale(1.1);
+    transform: scale(1.1);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 .timeline-content {
     display: flex;
-    align-items: center;
-    gap: 2rem;
-    max-width: 600px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
     background: white;
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    position: relative;
+    margin-left: 90px;
+    max-width: calc(100% - 90px);
+    text-align: left;
 }
 
 .timeline-content:hover {
@@ -726,6 +716,7 @@ body {
     margin-bottom: 0.75rem;
     font-size: 1.3rem;
     font-weight: 600;
+    text-align: left;
 }
 
 .timeline-content p {
@@ -733,6 +724,7 @@ body {
     line-height: 1.6;
     margin: 0;
     font-size: 1rem;
+    text-align: left;
 }
 
 /* Contact Page */
