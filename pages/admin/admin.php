@@ -34,34 +34,68 @@ $users = $db->query("SELECT * FROM users")->fetchAll();
 <body>
     <div id="nav-placeholder"></div>
     <main class="main-wrapper">
-        <h1>Admin Panel</h1>
-        
-        <h2>Add User</h2>
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <select name="tag">
-                <option value="admin">Admin</option>
-                <option value="student">Student</option>
-            </select>
-            <button type="submit" name="add_user">Add User</button>
-        </form>
+        <div class="content">
+            <section class="hero">
+                <h1>Admin Panel</h1>
+                <p>Add or manage user accounts</p>
+            </section>
 
-        <h2>Manage Users</h2>
-        <form method="POST">
-            <?php foreach ($users as $user): ?>
-                <div>
-                    <?= htmlspecialchars($user['username']) ?>
-                    <select name="tags[<?= $user['id'] ?>]">
-                        <option value="admin" <?= $user['tag'] === 'admin' ? 'selected' : '' ?>>Admin</option>
-                        <option value="student" <?= $user['tag'] === 'student' ? 'selected' : '' ?>>Student</option>
-                    </select>
+            <section class="card main-card">
+                <div class="card-content">
+                    <h3><i class="fas fa-user-plus"></i> Add User</h3>
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" placeholder="Username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" placeholder="Password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tag">User Role</label>
+                            <select name="tag" id="tag">
+                                <option value="admin">Admin</option>
+                                <option value="student">Student</option>
+                            </select>
+                        </div>
+                        <button type="submit" name="add_user" class="button primary">Add User</button>
+                    </form>
                 </div>
-            <?php endforeach; ?>
-            <button type="submit" name="update_tags">Update Tags</button>
-        </form>
-        
-        <a href="hub.php">Back to Hub</a>
+            </section>
+
+            <section class="card main-card">
+                <div class="card-content">
+                    <h3><i class="fas fa-users-cog"></i> Manage Users</h3>
+                    <form method="POST">
+                        <table class="pdf-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($users as $user): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($user['username']) ?></td>
+                                        <td>
+                                            <select name="tags[<?= $user['id'] ?>]">
+                                                <option value="admin" <?= $user['tag'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                                                <option value="student" <?= $user['tag'] === 'student' ? 'selected' : '' ?>>Student</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                        <button type="submit" name="update_tags" class="button primary" style="margin-top: 1rem;">Update Roles</button>
+                    </form>
+                </div>
+            </section>
+            
+            <a href="adminHub.php" class="button secondary">Back to Hub</a>
+        </div>
     </main>
     <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
     <script src="assets/adminNav.js"></script>
