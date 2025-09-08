@@ -656,18 +656,9 @@ body {
     position: relative;
 }
 
-.timeline-item:nth-child(even) {
-    flex-direction: row-reverse;
-}
-
 .timeline-item:nth-child(even) .timeline-content {
-    margin-left: 4rem;
-    margin-right: 0;
-}
-
-.timeline-item:nth-child(odd) .timeline-content {
-    margin-right: 4rem;
-    margin-left: 0;
+    flex-direction: row-reverse;
+    text-align: right;
 }
 
 .timeline-item:nth-child(even) .timeline-content h3,
@@ -680,25 +671,23 @@ body {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1rem;
+    font-size: 1.2rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 4;
+    z-index: 3;
     transition: all 0.3s ease;
-    border: 2px solid white;
 }
 
 .timeline-marker:hover {
     transform: translate(-50%, -50%) scale(1.1);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    z-index: 5;
 }
 
 .timeline-content {
