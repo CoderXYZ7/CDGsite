@@ -1,4 +1,4 @@
-<?php include 'config.php';
+<?php include '../../config.php';
 // Start session securely
 session_start([
     'cookie_secure' => true,

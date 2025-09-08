@@ -7,7 +7,7 @@ This document outlines the identified issues, redundancies, and potential improv
 
 - **Project Structure:**
     - [x] **Unify `index.html`:** There are multiple `index.html` files. Decide on a single entry point for the site and remove the others to avoid confusion. The root `index.html` just redirects to `pages/index.html`, which is unnecessary.
-    - [ ] **Move `config.php`:** The `config.php` file containing database credentials should be moved outside of the web root directory to prevent it from being accessed directly from the browser.
+    - [x] **Move `config.php`:** The `config.php` file containing database credentials should be moved outside of the web root directory to prevent it from being accessed directly from the browser.
     - [x] **Remove test files:** The `pages/foglietto/testIndex.php` file seems to be a test file and should be removed from the production environment.
 - **Consistency:**
     - [x] **CSS Styling:** There are two CSS files, `styles.css` and `stylesViewer.css`. Consider merging them or at least making sure the styles are consistent and don't override each other unexpectedly.
@@ -43,7 +43,7 @@ This document outlines the identified issues, redundancies, and potential improv
 
 ## 4. Security
 
-- **`config.php` Location:** As mentioned before, move `config.php` outside the web root. This is a critical security vulnerability.
+- [x] **`config.php` Location:** As mentioned before, move `config.php` outside the web root. This is a critical security vulnerability.
 - **SQL Injection:** Ensure all database queries use prepared statements.
 - **Cross-Site Scripting (XSS):** Sanitize all user input before displaying it on the page to prevent XSS attacks. The use of `htmlspecialchars()` is a good practice, but it should be used consistently.
 - **CSRF Protection:** The login form has CSRF protection, which is great. Ensure that all forms that perform actions (e.g., adding users, updating settings) have CSRF protection as well.

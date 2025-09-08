@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include '../../config.php';
 session_unset();
 session_destroy();
 header("Location: login.php");
