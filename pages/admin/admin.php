@@ -93,8 +93,6 @@ $users = $db->query("SELECT * FROM users")->fetchAll();
                     </form>
                 </div>
             </section>
-            
-            <a href="adminHub.php" class="button secondary">Back to Hub</a>
         </div>
     </main>
     <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
