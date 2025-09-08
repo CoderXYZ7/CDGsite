@@ -13,7 +13,7 @@ This document outlines the identified issues, redundancies, and potential improv
     - [x] **CSS Styling:** There are two CSS files, `styles.css` and `stylesViewer.css`. Consider merging them or at least making sure the styles are consistent and don't override each other unexpectedly.
     - [ ] **JavaScript:** The JavaScript is scattered across multiple files. Consider using a module bundler like Webpack or Parcel to better organize and manage the JavaScript code.
 - **Performance:**
-    - [ ] **Image Optimization:** Some images are quite large. Consider optimizing them for the web to improve page load times.
+    - [x] **Image Optimization:** Some images are quite large. Consider optimizing them for the web to improve page load times.
     - [ ] **Minify Assets:** Minify CSS and JavaScript files in a production environment to reduce their size.
 
 ## 2. Frontend (HTML/CSS/JS)
