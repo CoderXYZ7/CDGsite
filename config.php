@@ -3,6 +3,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+require_once __DIR__ . '/config_app.php';
+
 session_start();
 
 // Login database (MySQL)
