@@ -1,4 +1,14 @@
 <?php
+// Import PHPMailer classes into the global namespace
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+// Load PHPMailer
+require __DIR__ . '/../vendor/phpmailer/src/Exception.php';
+require __DIR__ . '/../vendor/phpmailer/src/PHPMailer.php';
+require __DIR__ . '/../vendor/phpmailer/src/SMTP.php';
+
+// Load app configuration
 require_once __DIR__ . '/../config_app.php';
 
 header('Content-Type: application/json');
@@ -22,55 +32,72 @@ if (empty($name) || empty($email) || empty($subject) || empty($message) || !filt
     exit();
 }
 
-$to = $contact_email;
-$email_subject = "Nuovo messaggio dal sito: " . $subject;
+$mail = new PHPMailer(true);
 
-$email_body = "
-<html>
-<head>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-        .header { background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 1.2em; }
-        .content { padding: 20px 0; }
-        .footer { font-size: 0.9em; text-align: center; color: #777; }
-        strong { color: #0056b3; }
-    </style>
-</head>
-<body>
-    <div class='container'>
-        <div class='header'>
-            Nuovo Messaggio dal Form di Contatto del Sito
-        </div>
-        <div class='content'>
-            <p>Hai ricevuto un nuovo messaggio da:</p>
-            <p><strong>Nome:</strong> " . htmlspecialchars($name) . "</p>
-            <p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>
-            <hr>
-            <p><strong>Oggetto:</strong> " . htmlspecialchars($subject) . "</p>
-            <p><strong>Messaggio:</strong></p>
-            <p>" . nl2br(htmlspecialchars($message)) . "</p>
-        </div>
-        <div class='footer'>
-            <p>Questo messaggio è stato inviato automaticamente dal sito della Collaborazione Pastorale.</p>
-        </div>
-    </div>
-</body>
-</html>
-";
+try {
+    // Server settings
+    $mail->isSMTP();
+    $mail->Host       = SMTP_HOST;
+    $mail->SMTPAuth   = true;
+    $mail->Username   = SMTP_USERNAME;
+    $mail->Password   = SMTP_PASSWORD;
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port       = SMTP_PORT;
 
-$headers = "MIME-Version: 1.0" . "\r\n";
-$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-$headers .= 'From: <noreply@cpsangiorgio.it>' . "\r\n";
-$headers .= 'Reply-To: ' . $email . "\r\n";
+    // Recipients
+    $mail->setFrom(SMTP_USERNAME, 'Sito Collaborazione Pastorale'); // The 'From' email and name
+    $mail->addAddress($contact_email); // The destination email
+    $mail->addReplyTo($email, $name); // Set the Reply-To to the person who submitted the form
 
-error_log("Contact form: attempting to send email to: " . $to);
-if (mail($to, $email_subject, $email_body, $headers)) {
-    error_log("Contact form: email sent successfully.");
+    // Content
+    $mail->isHTML(true);
+    $mail->CharSet = 'UTF-8';
+    $mail->Subject = "Nuovo messaggio dal sito: " . $subject;
+    
+    $email_body = "
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+            .header { background-color: #f4f4f4; padding: 10px; text-align: center; font-size: 1.2em; }
+            .content { padding: 20px 0; }
+            .footer { font-size: 0.9em; text-align: center; color: #777; }
+            strong { color: #0056b3; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <div class='header'>
+                Nuovo Messaggio dal Form di Contatto del Sito
+            </div>
+            <div class='content'>
+                <p>Hai ricevuto un nuovo messaggio da:</p>
+                <p><strong>Nome:</strong> " . htmlspecialchars($name) . "</p>
+                <p><strong>Email:</strong> " . htmlspecialchars($email) . "</p>
+                <hr>
+                <p><strong>Oggetto:</strong> " . htmlspecialchars($subject) . "</p>
+                <p><strong>Messaggio:</strong></p>
+                <p>" . nl2br(htmlspecialchars($message)) . "</p>
+            </div>
+            <div class='footer'>
+                <p>Questo messaggio è stato inviato automaticamente dal sito della Collaborazione Pastorale.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    ";
+    $mail->Body = $email_body;
+
+    $mail->send();
     echo json_encode(['status' => 'success', 'message' => 'Messaggio inviato con successo!']);
-} else {
-    error_log("Contact form: mail() function failed. Check server's mail configuration.");
+
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'Impossibile inviare il messaggio. Potrebbe esserci un problema di configurazione del server.']);
+    // Log the detailed error message to the server logs, not to the user
+    error_log("PHPMailer Error: {" . "
+" . "}"); 
+    echo json_encode(['status' => 'error', 'message' => "Impossibile inviare il messaggio. Errore: {" . "
+" . "}"]);
 }
 ?>
