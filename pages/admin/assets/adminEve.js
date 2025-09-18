@@ -44,6 +44,12 @@
                 const dateInput = document.getElementById('start-date');
                 dateInput.addEventListener('input', validateSunday);
 
+                // Add event listeners for event type radio buttons
+                const eventTypeRadios = document.querySelectorAll('input[name="event-type"]');
+                eventTypeRadios.forEach(radio => {
+                    radio.addEventListener('change', toggleEndDateTime);
+                });
+
                 // Load events
                 loadEvents();
             };
@@ -62,6 +68,21 @@
                     const nextSunday = new Date(selectedDate);
                     nextSunday.setDate(selectedDate.getDate() + daysToSunday);
                     dateInput.valueAsDate = nextSunday;
+                }
+            }
+
+            // Toggle end date/time fields based on event type
+            function toggleEndDateTime() {
+                const eventType = document.querySelector('input[name="event-type"]:checked').value;
+                const endDateTimeSection = document.getElementById('end-datetime-section');
+
+                if (eventType === 'continuous') {
+                    endDateTimeSection.style.display = 'block';
+                } else {
+                    endDateTimeSection.style.display = 'none';
+                    // Clear end date/time values for single events
+                    document.getElementById('event-end-date').value = '';
+                    document.getElementById('event-end-time').value = '';
                 }
             }
 
@@ -267,13 +288,47 @@
                     return;
                 }
 
+                // Get event type
+                const eventType = document.querySelector('input[name="event-type"]:checked').value;
+
+                // Validate continuous event fields
+                let endDate = null;
+                let endTime = null;
+                if (eventType === 'continuous') {
+                    endDate = document.getElementById('event-end-date').value;
+                    endTime = document.getElementById('event-end-time').value;
+
+                    if (!endDate) {
+                        alert("Please select an end date for continuous events.");
+                        return;
+                    }
+                    if (!endTime) {
+                        alert("Please select an end time for continuous events.");
+                        return;
+                    }
+
+                    // Validate that end date/time is after start date/time
+                    const selectedDate = customDate || weekDates[selectedDayIndex];
+                    const startDateTime = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(),
+                                                  time.split(':')[0], time.split(':')[1]);
+                    const endDateTime = new Date(endDate + 'T' + endTime);
+
+                    if (endDateTime <= startDateTime) {
+                        alert("End date/time must be after start date/time.");
+                        return;
+                    }
+                }
+
                 const selectedDate = customDate || weekDates[selectedDayIndex];
                 const eventData = {
                     title: title,
                     description: description,
                     date: formatApiDate(selectedDate),
                     time: time,
-                    place: place
+                    place: place,
+                    event_type: eventType,
+                    end_date: endDate,
+                    end_time: endTime
                 };
 
                 try {
@@ -294,6 +349,11 @@
                         document.getElementById('event-time').value = '';
                         document.getElementById('event-place').value = '';
                         document.getElementById('event-description').value = '';
+                        document.getElementById('event-end-date').value = '';
+                        document.getElementById('event-end-time').value = '';
+                        // Reset to single event
+                        document.querySelector('input[name="event-type"][value="single"]').checked = true;
+                        toggleEndDateTime();
                     } else {
                         alert("Error adding event.");
                     }
@@ -303,6 +363,34 @@
                 }
             }
 
+            // Calculate duration for continuous events
+            function calculateDuration(event) {
+                if (event.event_type !== 'continuous' || !event.end_date || !event.end_time) {
+                    return '-';
+                }
+
+                const startDateTime = new Date(event.date + 'T' + event.time);
+                const endDateTime = new Date(event.end_date + 'T' + event.end_time);
+
+                const diffMs = endDateTime - startDateTime;
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                let duration = '';
+                if (diffDays > 0) {
+                    duration += `${diffDays}d `;
+                }
+                if (diffHours > 0) {
+                    duration += `${diffHours}h `;
+                }
+                if (diffMinutes > 0) {
+                    duration += `${diffMinutes}m`;
+                }
+
+                return duration.trim() || '0m';
+            }
+
             // Display events
             function displayEvents() {
                 const eventsTable = document.getElementById('events-list');
@@ -310,7 +398,7 @@
 
                 if (events.length === 0) {
                     const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="6" style="text-align: center;">No events added yet</td>';
+                    row.innerHTML = '<td colspan="8" style="text-align: center;">No events added yet</td>';
                     eventsTable.appendChild(row);
                     return;
                 }
@@ -318,26 +406,45 @@
                 events.forEach(event => {
                     const row = document.createElement('tr');
 
+                    // Type column
+                    const typeCell = document.createElement('td');
+                    typeCell.textContent = event.event_type === 'continuous' ? 'Continuous' : 'Single';
+                    typeCell.style.fontWeight = 'bold';
+                    typeCell.style.color = event.event_type === 'continuous' ? '#e53e3e' : '#2d3748';
+                    row.appendChild(typeCell);
+
+                    // Date column
                     const dateCell = document.createElement('td');
                     dateCell.textContent = formatDate(event.date);
                     row.appendChild(dateCell);
 
+                    // Time column
                     const timeCell = document.createElement('td');
                     timeCell.textContent = event.time;
                     row.appendChild(timeCell);
 
+                    // Duration column
+                    const durationCell = document.createElement('td');
+                    durationCell.textContent = calculateDuration(event);
+                    durationCell.style.fontWeight = 'bold';
+                    row.appendChild(durationCell);
+
+                    // Place column
                     const placeCell = document.createElement('td');
                     placeCell.textContent = event.place;
                     row.appendChild(placeCell);
 
+                    // Title column
                     const titleCell = document.createElement('td');
                     titleCell.textContent = event.title;
                     row.appendChild(titleCell);
 
+                    // Description column
                     const descCell = document.createElement('td');
                     descCell.textContent = event.description;
                     row.appendChild(descCell);
 
+                    // Action column
                     const actionCell = document.createElement('td');
                     const deleteBtn = document.createElement('button');
                     deleteBtn.textContent = 'Delete';

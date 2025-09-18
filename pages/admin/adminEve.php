@@ -64,6 +64,19 @@ checkTag('admin'); // Allowed tags
                     <input type="text" id="event-title">
                 </div>
                 <div class="form-group">
+                    <label>Event Type:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="event-type" value="single" checked> Single Event</label>
+                        <label><input type="radio" name="event-type" value="continuous"> Continuous Event</label>
+                    </div>
+                </div>
+                <div id="end-datetime-section" class="form-group" style="display: none;">
+                    <label for="event-end-date">End Date:</label>
+                    <input type="date" id="event-end-date">
+                    <label for="event-end-time">End Time:</label>
+                    <input type="time" id="event-end-time">
+                </div>
+                <div class="form-group">
                     <label for="event-description">Description:</label>
                     <textarea id="event-description" rows="4"></textarea>
                 </div>
@@ -81,8 +94,10 @@ checkTag('admin'); // Allowed tags
                     <table id="events-table">
                         <thead>
                             <tr>
+                                <th>Type</th>
                                 <th>Date</th>
                                 <th>Time</th>
+                                <th>Duration</th>
                                 <th>Place</th>
                                 <th>Title</th>
                                 <th>Description</th>
