@@ -256,10 +256,16 @@
                     dayElement.classList.add('today');
                 }
 
-                // Check if day has events
-                const dayEvents = events.filter(event =>
-                    event.date.toDateString() === day.toDateString()
-                );
+                // Check if day has events (including continuous events)
+                const dayEvents = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    if (event.event_type === 'continuous' && event.end_date) {
+                        const endDate = new Date(event.end_date);
+                        return day >= eventDate && day <= endDate;
+                    } else {
+                        return eventDate.toDateString() === day.toDateString();
+                    }
+                });
 
                 if (dayEvents.length > 0) {
                     dayElement.classList.add('has-events');
@@ -303,9 +309,27 @@
                 const eventItem = document.createElement('div');
                 eventItem.className = 'event-item';
 
+                let durationText = '';
+                if (event.event_type === 'continuous' && event.end_date && event.end_time) {
+                    const startDateTime = new Date(event.date + 'T' + event.time);
+                    const endDateTime = new Date(event.end_date + 'T' + event.end_time);
+                    const diffMs = endDateTime - startDateTime;
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                    let duration = '';
+                    if (diffDays > 0) duration += `${diffDays}g `;
+                    if (diffHours > 0) duration += `${diffHours}h `;
+                    if (diffMinutes > 0) duration += `${diffMinutes}m`;
+                    durationText = duration.trim() ? ` (Durata: ${duration.trim()})` : '';
+                }
+
+                const eventTypeLabel = event.event_type === 'continuous' ? ' [EVENTO CONTINUO]' : '';
+
                 eventItem.innerHTML = `
-                    <h4>${event.title}</h4>
-                    <p class="event-date">${event.date.toLocaleDateString('it-IT')}</p>
+                    <h4>${event.title}${eventTypeLabel}</h4>
+                    <p class="event-date">${event.date.toLocaleDateString('it-IT')}${durationText}</p>
                     <p class="event-time">Ora: ${event.time}</p>
                     <p class="event-place">Luogo: ${event.place}</p>
                     <p>${event.description}</p>
