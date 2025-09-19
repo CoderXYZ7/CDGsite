@@ -361,35 +361,122 @@
         .table-container {
             overflow-x: auto;
             margin-top: var(--space-md);
+            border-radius: var(--border-radius-sm);
+            box-shadow: var(--shadow-sm);
+            background: var(--white);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 900px;
+            font-size: var(--font-size-small);
         }
 
         th, td {
             border: var(--border-width) solid #ddd;
-            padding: var(--space-sm);
+            padding: var(--space-xs) var(--space-sm);
             text-align: left;
             white-space: nowrap;
+            position: relative;
         }
 
         th {
-            background-color: var(--light-gray);
-            color: var(--primary-blue);
-            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-blue), #2d3748);
+            color: var(--white);
+            font-weight: 600;
+            font-size: var(--font-size-small);
+            padding: var(--space-sm);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         td {
-            max-width: 150px;
+            max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
+            transition: var(--transition);
         }
 
         td:nth-child(7), td:nth-child(8) {
-            max-width: 200px;
+            max-width: 180px;
+        }
+
+        /* Hover effects for better content visibility */
+        td:hover {
+            background-color: rgba(26, 54, 93, 0.05);
+            z-index: 5;
+        }
+
+        td:hover::after {
+            content: attr(title);
+            position: absolute;
+            left: 0;
+            top: 100%;
+            background: var(--dark-gray);
+            color: var(--white);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-small);
+            white-space: normal;
+            max-width: 300px;
+            word-wrap: break-word;
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+            pointer-events: none;
+            opacity: 1;
+            transition: opacity 0.2s;
+        }
+
+        /* Hide tooltip when not hovering */
+        td:not(:hover)::after {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Improve scrolling experience */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: var(--light-gray);
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #2d3748;
+        }
+
+        /* Add scroll indicators */
+        .table-container::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(to right, rgba(255,255,255,0.8), transparent);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .table-container::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 20px;
+            background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+            pointer-events: none;
+            z-index: 1;
         }
         
         .sort-buttons {

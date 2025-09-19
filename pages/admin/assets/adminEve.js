@@ -485,19 +485,24 @@
                     // Start Date column
                     const startDateCell = document.createElement('td');
                     startDateCell.textContent = formatDate(event.date);
+                    startDateCell.title = formatDate(event.date);
                     row.appendChild(startDateCell);
 
                     // Start Time column
                     const startTimeCell = document.createElement('td');
                     startTimeCell.textContent = event.time;
+                    startTimeCell.title = event.time;
                     row.appendChild(startTimeCell);
 
                     // End Date column
                     const endDateCell = document.createElement('td');
                     if (event.event_type === 'continuous' && event.end_date) {
-                        endDateCell.textContent = formatDate(event.end_date);
+                        const endDateText = formatDate(event.end_date);
+                        endDateCell.textContent = endDateText;
+                        endDateCell.title = endDateText;
                     } else {
                         endDateCell.textContent = '-';
+                        endDateCell.title = 'No end date';
                     }
                     row.appendChild(endDateCell);
 
@@ -505,24 +510,29 @@
                     const endTimeCell = document.createElement('td');
                     if (event.event_type === 'continuous' && event.end_time) {
                         endTimeCell.textContent = event.end_time;
+                        endTimeCell.title = event.end_time;
                     } else {
                         endTimeCell.textContent = '-';
+                        endTimeCell.title = 'No end time';
                     }
                     row.appendChild(endTimeCell);
 
                     // Place column
                     const placeCell = document.createElement('td');
                     placeCell.textContent = event.place;
+                    placeCell.title = event.place;
                     row.appendChild(placeCell);
 
                     // Title column
                     const titleCell = document.createElement('td');
                     titleCell.textContent = event.title;
+                    titleCell.title = event.title;
                     row.appendChild(titleCell);
 
                     // Description column
                     const descCell = document.createElement('td');
                     descCell.textContent = event.description;
+                    descCell.title = event.description;
                     row.appendChild(descCell);
 
                     // Action column
