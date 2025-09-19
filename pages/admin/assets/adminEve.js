@@ -17,7 +17,8 @@
                     const data = await response.json();
                     events = data.map(event => ({
                         ...event,
-                        date: new Date(event.date)
+                        date: new Date(event.date),
+                        end_date: event.end_date ? new Date(event.end_date) : null
                     }));
                     displayEvents();
                 } catch (error) {
