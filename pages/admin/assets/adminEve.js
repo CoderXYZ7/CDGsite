@@ -365,7 +365,7 @@
 
             // Calculate duration for continuous events
             function calculateDuration(event) {
-                if (event.event_type !== 'continuous' || !event.end_date || !event.end_time) {
+                if (event.event_type !== 'continuous' || !event.end_date || event.end_date === '' || !event.end_time || event.end_time === '') {
                     return '-';
                 }
 

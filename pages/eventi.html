@@ -310,7 +310,7 @@
                 eventItem.className = 'event-item';
 
                 let durationText = '';
-                if (event.event_type === 'continuous' && event.end_date && event.end_time) {
+                if (event.event_type === 'continuous' && event.end_date && event.end_date !== '' && event.end_time && event.end_time !== '') {
                     const startDateTime = new Date(event.date + 'T' + event.time);
                     const endDateTime = new Date(event.end_date + 'T' + event.end_time);
                     const diffMs = endDateTime - startDateTime;

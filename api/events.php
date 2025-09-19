@@ -25,6 +25,9 @@ switch ($method) {
             break;
         }
 
+        $end_date = isset($data['end_date']) && $data['end_date'] !== '' ? $data['end_date'] : null;
+        $end_time = isset($data['end_time']) && $data['end_time'] !== '' ? $data['end_time'] : null;
+
         $stmt = $events_db->prepare("INSERT INTO events (title, description, date, time, place, event_type, end_date, end_time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $data['title'],
@@ -33,8 +36,8 @@ switch ($method) {
             $data['time'] ?? '',
             $data['place'] ?? '',
             $data['event_type'] ?? 'single',
-            $data['end_date'] ?? null,
-            $data['end_time'] ?? null
+            $end_date,
+            $end_time
         ]);
 
         echo json_encode(['id' => $events_db->lastInsertId()]);
@@ -49,6 +52,9 @@ switch ($method) {
             break;
         }
 
+        $end_date = isset($data['end_date']) && $data['end_date'] !== '' ? $data['end_date'] : null;
+        $end_time = isset($data['end_time']) && $data['end_time'] !== '' ? $data['end_time'] : null;
+
         $stmt = $events_db->prepare("UPDATE events SET title = ?, description = ?, date = ?, time = ?, place = ?, event_type = ?, end_date = ?, end_time = ? WHERE id = ?");
         $stmt->execute([
             $data['title'] ?? '',
@@ -57,8 +63,8 @@ switch ($method) {
             $data['time'] ?? '',
             $data['place'] ?? '',
             $data['event_type'] ?? 'single',
-            $data['end_date'] ?? null,
-            $data['end_time'] ?? null,
+            $end_date,
+            $end_time,
             $data['id']
         ]);
 
