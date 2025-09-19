@@ -27,18 +27,31 @@ checkAuth();
                 <div class="card-content">
                     <h3><i class="fas fa-th-large"></i> Available Modules</h3>
                     <div class="page-links">
-                        <?php
-                        $stmt = $db->prepare("SELECT * FROM pages");
-                        $stmt->execute();
-                        $pages = $stmt->fetchAll();
-                        
-                        foreach ($pages as $page) {
-                            $allowed = explode(',', $page['allowed_tags']);
-                            if (in_array($_SESSION['user_tag'], $allowed)) {
-                                echo "<a href='{$page['path']}' class='button primary'>{$page['page_name']}</a>";
+                        <?php if ($db === null): ?>
+                            <div class="error" style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                                <i class="fas fa-exclamation-triangle"></i> Database unavailable - Module links cannot be loaded
+                            </div>
+                            <!-- Fallback links for common pages -->
+                            <a href="adminEve.php" class="button primary">Eventi</a>
+                            <a href="adminFog.php" class="button primary">Foglietto</a>
+                        <?php else: ?>
+                            <?php
+                            try {
+                                $stmt = $db->prepare("SELECT * FROM pages");
+                                $stmt->execute();
+                                $pages = $stmt->fetchAll();
+
+                                foreach ($pages as $page) {
+                                    $allowed = explode(',', $page['allowed_tags']);
+                                    if (in_array($_SESSION['user_tag'], $allowed)) {
+                                        echo "<a href='{$page['path']}' class='button primary'>{$page['page_name']}</a>";
+                                    }
+                                }
+                            } catch (Exception $e) {
+                                echo "<div class='error'>Error loading pages: " . htmlspecialchars($e->getMessage()) . "</div>";
                             }
-                        }
-                        ?>
+                            ?>
+                        <?php endif; ?>
                     </div>
                 </div>
             </section>

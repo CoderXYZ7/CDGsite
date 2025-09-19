@@ -3,6 +3,9 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Development bypass for when database is not available
+define('DB_BYPASS', getenv('DB_BYPASS') ?: true);
+
 require_once __DIR__ . '/config_app.php';
 
 session_start();
@@ -13,11 +16,15 @@ $dbname = "ocpsange_login_system";
 $username = "ocpsange_login_user";
 $password = "vsHC2mK3BGYwx";
 
+$db = null;
+$db_error = null;
+
 try {
     $db = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    $db_error = $e->getMessage();
+    // Don't die here - let the application handle the error gracefully
 }
 
 // Events database (SQLite for now, can be switched to MySQL later)
