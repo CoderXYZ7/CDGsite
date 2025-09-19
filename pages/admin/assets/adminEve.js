@@ -10,12 +10,19 @@
             // Load events from API
             async function loadEvents() {
                 try {
+                    console.log('Loading events from:', API_URL);
                     const response = await fetch(API_URL);
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                     const data = await response.json();
+                    console.log('Received data:', data);
                     events = data.map(event => ({
                         ...event,
                         date: new Date(event.date)
                     }));
+                    console.log('Processed events:', events);
                     displayEvents();
                 } catch (error) {
                     console.error('Error loading events:', error);
@@ -446,7 +453,9 @@
 
             // Display events
             function displayEvents() {
+                console.log('Displaying events:', events.length);
                 const eventsTable = document.getElementById('events-list');
+                console.log('Events table element:', eventsTable);
                 eventsTable.innerHTML = '';
 
                 if (events.length === 0) {
