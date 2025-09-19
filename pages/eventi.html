@@ -20,6 +20,8 @@
             --shadow: 0 2px 10px rgba(0,0,0,0.1);
             --shadow-hover: 0 4px 20px rgba(0,0,0,0.15);
             --transition: all 0.3s ease;
+            --dot-cont: #440303;
+            --dot-sing: #1a365d;
         }
 
         .page-header {
@@ -256,7 +258,7 @@
             height: 6px;
             background: var(--accent-red);
             border-radius: 50%;
-            box-shadow: 0 1px 3px rgb(255, 255, 255);
+            box-shadow: 0 1px 3px rgba(255, 255, 255, 0);
         }
 
         .events-sidebar {
@@ -814,9 +816,9 @@
                             const dot = document.createElement('div');
                             dot.className = 'event-dot';
                             if (event.event_type === 'continuous') {
-                                dot.style.background = 'var(--accent-red)';
+                                dot.style.background = 'var(--dot-cont)';
                             } else {
-                                dot.style.background = 'var(--primary-blue)';
+                                dot.style.background = 'var(--dot-sing)';
                             }
                             dayElement.appendChild(dot);
                         }
