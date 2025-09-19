@@ -165,6 +165,60 @@
             border: 2px solid var(--accent-red);
         }
 
+        .calendar-day.has-single-events {
+            background: linear-gradient(135deg, #e6fffa, #b2f5ea);
+            border: 2px solid #38b2ac;
+        }
+
+        .calendar-day.has-continuous-events {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            border: 2px solid var(--accent-red);
+        }
+
+        .calendar-day.has-mixed-events {
+            background: linear-gradient(135deg, #fef5e7, #fde68a);
+            border: 2px solid #d69e2e;
+        }
+
+        .calendar-day.event-start {
+            position: relative;
+        }
+
+        .calendar-day.event-start::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 6px;
+            height: 6px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(26, 54, 93, 0.6);
+        }
+
+        .calendar-day.event-end {
+            position: relative;
+        }
+
+        .calendar-day.event-end::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(229, 62, 62, 0.6);
+        }
+
+        .calendar-day.selected {
+            background: var(--primary-blue) !important;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+        }
+
         .day-number {
             font-size: 1.1rem;
             font-weight: 500;
@@ -207,13 +261,15 @@
         }
 
         .sidebar-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 600;
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            line-height: 1.3;
+            text-align: center;
         }
 
         .events-container {
@@ -541,15 +597,52 @@
                     }
                 });
 
+                // Categorize events and apply appropriate styling
                 if (dayEvents.length > 0) {
-                    dayElement.classList.add('has-events');
-                    // Add dots for events
-                    for (let j = 0; j < Math.min(dayEvents.length, 3); j++) {
-                        const dot = document.createElement('div');
-                        dot.className = 'event-dot';
-                        dayElement.appendChild(dot);
+                    const hasSingle = dayEvents.some(event => event.event_type === 'single');
+                    const hasContinuous = dayEvents.some(event => event.event_type === 'continuous');
+
+                    if (hasSingle && hasContinuous) {
+                        dayElement.classList.add('has-mixed-events');
+                    } else if (hasContinuous) {
+                        dayElement.classList.add('has-continuous-events');
+                    } else {
+                        dayElement.classList.add('has-single-events');
                     }
+
+                    // Add event dots with different colors
+                    dayEvents.forEach((event, index) => {
+                        if (index < 3) { // Limit to 3 dots
+                            const dot = document.createElement('div');
+                            dot.className = 'event-dot';
+                            if (event.event_type === 'continuous') {
+                                dot.style.background = 'var(--accent-red)';
+                            } else {
+                                dot.style.background = 'var(--primary-blue)';
+                            }
+                            dayElement.appendChild(dot);
+                        }
+                    });
+
+                    // Add start/end indicators for continuous events
+                    const continuousEvents = dayEvents.filter(event => event.event_type === 'continuous');
+                    continuousEvents.forEach(event => {
+                        if (event.end_date) {
+                            const eventStart = new Date(event.date);
+                            const eventEnd = new Date(event.end_date);
+
+                            if (day.toDateString() === eventStart.toDateString()) {
+                                dayElement.classList.add('event-start');
+                            }
+                            if (day.toDateString() === eventEnd.toDateString()) {
+                                dayElement.classList.add('event-end');
+                            }
+                        }
+                    });
                 }
+
+                // Add click handler to show events for this day
+                dayElement.addEventListener('click', () => showDayEvents(day, dayEvents));
 
                 const dayNumber = document.createElement('div');
                 dayNumber.className = 'day-number';
@@ -558,6 +651,115 @@
 
                 calendarDays.appendChild(dayElement);
             }
+        }
+
+        // Show events for a specific day
+        function showDayEvents(day, dayEvents) {
+            // Remove previous selection
+            document.querySelectorAll('.calendar-day.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            // Add selection to clicked day
+            event.currentTarget.classList.add('selected');
+
+            const eventsList = document.getElementById('events-list');
+            const sidebarTitle = document.getElementById('sidebar-title');
+
+            // Update sidebar title
+            const dayName = day.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+            sidebarTitle.innerHTML = `<i class="fas fa-calendar-day"></i> Eventi del ${dayName}`;
+
+            eventsList.innerHTML = '';
+
+            if (dayEvents.length === 0) {
+                eventsList.innerHTML = `
+                    <div class="no-events">
+                        <i class="fas fa-calendar-times"></i>
+                        <p>Nessun evento in questa data</p>
+                    </div>
+                `;
+                return;
+            }
+
+            dayEvents.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.className = 'event-card';
+
+                // Event type badge
+                const eventType = document.createElement('div');
+                eventType.className = `event-type ${event.event_type}`;
+                eventType.textContent = event.event_type === 'continuous' ? 'Continuo' : 'Singolo';
+                eventCard.appendChild(eventType);
+
+                // Event title
+                const eventTitle = document.createElement('div');
+                eventTitle.className = 'event-title';
+                eventTitle.textContent = event.title;
+                eventCard.appendChild(eventTitle);
+
+                // Event meta information
+                const eventMeta = document.createElement('div');
+                eventMeta.className = 'event-meta';
+
+                // Time
+                const eventTime = document.createElement('div');
+                eventTime.className = 'event-time';
+                eventTime.innerHTML = `<i class="fas fa-clock"></i> ${event.time}`;
+                eventMeta.appendChild(eventTime);
+
+                // Place
+                const eventPlace = document.createElement('div');
+                eventPlace.className = 'event-place';
+                eventPlace.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${event.place}`;
+                eventMeta.appendChild(eventPlace);
+
+                eventCard.appendChild(eventMeta);
+
+                // Description
+                if (event.description) {
+                    const eventDescription = document.createElement('div');
+                    eventDescription.className = 'event-description';
+                    eventDescription.textContent = event.description;
+                    eventCard.appendChild(eventDescription);
+                }
+
+                // Duration and day info for continuous events
+                if (event.event_type === 'continuous' && event.end_date && event.end_date !== '') {
+                    const eventStart = new Date(event.date);
+                    const eventEnd = new Date(event.end_date);
+                    const totalDays = Math.ceil((eventEnd - eventStart) / (1000 * 60 * 60 * 24)) + 1;
+                    const currentDay = Math.ceil((day - eventStart) / (1000 * 60 * 60 * 24)) + 1;
+
+                    const dayInfo = document.createElement('div');
+                    dayInfo.className = 'duration-badge';
+                    dayInfo.innerHTML = `<i class="fas fa-hashtag"></i> Giorno ${currentDay} di ${totalDays}`;
+                    eventCard.appendChild(dayInfo);
+
+                    // Duration badge
+                    const startDateTime = new Date(event.date.getFullYear(), event.date.getMonth(), event.date.getDate(),
+                                                  event.time.split(':')[0], event.time.split(':')[1]);
+                    const endDateTime = new Date(event.end_date + 'T' + event.end_time);
+                    const diffMs = endDateTime - startDateTime;
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                    let duration = '';
+                    if (diffDays > 0) duration += `${diffDays}g `;
+                    if (diffHours > 0) duration += `${diffHours}h `;
+                    if (diffMinutes > 0) duration += `${diffMinutes}m`;
+
+                    if (duration.trim()) {
+                        const durationBadge = document.createElement('div');
+                        durationBadge.className = 'duration-badge';
+                        durationBadge.innerHTML = `<i class="fas fa-hourglass-half"></i> ${duration.trim()}`;
+                        eventCard.appendChild(durationBadge);
+                    }
+                }
+
+                eventsList.appendChild(eventCard);
+            });
         }
 
         // Render events list
