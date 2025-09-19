@@ -92,22 +92,24 @@ checkTag('admin'); // Allowed tags
                     <button onclick="exportToCsv()">Export to CSV</button>
                 </div>
                 <div id="events-container">
+                    <div class="table-container">
                         <table id="events-table">
-                        <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>Start Date</th>
-                                <th>Start Time</th>
-                                <th>End Date</th>
-                                <th>End Time</th>
-                                <th>Place</th>
-                                <th>Title</th>
-                                <th>Description</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="events-list"></tbody>
-                    </table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Start Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Date</th>
+                                    <th>End Time</th>
+                                    <th>Place</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="events-list"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
