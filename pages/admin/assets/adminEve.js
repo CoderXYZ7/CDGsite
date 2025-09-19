@@ -50,6 +50,9 @@
                     radio.addEventListener('change', toggleEndDateTime);
                 });
 
+                // Add event listener for start time to update duration preview
+                document.getElementById('event-time').addEventListener('change', updateDurationPreview);
+
                 // Load events
                 loadEvents();
             };
@@ -391,6 +394,56 @@
                 return duration.trim() || '0m';
             }
 
+            // Update duration preview in the form
+            function updateDurationPreview() {
+                const eventType = document.querySelector('input[name="event-type"]:checked').value;
+                const durationPreview = document.getElementById('duration-preview');
+
+                if (eventType !== 'continuous') {
+                    durationPreview.textContent = '';
+                    return;
+                }
+
+                const startDate = customDate || (selectedDayIndex !== -1 ? weekDates[selectedDayIndex] : null);
+                const startTime = document.getElementById('event-time').value;
+                const endDate = document.getElementById('event-end-date').value;
+                const endTime = document.getElementById('event-end-time').value;
+
+                if (!startDate || !startTime || !endDate || !endTime) {
+                    durationPreview.textContent = '';
+                    return;
+                }
+
+                const startDateTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(),
+                                              startTime.split(':')[0], startTime.split(':')[1]);
+                const endDateTime = new Date(endDate + 'T' + endTime);
+
+                if (endDateTime <= startDateTime) {
+                    durationPreview.textContent = 'Invalid duration';
+                    durationPreview.style.color = 'red';
+                    return;
+                }
+
+                const diffMs = endDateTime - startDateTime;
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                let duration = '';
+                if (diffDays > 0) {
+                    duration += `${diffDays}d `;
+                }
+                if (diffHours > 0) {
+                    duration += `${diffHours}h `;
+                }
+                if (diffMinutes > 0) {
+                    duration += `${diffMinutes}m`;
+                }
+
+                durationPreview.textContent = `Duration: ${duration.trim() || '0m'}`;
+                durationPreview.style.color = '#e53e3e';
+            }
+
             // Display events
             function displayEvents() {
                 const eventsTable = document.getElementById('events-list');
@@ -398,7 +451,7 @@
 
                 if (events.length === 0) {
                     const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="8" style="text-align: center;">No events added yet</td>';
+                    row.innerHTML = '<td colspan="9" style="text-align: center;">No events added yet</td>';
                     eventsTable.appendChild(row);
                     return;
                 }
@@ -413,21 +466,33 @@
                     typeCell.style.color = event.event_type === 'continuous' ? '#e53e3e' : '#2d3748';
                     row.appendChild(typeCell);
 
-                    // Date column
-                    const dateCell = document.createElement('td');
-                    dateCell.textContent = formatDate(event.date);
-                    row.appendChild(dateCell);
+                    // Start Date column
+                    const startDateCell = document.createElement('td');
+                    startDateCell.textContent = formatDate(event.date);
+                    row.appendChild(startDateCell);
 
-                    // Time column
-                    const timeCell = document.createElement('td');
-                    timeCell.textContent = event.time;
-                    row.appendChild(timeCell);
+                    // Start Time column
+                    const startTimeCell = document.createElement('td');
+                    startTimeCell.textContent = event.time;
+                    row.appendChild(startTimeCell);
 
-                    // Duration column
-                    const durationCell = document.createElement('td');
-                    durationCell.textContent = calculateDuration(event);
-                    durationCell.style.fontWeight = 'bold';
-                    row.appendChild(durationCell);
+                    // End Date column
+                    const endDateCell = document.createElement('td');
+                    if (event.event_type === 'continuous' && event.end_date) {
+                        endDateCell.textContent = formatDate(event.end_date);
+                    } else {
+                        endDateCell.textContent = '-';
+                    }
+                    row.appendChild(endDateCell);
+
+                    // End Time column
+                    const endTimeCell = document.createElement('td');
+                    if (event.event_type === 'continuous' && event.end_time) {
+                        endTimeCell.textContent = event.end_time;
+                    } else {
+                        endTimeCell.textContent = '-';
+                    }
+                    row.appendChild(endTimeCell);
 
                     // Place column
                     const placeCell = document.createElement('td');

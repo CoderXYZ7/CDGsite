@@ -72,9 +72,10 @@ checkTag('admin'); // Allowed tags
                 </div>
                 <div id="end-datetime-section" class="form-group" style="display: none;">
                     <label for="event-end-date">End Date:</label>
-                    <input type="date" id="event-end-date">
+                    <input type="date" id="event-end-date" onchange="updateDurationPreview()">
                     <label for="event-end-time">End Time:</label>
-                    <input type="time" id="event-end-time">
+                    <input type="time" id="event-end-time" onchange="updateDurationPreview()">
+                    <div id="duration-preview" style="margin-top: 0.5rem; font-weight: bold; color: #e53e3e;"></div>
                 </div>
                 <div class="form-group">
                     <label for="event-description">Description:</label>
@@ -91,13 +92,14 @@ checkTag('admin'); // Allowed tags
                     <button onclick="exportToCsv()">Export to CSV</button>
                 </div>
                 <div id="events-container">
-                    <table id="events-table">
+                        <table id="events-table">
                         <thead>
                             <tr>
                                 <th>Type</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Duration</th>
+                                <th>Start Date</th>
+                                <th>Start Time</th>
+                                <th>End Date</th>
+                                <th>End Time</th>
                                 <th>Place</th>
                                 <th>Title</th>
                                 <th>Description</th>
