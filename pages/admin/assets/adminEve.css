@@ -513,6 +513,105 @@
             margin-top: var(--space-md);
         }
         
+        /* New styles for simplified table */
+        .type-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .type-badge.continuous {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .type-badge.single {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .datetime-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .datetime-start {
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .datetime-end {
+            color: var(--medium-gray);
+            font-size: 0.85rem;
+        }
+
+        .datetime-duration {
+            color: var(--accent-red);
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: 1px solid #e53e3e;
+            color: #e53e3e;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            background: #e53e3e;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Compact form styles */
+        .compact-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .compact-form .form-row {
+            display: flex;
+            gap: var(--space-sm);
+            align-items: flex-end;
+        }
+
+        .compact-form .form-control {
+            flex: 1;
+        }
+
+        .compact-form .form-control.event-type-control {
+            flex: 0 0 150px;
+        }
+
+        .radio-group.compact {
+            flex-direction: row;
+            gap: var(--space-md);
+        }
+
+        .radio-group.compact .radio-option {
+            padding: var(--space-xs);
+            margin: 0;
+        }
+
+        .secondary-btn.compact {
+            padding: var(--space-xs) var(--space-sm);
+            font-size: var(--font-size-small);
+        }
+
         /* Responsive adjustments */
         @media (max-width: 1024px) {
             .main-grid {

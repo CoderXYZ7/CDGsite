@@ -44,95 +44,96 @@ checkTag('admin'); // Allowed tags
                 <h2><i class="fas fa-plus-circle"></i> Create New Event</h2>
             </div>
 
-            <div class="form-grid">
-                <!-- Date and Time -->
-                <div class="form-section">
-                    <h3><i class="fas fa-clock"></i> Date & Time</h3>
-                    <div class="form-row">
-                        <div class="form-control">
-                            <label for="selected-day">Selected Day:</label>
-                            <input type="text" id="selected-day" readonly>
+            <!-- Compact Form Layout -->
+            <div class="compact-form">
+                <!-- Row 1: Event Type & Title -->
+                <div class="form-row">
+                    <div class="form-control event-type-control">
+                        <label>Event Type:</label>
+                        <div class="radio-group compact">
+                            <label class="radio-option">
+                                <input type="radio" name="event-type" value="single" checked>
+                                <span class="radio-label">Single</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="event-type" value="continuous">
+                                <span class="radio-label">Continuous</span>
+                            </label>
                         </div>
-                        <button onclick="showCustomDateDialog()" class="secondary-btn">
-                            <i class="fas fa-calendar-plus"></i> Custom Date
-                        </button>
                     </div>
-                    <div class="form-group">
+                    <div class="form-control">
+                        <label for="event-title">Title:</label>
+                        <input type="text" id="event-title" placeholder="Event title">
+                    </div>
+                </div>
+
+                <!-- Row 2: Date & Time -->
+                <div class="form-row">
+                    <div class="form-control">
+                        <label for="selected-day">Selected Day:</label>
+                        <input type="text" id="selected-day" readonly>
+                    </div>
+                    <div class="form-control">
                         <label for="event-time">Start Time:</label>
                         <input type="time" id="event-time" onchange="updateDurationPreview()">
                     </div>
-                </div>
-
-                <!-- Event Details -->
-                <div class="form-section">
-                    <h3><i class="fas fa-info-circle"></i> Event Details</h3>
-                    <div class="form-group">
-                        <label for="event-title">Title:</label>
-                        <input type="text" id="event-title" placeholder="Enter event title">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-control">
-                            <label for="event-place">Place:</label>
-                            <select id="event-place">
-                                <option value="">Select a place</option>
-                                <option value="Conference Room A">Conference Room A</option>
-                                <option value="Conference Room B">Conference Room B</option>
-                                <option value="Auditorium">Auditorium</option>
-                                <option value="Cafeteria">Cafeteria</option>
-                                <option value="Meeting Room 1">Meeting Room 1</option>
-                                <option value="Meeting Room 2">Meeting Room 2</option>
-                            </select>
-                        </div>
-                        <button onclick="showCustomPlaceDialog()" class="secondary-btn">
-                            <i class="fas fa-plus"></i> Add Custom
+                    <div class="form-control">
+                        <button onclick="showCustomDateDialog()" class="secondary-btn compact">
+                            <i class="fas fa-calendar-plus"></i> Custom Date
                         </button>
                     </div>
-                    <div class="form-group">
+                </div>
+
+                <!-- Row 3: Place & Description -->
+                <div class="form-row">
+                    <div class="form-control">
+                        <label for="event-place">Place:</label>
+                        <select id="event-place">
+                            <option value="">Select place</option>
+                            <option value="Conference Room A">Conference Room A</option>
+                            <option value="Conference Room B">Conference Room B</option>
+                            <option value="Auditorium">Auditorium</option>
+                            <option value="Cafeteria">Cafeteria</option>
+                            <option value="Meeting Room 1">Meeting Room 1</option>
+                            <option value="Meeting Room 2">Meeting Room 2</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <button onclick="showCustomPlaceDialog()" class="secondary-btn compact">
+                            <i class="fas fa-plus"></i> Custom
+                        </button>
+                    </div>
+                    <div class="form-control">
                         <label for="event-description">Description:</label>
-                        <textarea id="event-description" rows="3" placeholder="Enter event description"></textarea>
+                        <input type="text" id="event-description" placeholder="Brief description">
                     </div>
                 </div>
 
-                <!-- Event Type -->
-                <div class="form-section">
-                    <h3><i class="fas fa-cogs"></i> Event Type</h3>
-                    <div class="radio-group">
-                        <label class="radio-option">
-                            <input type="radio" name="event-type" value="single" checked>
-                            <span class="radio-label">
-                                <i class="fas fa-dot-circle"></i> Single Event
-                            </span>
-                        </label>
-                        <label class="radio-option">
-                            <input type="radio" name="event-type" value="continuous">
-                            <span class="radio-label">
-                                <i class="fas fa-arrows-alt-h"></i> Continuous Event
-                            </span>
-                        </label>
-                    </div>
-
-                    <div id="end-datetime-section" class="continuous-options" style="display: none;">
-                        <div class="form-row">
-                            <div class="form-control">
-                                <label for="event-end-date">End Date:</label>
-                                <input type="date" id="event-end-date" onchange="updateDurationPreview()">
-                            </div>
-                            <div class="form-control">
-                                <label for="event-end-time">End Time:</label>
-                                <input type="time" id="event-end-time" onchange="updateDurationPreview()">
-                            </div>
+                <!-- Continuous Event Options -->
+                <div id="end-datetime-section" class="continuous-options" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-control">
+                            <label for="event-end-date">End Date:</label>
+                            <input type="date" id="event-end-date" onchange="updateDurationPreview()">
                         </div>
-                        <div id="duration-preview" class="duration-info">
-                            <i class="fas fa-clock"></i> Duration will be calculated here
+                        <div class="form-control">
+                            <label for="event-end-time">End Time:</label>
+                            <input type="time" id="event-end-time" onchange="updateDurationPreview()">
+                        </div>
+                        <div class="form-control">
+                            <div id="duration-preview" class="duration-info">
+                                <i class="fas fa-clock"></i> Duration: calculating...
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-actions">
-                <button onclick="addEvent()" class="primary-btn large">
-                    <i class="fas fa-save"></i> Create Event
-                </button>
+                <!-- Action Button -->
+                <div class="form-actions">
+                    <button onclick="addEvent()" class="primary-btn">
+                        <i class="fas fa-save"></i> Create Event
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -158,11 +159,8 @@ checkTag('admin'); // Allowed tags
                     <table id="events-table">
                         <thead>
                             <tr>
-                                <th><i class="fas fa-tag"></i> Type</th>
-                                <th><i class="fas fa-calendar-day"></i> Start Date</th>
-                                <th><i class="fas fa-clock"></i> Start Time</th>
-                                <th><i class="fas fa-calendar-check"></i> End Date</th>
-                                <th><i class="fas fa-clock"></i> End Time</th>
+                                <th>Type</th>
+                                <th><i class="fas fa-calendar-day"></i> Date/Time</th>
                                 <th><i class="fas fa-map-marker-alt"></i> Place</th>
                                 <th><i class="fas fa-heading"></i> Title</th>
                                 <th><i class="fas fa-align-left"></i> Description</th>

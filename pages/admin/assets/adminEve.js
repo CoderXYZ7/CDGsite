@@ -467,7 +467,7 @@
 
                 if (events.length === 0) {
                     const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="9" style="text-align: center;">No events added yet</td>';
+                    row.innerHTML = '<td colspan="6" style="text-align: center;">No events added yet</td>';
                     eventsTable.appendChild(row);
                     return;
                 }
@@ -475,47 +475,45 @@
                 events.forEach(event => {
                     const row = document.createElement('tr');
 
-                    // Type column
+                    // Type column - simplified to [Sin] or [Con]
                     const typeCell = document.createElement('td');
-                    typeCell.textContent = event.event_type === 'continuous' ? 'Continuous' : 'Single';
-                    typeCell.style.fontWeight = 'bold';
-                    typeCell.style.color = event.event_type === 'continuous' ? '#e53e3e' : '#2d3748';
+                    const typeBadge = document.createElement('span');
+                    typeBadge.className = `type-badge ${event.event_type}`;
+                    typeBadge.textContent = event.event_type === 'continuous' ? '[Con]' : '[Sin]';
+                    typeCell.appendChild(typeBadge);
                     row.appendChild(typeCell);
 
-                    // Start Date column
-                    const startDateCell = document.createElement('td');
-                    startDateCell.textContent = formatDate(event.date);
-                    startDateCell.title = formatDate(event.date);
-                    row.appendChild(startDateCell);
+                    // Combined Date/Time column
+                    const dateTimeCell = document.createElement('td');
+                    const dateTimeDiv = document.createElement('div');
+                    dateTimeDiv.className = 'datetime-info';
 
-                    // Start Time column
-                    const startTimeCell = document.createElement('td');
-                    startTimeCell.textContent = event.time;
-                    startTimeCell.title = event.time;
-                    row.appendChild(startTimeCell);
+                    // Start date/time
+                    const startInfo = document.createElement('div');
+                    startInfo.className = 'datetime-start';
+                    startInfo.innerHTML = `<strong>${formatDate(event.date)}</strong> ${event.time}`;
 
-                    // End Date column
-                    const endDateCell = document.createElement('td');
-                    if (event.event_type === 'continuous' && event.end_date) {
-                        const endDateText = formatDate(event.end_date);
-                        endDateCell.textContent = endDateText;
-                        endDateCell.title = endDateText;
-                    } else {
-                        endDateCell.textContent = '-';
-                        endDateCell.title = 'No end date';
+                    dateTimeDiv.appendChild(startInfo);
+
+                    // End date/time for continuous events
+                    if (event.event_type === 'continuous' && event.end_date && event.end_time) {
+                        const endInfo = document.createElement('div');
+                        endInfo.className = 'datetime-end';
+                        endInfo.innerHTML = `→ ${formatDate(event.end_date)} ${event.end_time}`;
+                        dateTimeDiv.appendChild(endInfo);
+
+                        // Duration
+                        const duration = calculateDuration(event);
+                        if (duration !== '-') {
+                            const durationInfo = document.createElement('div');
+                            durationInfo.className = 'datetime-duration';
+                            durationInfo.innerHTML = `<small>(${duration})</small>`;
+                            dateTimeDiv.appendChild(durationInfo);
+                        }
                     }
-                    row.appendChild(endDateCell);
 
-                    // End Time column
-                    const endTimeCell = document.createElement('td');
-                    if (event.event_type === 'continuous' && event.end_time) {
-                        endTimeCell.textContent = event.end_time;
-                        endTimeCell.title = event.end_time;
-                    } else {
-                        endTimeCell.textContent = '-';
-                        endTimeCell.title = 'No end time';
-                    }
-                    row.appendChild(endTimeCell);
+                    dateTimeCell.appendChild(dateTimeDiv);
+                    row.appendChild(dateTimeCell);
 
                     // Place column
                     const placeCell = document.createElement('td');
@@ -538,7 +536,9 @@
                     // Action column
                     const actionCell = document.createElement('td');
                     const deleteBtn = document.createElement('button');
-                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                    deleteBtn.title = 'Delete event';
                     deleteBtn.onclick = function() {
                         deleteEvent(event.id);
                     };
