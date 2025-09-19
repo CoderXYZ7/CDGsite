@@ -10,19 +10,15 @@
             // Load events from API
             async function loadEvents() {
                 try {
-                    console.log('Loading events from:', API_URL);
                     const response = await fetch(API_URL);
-                    console.log('Response status:', response.status);
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     const data = await response.json();
-                    console.log('Received data:', data);
                     events = data.map(event => ({
                         ...event,
                         date: new Date(event.date)
                     }));
-                    console.log('Processed events:', events);
                     displayEvents();
                 } catch (error) {
                     console.error('Error loading events:', error);
@@ -98,6 +94,12 @@
 
             // Format date in dd/mm/yyyy format for display
             function formatDate(date) {
+                // Handle case where date might not be a Date object
+                if (!(date instanceof Date) || isNaN(date)) {
+                    console.warn('Invalid date passed to formatDate:', date);
+                    return 'Invalid Date';
+                }
+
                 const day = String(date.getDate()).padStart(2, '0');
                 const month = String(date.getMonth() + 1).padStart(2, '0');
                 const year = date.getFullYear();
@@ -114,6 +116,12 @@
 
             // Format date in yyyy/mm/dd format for CSV
             function formatCsvDate(date) {
+                // Handle case where date might not be a Date object
+                if (!(date instanceof Date) || isNaN(date)) {
+                    console.warn('Invalid date passed to formatCsvDate:', date);
+                    return 'Invalid Date';
+                }
+
                 const day = String(date.getDate()).padStart(2, '0');
                 const month = String(date.getMonth() + 1).padStart(2, '0');
                 const year = date.getFullYear();
@@ -453,9 +461,7 @@
 
             // Display events
             function displayEvents() {
-                console.log('Displaying events:', events.length);
                 const eventsTable = document.getElementById('events-list');
-                console.log('Events table element:', eventsTable);
                 eventsTable.innerHTML = '';
 
                 if (events.length === 0) {
