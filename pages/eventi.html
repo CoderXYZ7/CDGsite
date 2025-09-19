@@ -183,6 +183,22 @@
             border: 2px solid #dd6b20;
         }
 
+        /* Improved dot colors for better visibility */
+        .calendar-day.has-single-events .event-dot {
+            background: #ffffff;
+            border: 1px solid #3182ce;
+        }
+
+        .calendar-day.has-continuous-events .event-dot {
+            background: #ffffff;
+            border: 1px solid #c53030;
+        }
+
+        .calendar-day.has-mixed-events .event-dot {
+            background: #2d3748;
+            border: 1px solid #dd6b20;
+        }
+
         .calendar-day.event-start {
             position: relative;
         }
@@ -495,6 +511,7 @@
             .calendar-day {
                 min-height: 60px;
                 padding: 0.25rem;
+                aspect-ratio: 1;
             }
 
             .sidebar-header {
@@ -540,31 +557,112 @@
             }
         }
 
+        @media (max-width: 640px) {
+            .calendar-days {
+                grid-template-columns: repeat(7, minmax(35px, 1fr));
+                gap: 2px;
+            }
+
+            .weekdays {
+                grid-template-columns: repeat(7, minmax(35px, 1fr));
+                gap: 2px;
+            }
+
+            .calendar-day {
+                min-height: 45px;
+                padding: 0.2rem;
+                aspect-ratio: 1;
+            }
+
+            .day-number {
+                font-size: 0.9rem;
+                margin-bottom: 0.1rem;
+            }
+
+            .event-dot {
+                width: 4px;
+                height: 4px;
+            }
+
+            .calendar-day.event-start::before,
+            .calendar-day.event-end::after {
+                width: 4px;
+                height: 4px;
+            }
+        }
+
         @media (max-width: 480px) {
             .calendar-nav {
                 gap: 0.25rem;
             }
 
             .nav-btn {
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
-
-            .weekdays {
-                gap: 0.25rem;
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
             }
 
             .calendar-days {
-                gap: 0.25rem;
+                grid-template-columns: repeat(7, minmax(30px, 1fr));
+                gap: 1px;
+            }
+
+            .weekdays {
+                grid-template-columns: repeat(7, minmax(30px, 1fr));
+                gap: 1px;
             }
 
             .calendar-day {
-                min-height: 50px;
+                min-height: 40px;
+                padding: 0.15rem;
             }
 
             .day-number {
-                font-size: 1rem;
+                font-size: 0.8rem;
+                margin-bottom: 0.1rem;
+            }
+
+            .weekday {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.1rem;
+            }
+
+            .event-dot {
+                width: 3px;
+                height: 3px;
+            }
+
+            .calendar-day.event-start::before,
+            .calendar-day.event-end::after {
+                width: 3px;
+                height: 3px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .calendar-days {
+                grid-template-columns: repeat(7, minmax(25px, 1fr));
+                gap: 1px;
+            }
+
+            .weekdays {
+                grid-template-columns: repeat(7, minmax(25px, 1fr));
+                gap: 1px;
+            }
+
+            .calendar-day {
+                min-height: 35px;
+                padding: 0.1rem;
+            }
+
+            .day-number {
+                font-size: 0.75rem;
+                margin-bottom: 0.05rem;
+            }
+
+            .weekday {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.05rem;
             }
         }
     </style>
