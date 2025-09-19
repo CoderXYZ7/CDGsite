@@ -342,15 +342,66 @@
         .event-meta {
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            gap: 0.5rem;
             font-size: 0.9rem;
         }
 
-        .event-date, .event-time, .event-place {
+        .event-datetime {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .datetime-row {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             color: var(--text-medium);
+        }
+
+        .datetime-label {
+            font-weight: 600;
+            min-width: 50px;
+            color: var(--text-dark);
+        }
+
+        .datetime-value {
+            color: var(--text-medium);
+            font-weight: 500;
+        }
+
+        .day-counter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #e6fffa;
+            color: #2b6cb0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            align-self: flex-start;
+        }
+
+        .duration-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #fef5e7;
+            color: #d69e2e;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            align-self: flex-start;
+        }
+
+        .event-place {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-medium);
+            font-weight: 500;
         }
 
         .event-description {
@@ -683,7 +734,7 @@
                 // Event type badge
                 const eventType = document.createElement('div');
                 eventType.className = `event-type ${event.event_type}`;
-                eventType.textContent = event.event_type === 'continuous' ? 'Continuo' : 'Singolo';
+                eventType.textContent = event.event_type === 'continuous' ? 'Evento Continuo' : 'Evento Singolo';
                 eventCard.appendChild(eventType);
 
                 // Event title
@@ -696,11 +747,85 @@
                 const eventMeta = document.createElement('div');
                 eventMeta.className = 'event-meta';
 
-                // Time
-                const eventTime = document.createElement('div');
-                eventTime.className = 'event-time';
-                eventTime.innerHTML = `<i class="fas fa-clock"></i> ${event.time}`;
-                eventMeta.appendChild(eventTime);
+                if (event.event_type === 'continuous' && event.end_date && event.end_date !== '') {
+                    // For continuous events, show start and end info
+                    const startDateTime = document.createElement('div');
+                    startDateTime.className = 'event-datetime';
+                    startDateTime.innerHTML = `
+                        <div class="datetime-row">
+                            <i class="fas fa-play-circle"></i>
+                            <span class="datetime-label">Inizio:</span>
+                            <span class="datetime-value">${event.date.toLocaleDateString('it-IT')} alle ${event.time}</span>
+                        </div>
+                    `;
+                    eventMeta.appendChild(startDateTime);
+
+                    const endDateTime = document.createElement('div');
+                    endDateTime.className = 'event-datetime';
+                    endDateTime.innerHTML = `
+                        <div class="datetime-row">
+                            <i class="fas fa-stop-circle"></i>
+                            <span class="datetime-label">Fine:</span>
+                            <span class="datetime-value">${new Date(event.end_date).toLocaleDateString('it-IT')} alle ${event.end_time}</span>
+                        </div>
+                    `;
+                    eventMeta.appendChild(endDateTime);
+
+                    // Day counter for continuous events
+                    const eventStart = new Date(event.date);
+                    const eventEnd = new Date(event.end_date);
+                    const totalDays = Math.ceil((eventEnd - eventStart) / (1000 * 60 * 60 * 24)) + 1;
+                    const currentDay = Math.ceil((day - eventStart) / (1000 * 60 * 60 * 24)) + 1;
+
+                    const dayCounter = document.createElement('div');
+                    dayCounter.className = 'day-counter';
+                    dayCounter.innerHTML = `<i class="fas fa-hashtag"></i> Giorno ${currentDay} di ${totalDays}`;
+                    eventMeta.appendChild(dayCounter);
+
+                    // Duration
+                    const startDateTimeObj = new Date(event.date.getFullYear(), event.date.getMonth(), event.date.getDate(),
+                                                      event.time.split(':')[0], event.time.split(':')[1]);
+                    const endDateTimeObj = new Date(event.end_date + 'T' + event.end_time);
+                    const diffMs = endDateTimeObj - startDateTimeObj;
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+                    let duration = '';
+                    if (diffDays > 0) duration += `${diffDays} giorni `;
+                    if (diffHours > 0) duration += `${diffHours} ore `;
+                    if (diffMinutes > 0) duration += `${diffMinutes} min`;
+
+                    if (duration.trim()) {
+                        const durationInfo = document.createElement('div');
+                        durationInfo.className = 'duration-info';
+                        durationInfo.innerHTML = `<i class="fas fa-hourglass-half"></i> Durata: ${duration.trim()}`;
+                        eventMeta.appendChild(durationInfo);
+                    }
+                } else {
+                    // For single events, show date and time
+                    const eventDateTime = document.createElement('div');
+                    eventDateTime.className = 'event-datetime';
+                    eventDateTime.innerHTML = `
+                        <div class="datetime-row">
+                            <i class="fas fa-calendar-day"></i>
+                            <span class="datetime-label">Data:</span>
+                            <span class="datetime-value">${event.date.toLocaleDateString('it-IT')}</span>
+                        </div>
+                    `;
+                    eventMeta.appendChild(eventDateTime);
+
+                    const eventTime = document.createElement('div');
+                    eventTime.className = 'event-datetime';
+                    eventTime.innerHTML = `
+                        <div class="datetime-row">
+                            <i class="fas fa-clock"></i>
+                            <span class="datetime-label">Ora:</span>
+                            <span class="datetime-value">${event.time}</span>
+                        </div>
+                    `;
+                    eventMeta.appendChild(eventTime);
+                }
 
                 // Place
                 const eventPlace = document.createElement('div');
@@ -714,42 +839,8 @@
                 if (event.description) {
                     const eventDescription = document.createElement('div');
                     eventDescription.className = 'event-description';
-                    eventDescription.textContent = event.description;
+                    eventDescription.innerHTML = `<i class="fas fa-info-circle"></i> ${event.description}`;
                     eventCard.appendChild(eventDescription);
-                }
-
-                // Duration and day info for continuous events
-                if (event.event_type === 'continuous' && event.end_date && event.end_date !== '') {
-                    const eventStart = new Date(event.date);
-                    const eventEnd = new Date(event.end_date);
-                    const totalDays = Math.ceil((eventEnd - eventStart) / (1000 * 60 * 60 * 24)) + 1;
-                    const currentDay = Math.ceil((day - eventStart) / (1000 * 60 * 60 * 24)) + 1;
-
-                    const dayInfo = document.createElement('div');
-                    dayInfo.className = 'duration-badge';
-                    dayInfo.innerHTML = `<i class="fas fa-hashtag"></i> Giorno ${currentDay} di ${totalDays}`;
-                    eventCard.appendChild(dayInfo);
-
-                    // Duration badge
-                    const startDateTime = new Date(event.date.getFullYear(), event.date.getMonth(), event.date.getDate(),
-                                                  event.time.split(':')[0], event.time.split(':')[1]);
-                    const endDateTime = new Date(event.end_date + 'T' + event.end_time);
-                    const diffMs = endDateTime - startDateTime;
-                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-                    let duration = '';
-                    if (diffDays > 0) duration += `${diffDays}g `;
-                    if (diffHours > 0) duration += `${diffHours}h `;
-                    if (diffMinutes > 0) duration += `${diffMinutes}m`;
-
-                    if (duration.trim()) {
-                        const durationBadge = document.createElement('div');
-                        durationBadge.className = 'duration-badge';
-                        durationBadge.innerHTML = `<i class="fas fa-hourglass-half"></i> ${duration.trim()}`;
-                        eventCard.appendChild(durationBadge);
-                    }
                 }
 
                 eventsList.appendChild(eventCard);
