@@ -636,7 +636,11 @@
                     const eventDate = new Date(event.date);
                     if (event.event_type === 'continuous' && event.end_date) {
                         const endDate = new Date(event.end_date);
-                        return day >= eventDate && day <= endDate;
+                        // Normalize dates to avoid timezone issues
+                        const dayNormalized = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+                        const startNormalized = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+                        const endNormalized = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                        return dayNormalized >= startNormalized && dayNormalized <= endNormalized;
                     } else {
                         return eventDate.toDateString() === day.toDateString();
                     }
@@ -772,10 +776,11 @@
                     eventMeta.appendChild(endDateTime);
 
                     // Day counter for continuous events
-                    const eventStart = new Date(event.date);
-                    const eventEnd = new Date(event.end_date);
+                    const eventStart = new Date(event.date.getFullYear(), event.date.getMonth(), event.date.getDate());
+                    const eventEnd = new Date(new Date(event.end_date).getFullYear(), new Date(event.end_date).getMonth(), new Date(event.end_date).getDate());
+                    const dayNormalized = new Date(day.getFullYear(), day.getMonth(), day.getDate());
                     const totalDays = Math.ceil((eventEnd - eventStart) / (1000 * 60 * 60 * 24)) + 1;
-                    const currentDay = Math.ceil((day - eventStart) / (1000 * 60 * 60 * 24)) + 1;
+                    const currentDay = Math.floor((dayNormalized - eventStart) / (1000 * 60 * 60 * 24)) + 1;
 
                     const dayCounter = document.createElement('div');
                     dayCounter.className = 'day-counter';
