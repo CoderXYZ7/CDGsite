@@ -16,95 +16,159 @@ checkTag('admin'); // Allowed tags
 <body>
     <div id="nav-placeholder"></div>
     <main class="main-wrapper">
-        <h1>Event Scheduler</h1>
-        
-        <div class="section">
-            <h2>Start Date</h2>
+        <div class="page-header">
+            <h1><i class="fas fa-calendar-alt"></i> Event Scheduler</h1>
+            <p class="page-subtitle">Manage and schedule events for your organization</p>
+        </div>
+
+        <!-- Week Selection Section -->
+        <div class="section week-selector">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-week"></i> Week Selection</h2>
+            </div>
             <div class="form-row">
                 <div class="form-control">
                     <label for="start-date">Select Sunday to start the week from:</label>
                     <input type="date" id="start-date" onchange="validateSunday()">
                 </div>
-                <button onclick="generateWeek()">Generate Week</button>
+                <button onclick="generateWeek()" class="primary-btn">
+                    <i class="fas fa-sync-alt"></i> Generate Week
+                </button>
             </div>
             <div id="week-days" class="week-days"></div>
         </div>
-        
-        <div class="container">
-            <div class="section">
-                <h2>Create Event</h2>
-                <div class="form-row">
-                    <div class="form-control">
-                        <label for="selected-day">Selected Day:</label>
-                        <input type="text" id="selected-day" readonly>
+
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Create Event Section -->
+            <div class="section create-event-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-plus-circle"></i> Create New Event</h2>
+                </div>
+
+                <div class="form-grid">
+                    <!-- Date and Time -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-clock"></i> Date & Time</h3>
+                        <div class="form-row">
+                            <div class="form-control">
+                                <label for="selected-day">Selected Day:</label>
+                                <input type="text" id="selected-day" readonly>
+                            </div>
+                            <button onclick="showCustomDateDialog()" class="secondary-btn">
+                                <i class="fas fa-calendar-plus"></i> Custom Date
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-time">Start Time:</label>
+                            <input type="time" id="event-time" onchange="updateDurationPreview()">
+                        </div>
                     </div>
-                    <button onclick="showCustomDateDialog()" class="secondary">Custom Date</button>
-                </div>
-                <div class="form-group">
-                    <label for="event-time">Time:</label>
-                    <input type="time" id="event-time">
-                </div>
-                <div class="form-row">
-                    <div class="form-control">
-                        <label for="event-place">Place:</label>
-                        <select id="event-place">
-                            <option value="">Select a place</option>
-                            <option value="Conference Room A">Conference Room A</option>
-                            <option value="Conference Room B">Conference Room B</option>
-                            <option value="Auditorium">Auditorium</option>
-                            <option value="Cafeteria">Cafeteria</option>
-                            <option value="Meeting Room 1">Meeting Room 1</option>
-                            <option value="Meeting Room 2">Meeting Room 2</option>
-                        </select>
+
+                    <!-- Event Details -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-info-circle"></i> Event Details</h3>
+                        <div class="form-group">
+                            <label for="event-title">Title:</label>
+                            <input type="text" id="event-title" placeholder="Enter event title">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-control">
+                                <label for="event-place">Place:</label>
+                                <select id="event-place">
+                                    <option value="">Select a place</option>
+                                    <option value="Conference Room A">Conference Room A</option>
+                                    <option value="Conference Room B">Conference Room B</option>
+                                    <option value="Auditorium">Auditorium</option>
+                                    <option value="Cafeteria">Cafeteria</option>
+                                    <option value="Meeting Room 1">Meeting Room 1</option>
+                                    <option value="Meeting Room 2">Meeting Room 2</option>
+                                </select>
+                            </div>
+                            <button onclick="showCustomPlaceDialog()" class="secondary-btn">
+                                <i class="fas fa-plus"></i> Add Custom
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label for="event-description">Description:</label>
+                            <textarea id="event-description" rows="3" placeholder="Enter event description"></textarea>
+                        </div>
                     </div>
-                    <button onclick="showCustomPlaceDialog()" class="secondary">Add Custom</button>
-                </div>
-                <div class="form-group">
-                    <label for="event-title">Title:</label>
-                    <input type="text" id="event-title">
-                </div>
-                <div class="form-group">
-                    <label>Event Type:</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="event-type" value="single" checked> Single Event</label>
-                        <label><input type="radio" name="event-type" value="continuous"> Continuous Event</label>
+
+                    <!-- Event Type -->
+                    <div class="form-section">
+                        <h3><i class="fas fa-cogs"></i> Event Type</h3>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="event-type" value="single" checked>
+                                <span class="radio-label">
+                                    <i class="fas fa-dot-circle"></i> Single Event
+                                </span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="event-type" value="continuous">
+                                <span class="radio-label">
+                                    <i class="fas fa-arrows-alt-h"></i> Continuous Event
+                                </span>
+                            </label>
+                        </div>
+
+                        <div id="end-datetime-section" class="continuous-options" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-control">
+                                    <label for="event-end-date">End Date:</label>
+                                    <input type="date" id="event-end-date" onchange="updateDurationPreview()">
+                                </div>
+                                <div class="form-control">
+                                    <label for="event-end-time">End Time:</label>
+                                    <input type="time" id="event-end-time" onchange="updateDurationPreview()">
+                                </div>
+                            </div>
+                            <div id="duration-preview" class="duration-info">
+                                <i class="fas fa-clock"></i> Duration will be calculated here
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="end-datetime-section" class="form-group" style="display: none;">
-                    <label for="event-end-date">End Date:</label>
-                    <input type="date" id="event-end-date" onchange="updateDurationPreview()">
-                    <label for="event-end-time">End Time:</label>
-                    <input type="time" id="event-end-time" onchange="updateDurationPreview()">
-                    <div id="duration-preview" style="margin-top: 0.5rem; font-weight: bold; color: #e53e3e;"></div>
+
+                <div class="form-actions">
+                    <button onclick="addEvent()" class="primary-btn large">
+                        <i class="fas fa-save"></i> Create Event
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="event-description">Description:</label>
-                    <textarea id="event-description" rows="4"></textarea>
-                </div>
-                <button onclick="addEvent()">Add Event</button>
             </div>
-            
-            <div class="section">
-                <h2>Event List</h2>
-                <div class="sort-buttons">
-                    <button onclick="sortEvents('date')">Sort by Date</button>
-                    <button onclick="sortEvents('place')">Sort by Place</button>
-                    <button onclick="exportToCsv()">Export to CSV</button>
+
+            <!-- Event List Section -->
+            <div class="section event-list-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-list"></i> Event List</h2>
+                    <div class="section-actions">
+                        <button onclick="sortEvents('date')" class="action-btn">
+                            <i class="fas fa-sort-amount-down"></i> Sort by Date
+                        </button>
+                        <button onclick="sortEvents('place')" class="action-btn">
+                            <i class="fas fa-sort-alpha-down"></i> Sort by Place
+                        </button>
+                        <button onclick="exportToCsv()" class="action-btn">
+                            <i class="fas fa-download"></i> Export CSV
+                        </button>
+                    </div>
                 </div>
+
                 <div id="events-container">
                     <div class="table-container">
                         <table id="events-table">
                             <thead>
                                 <tr>
-                                    <th>Type</th>
-                                    <th>Start Date</th>
-                                    <th>Start Time</th>
-                                    <th>End Date</th>
-                                    <th>End Time</th>
-                                    <th>Place</th>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Action</th>
+                                    <th><i class="fas fa-tag"></i> Type</th>
+                                    <th><i class="fas fa-calendar-day"></i> Start Date</th>
+                                    <th><i class="fas fa-clock"></i> Start Time</th>
+                                    <th><i class="fas fa-calendar-check"></i> End Date</th>
+                                    <th><i class="fas fa-clock"></i> End Time</th>
+                                    <th><i class="fas fa-map-marker-alt"></i> Place</th>
+                                    <th><i class="fas fa-heading"></i> Title</th>
+                                    <th><i class="fas fa-align-left"></i> Description</th>
+                                    <th><i class="fas fa-cogs"></i> Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="events-list"></tbody>
