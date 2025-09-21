@@ -4,7 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Development bypass for when database is not available
-define('DB_BYPASS', getenv('DB_BYPASS') ?: true);
+define('DB_BYPASS', getenv('DB_BYPASS') ?: false);
 
 require_once __DIR__ . '/config_app.php';
 
