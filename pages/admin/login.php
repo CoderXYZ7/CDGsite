@@ -1,6 +1,5 @@
-<!DOCTYPE html>
-<html>
-<?php include '../../config.php';
+<?php
+include '../../config.php';
 
 // Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {
@@ -68,6 +67,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
     }
 }
 ?>
+<!DOCTYPE html>
+<html>
 <head>
     <title>Login</title>
     <link rel="stylesheet" href="assets/login.css">

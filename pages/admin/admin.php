@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html>
 <?php
 include '../../config.php';
 checkAuth();
@@ -49,6 +47,8 @@ if ($db_available) {
     $error_message = "Database unavailable - User management features are disabled";
 }
 ?>
+<!DOCTYPE html>
+<html>
 <head>
     <title>Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
