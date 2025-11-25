@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="social-links">
                     <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
                     <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.youtube.com/c/CpdiSanGiorgiodiNogaro" class="social-link"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
             <div class="footer-links">
