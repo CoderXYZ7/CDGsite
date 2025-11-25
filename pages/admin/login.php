@@ -71,45 +71,48 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
 <html>
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="assets/login.css">
+    <link rel="stylesheet" href="../../static/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-    <div class="login-container">
-        <h1>Admin Login</h1>
+<body class="login-body">
+    <div class="card login-card">
+        <div class="card-content">
+            <h1 style="text-align: center; color: var(--primary-color); margin-bottom: 2rem;">Admin Login</h1>
 
-        <?php if (DB_BYPASS): ?>
-            <div class="error" style="background-color: #fff3cd; color: #856404; border-color: #ffeaa7;">
-                ⚠️ Development Mode: Database bypass enabled. Use admin/admin to login.
-            </div>
-        <?php endif; ?>
-
-        <?php if (isset($error)): ?>
-            <div class="error"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
-        
-        <form method="POST">
-            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-            
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required autofocus>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="password-container">
-                    <input type="password" id="password" name="password" required>
-                    <button type="button" class="toggle-password" aria-label="Show password">👁️</button>
+            <?php if (DB_BYPASS): ?>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Development Mode: Database bypass enabled. Use admin/admin to login.
                 </div>
-            </div>
+            <?php endif; ?>
+
+            <?php if (isset($error)): ?>
+                <div class="alert alert-error"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
             
-            <div class="remember-me">
-                <input type="checkbox" id="remember" name="remember">
-                <label for="remember">Remember me</label>
-            </div>
-            
-            <button type="submit" class="button">Login</button>
-        </form>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required autofocus>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" required>
+                        <button type="button" class="toggle-password" aria-label="Show password"><i class="fas fa-eye"></i></button>
+                    </div>
+                </div>
+                
+                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="remember" name="remember" style="width: auto;">
+                    <label for="remember" style="margin: 0;">Remember me</label>
+                </div>
+                
+                <button type="submit" class="button primary" style="width: 100%;">Login</button>
+            </form>
+        </div>
     </div>
     
     <script src="assets/login.js"></script>

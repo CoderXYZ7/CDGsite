@@ -64,13 +64,13 @@ if ($db_available) {
             </section>
 
             <?php if (isset($success_message)): ?>
-                <div class="success" style="background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                <div class="alert alert-success">
                     <i class="fas fa-check-circle"></i> <?= htmlspecialchars($success_message) ?>
                 </div>
             <?php endif; ?>
 
             <?php if (isset($error_message)): ?>
-                <div class="error" style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                <div class="alert alert-error">
                     <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($error_message) ?>
                 </div>
             <?php endif; ?>
@@ -89,7 +89,7 @@ if ($db_available) {
                         </div>
                         <div class="form-group">
                             <label for="tag">User Role</label>
-                            <select name="tag" id="tag">
+                            <select name="tag" id="tag" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
                                 <option value="admin">Admin</option>
                                 <option value="student">Student</option>
                             </select>
@@ -103,7 +103,7 @@ if ($db_available) {
                 <div class="card-content">
                     <h3><i class="fas fa-users-cog"></i> Manage Users</h3>
                     <form method="POST">
-                        <table class="pdf-table">
+                        <table class="admin-table">
                             <thead>
                                 <tr>
                                     <th>Username</th>
@@ -115,7 +115,7 @@ if ($db_available) {
                                     <tr>
                                         <td><?= htmlspecialchars($user['username']) ?></td>
                                         <td>
-                                            <select name="tags[<?= $user['id'] ?>]">
+                                            <select name="tags[<?= $user['id'] ?>]" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ddd;">
                                                 <option value="admin" <?= $user['tag'] === 'admin' ? 'selected' : '' ?>>Admin</option>
                                                 <option value="student" <?= $user['tag'] === 'student' ? 'selected' : '' ?>>Student</option>
                                             </select>

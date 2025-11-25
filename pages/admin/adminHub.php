@@ -8,7 +8,6 @@ checkAuth();
     <title>Hub</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../static/css/styles.css">
-    <link rel="stylesheet" href="assets/adminHub.css">
 </head>
 <body>
     <div id="nav-placeholder"></div>
@@ -28,7 +27,7 @@ checkAuth();
                     <h3><i class="fas fa-th-large"></i> Available Modules</h3>
                     <div class="page-links">
                         <?php if ($db === null): ?>
-                            <div class="error" style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                            <div class="alert alert-warning">
                                 <i class="fas fa-exclamation-triangle"></i> Database unavailable - Module links cannot be loaded
                             </div>
                             <!-- Fallback links for common pages -->
@@ -48,7 +47,7 @@ checkAuth();
                                     }
                                 }
                             } catch (Exception $e) {
-                                echo "<div class='error'>Error loading pages: " . htmlspecialchars($e->getMessage()) . "</div>";
+                                echo "<div class='alert alert-error'>Error loading pages: " . htmlspecialchars($e->getMessage()) . "</div>";
                             }
                             ?>
                         <?php endif; ?>
@@ -56,7 +55,7 @@ checkAuth();
                 </div>
             </section>
 
-            <a href="logout.php" class="button danger" style="margin-top: 1rem;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="logout.php" class="button secondary" style="margin-top: 1rem; background-color: #dc3545; border-color: #dc3545;"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </main>
     <script src="assets/adminNav.js"></script>
