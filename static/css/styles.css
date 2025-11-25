@@ -244,18 +244,7 @@ body {
     margin-bottom: 3rem;
 }
 
-.hero.hero-solid {
-    background: var(--primary-color);
-    padding: 3rem 0;
-    border-radius: 0;
-}
 
-.hero.hero-gradient {
-    background: linear-gradient(135deg, var(--primary-color), #2d3748);
-    padding: 2rem 1rem;
-    border-radius: 0;
-    margin-bottom: 1.5rem;
-}
 
 .hero h1 {
     font-size: 2.5rem;
@@ -1575,9 +1564,9 @@ body {
 }
 
 /* Eventi Page Styles */
-/* .page-header removed, replaced by .hero.hero-gradient */
+/* .page-header removed, replaced by .hero */
 
-.hero.hero-gradient h1 {
+.hero h1 {
     font-size: 2rem;
     margin-bottom: 0.25rem;
     display: flex;
@@ -1586,7 +1575,7 @@ body {
     gap: 0.75rem;
 }
 
-.hero.hero-gradient .page-subtitle {
+.hero .page-subtitle {
     font-size: 1rem;
     opacity: 0.9;
     margin: 0;
