@@ -4,108 +4,97 @@ checkAuth();
 checkTag('admin'); // Allowed tags
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Scheduler</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Gestione Eventi - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../static/css/styles.css">
     <link rel="stylesheet" href="assets/adminEve.css">
 </head>
 <body>
     <div id="nav-placeholder"></div>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+
     <main class="main-wrapper">
         <div class="page-header">
-            <h1><i class="fas fa-calendar-alt"></i> Event Scheduler</h1>
-            <p class="page-subtitle">Manage and schedule events for your organization</p>
-        </div>
-
-        <!-- Week Selection Section -->
-        <div class="section week-selector">
-            <div class="section-header">
-                <h2><i class="fas fa-calendar-week"></i> Week Selection</h2>
-            </div>
-            <div class="form-row">
-                <div class="form-control">
-                    <label for="start-date">Select Sunday to start the week from:</label>
-                    <input type="date" id="start-date" onchange="validateSunday()">
-                </div>
-                <button onclick="generateWeek()" class="primary-btn">
-                    <i class="fas fa-sync-alt"></i> Generate Week
-                </button>
-            </div>
-            <div id="week-days" class="week-days"></div>
+            <h1><i class="fas fa-calendar-alt"></i> Gestione Eventi</h1>
+            <p class="page-subtitle">Crea, modifica ed elimina gli eventi della comunità</p>
         </div>
 
         <!-- Create Event Section -->
         <div class="section create-event-section">
             <div class="section-header">
-                <h2><i class="fas fa-plus-circle"></i> Create New Event</h2>
+                <h2><i class="fas fa-plus-circle"></i> Crea Nuovo Evento</h2>
             </div>
 
-            <!-- Compact Form Layout -->
             <div class="compact-form">
                 <!-- Row 1: Event Type & Title -->
                 <div class="form-row">
                     <div class="form-control event-type-control">
-                        <label>Event Type:</label>
+                        <label>Tipo di Evento:</label>
                         <div class="radio-group compact">
                             <label class="radio-option">
                                 <input type="radio" name="event-type" value="single" checked>
-                                <span class="radio-label">Single</span>
+                                <span class="radio-label">Singolo</span>
                             </label>
                             <label class="radio-option">
                                 <input type="radio" name="event-type" value="continuous">
-                                <span class="radio-label">Continuous</span>
+                                <span class="radio-label">Continuativo</span>
                             </label>
                         </div>
                     </div>
                     <div class="form-control">
-                        <label for="event-title">Title:</label>
-                        <input type="text" id="event-title" placeholder="Event title">
+                        <label for="event-title">Titolo:</label>
+                        <input type="text" id="event-title" placeholder="Titolo dell'evento">
                     </div>
                 </div>
 
                 <!-- Row 2: Date & Time -->
                 <div class="form-row">
                     <div class="form-control">
-                        <label for="selected-day">Selected Day:</label>
-                        <input type="text" id="selected-day" readonly>
+                        <label for="event-date">Data:</label>
+                        <input type="date" id="event-date">
                     </div>
                     <div class="form-control">
-                        <label for="event-time">Start Time:</label>
-                        <input type="time" id="event-time" onchange="updateDurationPreview()">
-                    </div>
-                    <div class="form-control">
-                        <button onclick="showCustomDateDialog()" class="secondary-btn compact">
-                            <i class="fas fa-calendar-plus"></i> Custom Date
-                        </button>
+                        <label for="event-time">Ora inizio:</label>
+                        <input type="time" id="event-time">
                     </div>
                 </div>
 
                 <!-- Row 3: Place & Description -->
                 <div class="form-row">
                     <div class="form-control">
-                        <label for="event-place">Place:</label>
+                        <label for="event-place">Luogo:</label>
                         <select id="event-place">
-                            <option value="">Select place</option>
-                            <option value="Conference Room A">Conference Room A</option>
-                            <option value="Conference Room B">Conference Room B</option>
-                            <option value="Auditorium">Auditorium</option>
-                            <option value="Cafeteria">Cafeteria</option>
-                            <option value="Meeting Room 1">Meeting Room 1</option>
-                            <option value="Meeting Room 2">Meeting Room 2</option>
+                            <option value="">Seleziona luogo</option>
+                            <option value="Chiesa di San Giorgio">Chiesa di San Giorgio</option>
+                            <option value="Chiesa di San Nicolò">Chiesa di San Nicolò</option>
+                            <option value="Oratorio">Oratorio</option>
+                            <option value="Salone Parrocchiale">Salone Parrocchiale</option>
+                            <option value="Piazza Duomo">Piazza Duomo</option>
+                            <option value="Parrocchia di Marano Lagunare">Parrocchia di Marano Lagunare</option>
+                            <option value="Parrocchia di Porpetto">Parrocchia di Porpetto</option>
+                            <option value="Parrocchia di Carlino">Parrocchia di Carlino</option>
+                            <option value="Parrocchia di Corgnolo">Parrocchia di Corgnolo</option>
+                            <option value="Parrocchia di Porto Nogaro">Parrocchia di Porto Nogaro</option>
+                            <option value="Parrocchia di Villanova">Parrocchia di Villanova</option>
+                            <option value="Parrocchia di Zellina">Parrocchia di Zellina</option>
                         </select>
                     </div>
-                    <div class="form-control">
-                        <button onclick="showCustomPlaceDialog()" class="secondary-btn compact">
-                            <i class="fas fa-plus"></i> Custom
+                    <div class="form-control" style="flex: 0 0 auto;">
+                        <label>&nbsp;</label>
+                        <button type="button" onclick="showCustomPlaceDialog()" class="secondary-btn compact">
+                            <i class="fas fa-plus"></i> Altro
                         </button>
                     </div>
                     <div class="form-control">
-                        <label for="event-description">Description:</label>
-                        <input type="text" id="event-description" placeholder="Brief description">
+                        <label for="event-description">Descrizione:</label>
+                        <input type="text" id="event-description" placeholder="Descrizione (opzionale)">
                     </div>
                 </div>
 
@@ -113,25 +102,23 @@ checkTag('admin'); // Allowed tags
                 <div id="end-datetime-section" class="continuous-options" style="display: none;">
                     <div class="form-row">
                         <div class="form-control">
-                            <label for="event-end-date">End Date:</label>
+                            <label for="event-end-date">Data fine:</label>
                             <input type="date" id="event-end-date" onchange="updateDurationPreview()">
                         </div>
                         <div class="form-control">
-                            <label for="event-end-time">End Time:</label>
+                            <label for="event-end-time">Ora fine:</label>
                             <input type="time" id="event-end-time" onchange="updateDurationPreview()">
                         </div>
                         <div class="form-control">
-                            <div id="duration-preview" class="duration-info">
-                                <i class="fas fa-clock"></i> Duration: calculating...
-                            </div>
+                            <div id="duration-preview" class="duration-info"></div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Action Button -->
                 <div class="form-actions">
-                    <button onclick="addEvent()" class="primary-btn">
-                        <i class="fas fa-save"></i> Create Event
+                    <button type="button" onclick="addEvent()" class="primary-btn">
+                        <i class="fas fa-save"></i> Crea Evento
                     </button>
                 </div>
             </div>
@@ -140,16 +127,16 @@ checkTag('admin'); // Allowed tags
         <!-- Event List Section -->
         <div class="section event-list-section">
             <div class="section-header">
-                <h2><i class="fas fa-list"></i> Event List</h2>
+                <h2><i class="fas fa-list"></i> Lista Eventi</h2>
                 <div class="section-actions">
-                    <button onclick="sortEvents('date')" class="action-btn">
-                        <i class="fas fa-sort-amount-down"></i> Sort by Date
+                    <button type="button" onclick="sortEvents('date')" class="action-btn">
+                        <i class="fas fa-sort-amount-down"></i> Per Data
                     </button>
-                    <button onclick="sortEvents('place')" class="action-btn">
-                        <i class="fas fa-sort-alpha-down"></i> Sort by Place
+                    <button type="button" onclick="sortEvents('place')" class="action-btn">
+                        <i class="fas fa-sort-alpha-down"></i> Per Luogo
                     </button>
-                    <button onclick="exportToCsv()" class="action-btn">
-                        <i class="fas fa-download"></i> Export CSV
+                    <button type="button" onclick="exportToCsv()" class="action-btn">
+                        <i class="fas fa-download"></i> Esporta CSV
                     </button>
                 </div>
             </div>
@@ -159,12 +146,12 @@ checkTag('admin'); // Allowed tags
                     <table id="events-table">
                         <thead>
                             <tr>
-                                <th>Type</th>
-                                <th><i class="fas fa-calendar-day"></i> Date/Time</th>
-                                <th><i class="fas fa-map-marker-alt"></i> Place</th>
-                                <th><i class="fas fa-heading"></i> Title</th>
-                                <th><i class="fas fa-align-left"></i> Description</th>
-                                <th><i class="fas fa-cogs"></i> Actions</th>
+                                <th>Tipo</th>
+                                <th><i class="fas fa-calendar-day"></i> Data/Ora</th>
+                                <th><i class="fas fa-map-marker-alt"></i> Luogo</th>
+                                <th><i class="fas fa-heading"></i> Titolo</th>
+                                <th><i class="fas fa-align-left"></i> Descrizione</th>
+                                <th><i class="fas fa-cogs"></i> Azioni</th>
                             </tr>
                         </thead>
                         <tbody id="events-list"></tbody>
@@ -172,40 +159,84 @@ checkTag('admin'); // Allowed tags
                 </div>
             </div>
         </div>
-        
-        <!-- Custom Date Dialog -->
-        <div id="custom-date-dialog" class="custom-input-dialog">
-            <div class="dialog-content">
-                <h3>Enter Custom Date</h3>
-                <div class="form-group">
-                    <label for="custom-date">Date (dd/mm/yyyy):</label>
-                    <input type="date" id="custom-date">
-                </div>
-                <div class="dialog-buttons">
-                    <button onclick="closeCustomDateDialog()" class="secondary">Cancel</button>
-                    <button onclick="addCustomDate()">Add Date</button>
-                </div>
-            </div>
-        </div>
-        
+
         <!-- Custom Place Dialog -->
         <div id="custom-place-dialog" class="custom-input-dialog">
             <div class="dialog-content">
-                <h3>Enter Custom Place</h3>
+                <h3>Inserisci Luogo Personalizzato</h3>
                 <div class="form-group">
-                    <label for="custom-place">Place Name:</label>
-                    <input type="text" id="custom-place">
+                    <label for="custom-place">Nome del luogo:</label>
+                    <input type="text" id="custom-place" placeholder="es. Sagrato della chiesa">
                 </div>
                 <div class="dialog-buttons">
-                    <button onclick="closeCustomPlaceDialog()" class="secondary">Cancel</button>
-                    <button onclick="addCustomPlace()">Add Place</button>
+                    <button type="button" onclick="closeCustomPlaceDialog()" class="secondary">Annulla</button>
+                    <button type="button" onclick="addCustomPlace()">Aggiungi</button>
                 </div>
             </div>
         </div>
 
-        <script src="assets/adminEve.js"></script>
+        <!-- Edit Event Dialog -->
+        <div id="edit-event-dialog" class="custom-input-dialog">
+            <div class="dialog-content dialog-wide">
+                <h3><i class="fas fa-edit"></i> Modifica Evento</h3>
+                <input type="hidden" id="edit-event-id">
+                <div class="form-group">
+                    <label>Tipo di Evento:</label>
+                    <div class="radio-group compact">
+                        <label class="radio-option">
+                            <input type="radio" name="edit-event-type" value="single">
+                            <span class="radio-label">Singolo</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="edit-event-type" value="continuous">
+                            <span class="radio-label">Continuativo</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-title">Titolo:</label>
+                    <input type="text" id="edit-title">
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex:1">
+                        <label for="edit-date">Data:</label>
+                        <input type="date" id="edit-date">
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label for="edit-time">Ora inizio:</label>
+                        <input type="time" id="edit-time">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-place">Luogo:</label>
+                    <input type="text" id="edit-place">
+                </div>
+                <div class="form-group">
+                    <label for="edit-description">Descrizione:</label>
+                    <input type="text" id="edit-description" placeholder="Opzionale">
+                </div>
+                <div id="edit-end-datetime-section" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1">
+                            <label for="edit-end-date">Data fine:</label>
+                            <input type="date" id="edit-end-date">
+                        </div>
+                        <div class="form-group" style="flex:1">
+                            <label for="edit-end-time">Ora fine:</label>
+                            <input type="time" id="edit-end-time">
+                        </div>
+                    </div>
+                </div>
+                <div class="dialog-buttons">
+                    <button type="button" onclick="closeEditDialog()" class="secondary">Annulla</button>
+                    <button type="button" onclick="saveEdit()" class="primary-btn-dialog">Salva Modifiche</button>
+                </div>
+            </div>
+        </div>
     </main>
-    <div id="admin-username" style="display: none;">
+
+    <div id="admin-username" style="display: none;"><?php echo htmlspecialchars($_SESSION['username']); ?></div>
+    <script src="assets/adminEve.js"></script>
     <script src="assets/adminNav.js"></script>
 </body>
 </html>

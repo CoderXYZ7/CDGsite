@@ -189,45 +189,6 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
         
-        .week-days {
-            display: flex;
-            flex-wrap: wrap;
-            gap: var(--space-xs);
-            margin-bottom: var(--space-md);
-        }
-        
-        .day-button {
-            padding: var(--space-xs);
-            background-color: var(--white);
-            border: var(--border-width) solid #ddd;
-            border-radius: var(--border-radius-sm);
-            cursor: pointer;
-            font-size: var(--font-size-small);
-            text-align: center;
-            width: 70px;
-            transition: var(--transition);
-        }
-        
-        .day-button:hover {
-            border-color: var(--accent-red);
-        }
-        
-        .day-button .day-name {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 2px;
-        }
-        
-        .day-button .day-date {
-            font-size: var(--font-size-small);
-        }
-        
-        .day-button.selected {
-            background-color: var(--accent-red);
-            color: var(--white);
-            border-color: var(--accent-red);
-        }
-        
         .form-group {
             margin-bottom: var(--space-md);
         }
@@ -610,6 +571,113 @@
         .secondary-btn.compact {
             padding: var(--space-xs) var(--space-sm);
             font-size: var(--font-size-small);
+        }
+
+        /* Toast notifications */
+        #toast-container {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-small);
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            max-width: 320px;
+        }
+
+        .toast.toast-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-success {
+            background: #276749;
+            color: white;
+        }
+
+        .toast-error {
+            background: #c53030;
+            color: white;
+        }
+
+        .toast-info {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Edit button */
+        .edit-btn {
+            background: transparent;
+            border: 1px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 4px;
+        }
+
+        .edit-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .action-cell {
+            white-space: nowrap;
+        }
+
+        /* Wide dialog for edit form */
+        .dialog-wide {
+            width: 500px;
+            max-width: 95vw;
+        }
+
+        .dialog-wide .form-row {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .dialog-wide .form-group {
+            margin-bottom: var(--space-sm);
+        }
+
+        /* Primary button style for dialog */
+        .primary-btn-dialog {
+            background: linear-gradient(135deg, var(--accent-red), #ff6a3d);
+            color: var(--white);
+            border: none;
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-family: var(--font-family);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .primary-btn-dialog:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
 
         /* Responsive adjustments */
