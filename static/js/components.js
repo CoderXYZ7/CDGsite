@@ -118,49 +118,6 @@ document.addEventListener('DOMContentLoaded', function() {
         footerPlaceholder.innerHTML = footerHtml;
     }
 
-    // Collapsible functionality with animation and arrow rotation
-    const collapsibleLists = document.querySelectorAll('.collapsible-list');
-    collapsibleLists.forEach(list => {
-        const content = list.nextElementSibling;
-        const icon = list.querySelector('.collapsible-icon');
-        
-        // Initialize collapsed state
-        content.style.display = 'none';
-        content.style.overflow = 'hidden';
-        content.style.transition = 'max-height 0.3s ease, opacity 0.3s ease';
-        
-        list.addEventListener('click', () => {
-            const isExpanded = content.style.display === 'block';
-            
-            if (isExpanded) {
-                // Collapse
-                content.style.maxHeight = '0';
-                content.style.opacity = '0';
-                setTimeout(() => {
-                    content.style.display = 'none';
-                }, 300);
-            } else {
-                // Expand
-                content.style.display = 'block';
-                const contentHeight = content.scrollHeight;
-                content.style.maxHeight = '0';
-                content.style.opacity = '0';
-                
-                // Trigger reflow
-                void content.offsetHeight;
-                
-                content.style.maxHeight = `${contentHeight}px`;
-                content.style.opacity = '1';
-            }
-            
-            // Rotate icon
-            if (icon) {
-                icon.style.transition = 'transform 0.3s ease';
-                icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(90deg)';
-            }
-        });
-    });
-
     // Close mobile menu when clicking on a link
     const navLinks = document.querySelectorAll('.nav-list a, .card-link');
     navLinks.forEach(link => {

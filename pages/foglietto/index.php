@@ -17,7 +17,8 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
     <link rel="icon" type="image/png" href="../../static/images/LogoNoBG.png" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Foglietto</title>
+    <meta name="description" content="Foglietto settimanale della Collaborazione Pastorale di San Giorgio di Nogaro. Consulta e scarica il foglietto delle domeniche e delle settimane precedenti.">
+    <title>Foglietto Settimanale - Collaborazione Pastorale San Giorgio di Nogaro</title>
     <link rel="stylesheet" href="../../static/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- PDF.js CSS -->
