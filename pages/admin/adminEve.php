@@ -124,6 +124,91 @@ checkTag('admin'); // Allowed tags
             </div>
         </div>
 
+        <!-- CSV Import Section -->
+        <div class="section csv-import-section">
+            <div class="section-header">
+                <h2><i class="fas fa-file-upload"></i> Importazione CSV</h2>
+            </div>
+
+            <div class="csv-input-area">
+                <div class="csv-drop-zone" id="csv-drop-zone">
+                    <i class="fas fa-cloud-upload-alt csv-drop-icon"></i>
+                    <p class="csv-drop-label">Trascina un file CSV qui</p>
+                    <p class="csv-drop-or">oppure</p>
+                    <label for="csv-file-input" class="primary-btn" style="cursor:pointer; display:inline-flex;">
+                        <i class="fas fa-folder-open"></i> Scegli file
+                    </label>
+                    <input type="file" id="csv-file-input" accept=".csv,text/csv" style="display:none">
+                </div>
+
+                <div class="csv-format-hint">
+                    <strong><i class="fas fa-info-circle"></i> Formato accettato:</strong>
+                    <div class="csv-format-examples">
+                        <div class="csv-format-row">
+                            <span class="csv-format-tag">Semplice</span>
+                            <code>data,ora,luogo,titolo,descrizione</code>
+                        </div>
+                        <div class="csv-format-row">
+                            <span class="csv-format-tag">Esteso</span>
+                            <code>tipo,data,ora,data_fine,ora_fine,luogo,titolo,descrizione</code>
+                        </div>
+                    </div>
+                    <small>Date: <code>gg/mm/aaaa</code> oppure <code>aaaa-mm-gg</code> &nbsp;·&nbsp; Tipo: <code>single</code> o <code>continuous</code></small>
+                </div>
+
+                <div class="csv-paste-toggle">
+                    <button type="button" class="secondary-btn compact" onclick="togglePasteArea()">
+                        <i class="fas fa-paste"></i> Incolla testo CSV
+                    </button>
+                </div>
+
+                <div id="csv-paste-area" style="display:none;">
+                    <textarea id="csv-text" rows="7" placeholder="Incolla il contenuto CSV qui...&#10;es: data,ora,luogo,titolo,descrizione&#10;    14/04/2026,18:00,Chiesa di San Giorgio,Santa Messa,"></textarea>
+                    <div class="csv-paste-actions">
+                        <button type="button" class="primary-btn" onclick="parseFromText()">
+                            <i class="fas fa-search"></i> Analizza
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview area -->
+            <div id="csv-preview" style="display:none;">
+                <div class="csv-preview-header">
+                    <h3><span id="csv-row-count">0</span> eventi trovati</h3>
+                    <div class="csv-preview-actions">
+                        <button type="button" class="action-btn" onclick="selectAllCsvRows(true)">
+                            <i class="fas fa-check-square"></i> Tutti
+                        </button>
+                        <button type="button" class="action-btn" onclick="selectAllCsvRows(false)">
+                            <i class="fas fa-square"></i> Nessuno
+                        </button>
+                        <button type="button" class="primary-btn" id="import-btn" onclick="importCsvEvents()">
+                            <i class="fas fa-upload"></i> Importa (<span id="import-count">0</span>)
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="csv-preview-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-csv" onchange="selectAllCsvRows(this.checked)"></th>
+                                <th>Tipo</th>
+                                <th>Data</th>
+                                <th>Ora</th>
+                                <th>Fine</th>
+                                <th>Luogo</th>
+                                <th>Titolo</th>
+                                <th>Descrizione</th>
+                                <th>Stato</th>
+                            </tr>
+                        </thead>
+                        <tbody id="csv-preview-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Event List Section -->
         <div class="section event-list-section">
             <div class="section-header">

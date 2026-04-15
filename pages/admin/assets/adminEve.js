@@ -419,6 +419,205 @@ async function saveEdit() {
     }
 }
 
+// --- CSV Import ---
+let csvParsedRows = [];
+
+function togglePasteArea() {
+    const area = document.getElementById('csv-paste-area');
+    area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    if (area.style.display === 'block') document.getElementById('csv-text').focus();
+}
+
+function parseDateStr(str) {
+    str = str.trim();
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+        const [d, m, y] = str.split('/');
+        return `${y}-${m}-${d}`;
+    }
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+    if (/^\d{4}\/\d{2}\/\d{2}$/.test(str)) return str.replace(/\//g, '-');
+    return null;
+}
+
+function parseCSVLine(line) {
+    const fields = [];
+    let inQuote = false, current = '';
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+            if (inQuote && line[i + 1] === '"') { current += '"'; i++; }
+            else inQuote = !inQuote;
+        } else if (ch === ',' && !inQuote) {
+            fields.push(current); current = '';
+        } else {
+            current += ch;
+        }
+    }
+    fields.push(current);
+    return fields.map(f => f.trim());
+}
+
+function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) return { error: 'Il file deve contenere almeno una riga di intestazione e una riga di dati.' };
+
+    const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
+    const idx = name => headers.indexOf(name);
+    const isExtended = idx('tipo') >= 0 || idx('data_fine') >= 0;
+
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+        const f = parseCSVLine(lines[i]);
+        let row;
+
+        if (isExtended) {
+            row = {
+                event_type: f[idx('tipo')] || 'single',
+                date:       parseDateStr(f[idx('data')] || ''),
+                time:       f[idx('ora')] || '',
+                end_date:   idx('data_fine') >= 0 && f[idx('data_fine')] ? parseDateStr(f[idx('data_fine')]) : null,
+                end_time:   idx('ora_fine') >= 0 ? (f[idx('ora_fine')] || null) : null,
+                place:      f[idx('luogo')] || '',
+                title:      f[idx('titolo')] || '',
+                description: idx('descrizione') >= 0 ? (f[idx('descrizione')] || '') : ''
+            };
+        } else {
+            // Simple format: data,ora,luogo,titolo,descrizione
+            row = {
+                event_type:  'single',
+                date:        parseDateStr(f[idx('data')] !== undefined ? f[idx('data')] : f[0]),
+                time:        f[idx('ora')] !== undefined ? f[idx('ora')] : f[1] || '',
+                end_date:    null,
+                end_time:    null,
+                place:       f[idx('luogo')] !== undefined ? f[idx('luogo')] : f[2] || '',
+                title:       f[idx('titolo')] !== undefined ? f[idx('titolo')] : f[3] || '',
+                description: f[idx('descrizione')] !== undefined ? f[idx('descrizione')] : f[4] || ''
+            };
+        }
+
+        // Normalise event_type
+        const typeMap = { 'cont.': 'continuous', 'continuativo': 'continuous', 'sing.': 'single', 'singolo': 'single' };
+        row.event_type = typeMap[row.event_type.toLowerCase()] || row.event_type;
+
+        // Validate
+        const errs = [];
+        if (!row.date)  errs.push('data non valida');
+        if (!row.time)  errs.push('ora mancante');
+        if (!row.place) errs.push('luogo mancante');
+        if (!row.title) errs.push('titolo mancante');
+        if (row.event_type === 'continuous' && !row.end_date) errs.push('data_fine mancante');
+
+        row._line   = i + 1;
+        row._errors = errs;
+        rows.push(row);
+    }
+    return { rows };
+}
+
+function showCsvPreview(rows) {
+    csvParsedRows = rows;
+    const tbody = document.getElementById('csv-preview-body');
+    tbody.innerHTML = '';
+
+    rows.forEach((row, idx) => {
+        const hasError = row._errors.length > 0;
+        const tr = document.createElement('tr');
+        if (hasError) tr.className = 'csv-row-invalid';
+
+        const endStr = row.end_date ? `${row.end_date}${row.end_time ? ' ' + row.end_time : ''}` : '—';
+        const typeLabel = row.event_type === 'continuous' ? 'Cont.' : 'Sing.';
+
+        const safe = s => s ? s.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+
+        tr.innerHTML = `
+            <td><input type="checkbox" class="csv-row-check" data-index="${idx}"
+                ${hasError ? 'disabled title="Correggi gli errori prima di importare"' : 'checked'}
+                onchange="updateCsvImportCount()"></td>
+            <td><span class="type-badge ${row.event_type}">${typeLabel}</span></td>
+            <td>${row.date || '<span class="csv-err">?</span>'}</td>
+            <td>${row.time || '<span class="csv-err">?</span>'}</td>
+            <td class="csv-end-col">${endStr}</td>
+            <td>${safe(row.place) || '<span class="csv-err">?</span>'}</td>
+            <td>${safe(row.title) || '<span class="csv-err">?</span>'}</td>
+            <td class="csv-desc-col">${safe(row.description) || '—'}</td>
+            <td id="csv-status-${idx}">
+                ${hasError
+                    ? `<span class="csv-status-error" title="${row._errors.join(', ')}"><i class="fas fa-exclamation-triangle"></i> ${row._errors.join(', ')}</span>`
+                    : '<span class="csv-status-pending"><i class="fas fa-clock"></i> In attesa</span>'}
+            </td>`;
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById('csv-row-count').textContent = rows.length;
+    document.getElementById('csv-preview').style.display = 'block';
+    updateCsvImportCount();
+    document.getElementById('csv-preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function updateCsvImportCount() {
+    const n = document.querySelectorAll('.csv-row-check:checked').length;
+    document.getElementById('import-count').textContent = n;
+    document.getElementById('select-all-csv').checked =
+        n > 0 && n === document.querySelectorAll('.csv-row-check:not(:disabled)').length;
+}
+
+function selectAllCsvRows(checked) {
+    document.querySelectorAll('.csv-row-check:not(:disabled)').forEach(cb => { cb.checked = checked; });
+    updateCsvImportCount();
+}
+
+async function importCsvEvents() {
+    const checks = [...document.querySelectorAll('.csv-row-check:checked')];
+    if (checks.length === 0) { showToast('Nessuna riga selezionata.', 'error'); return; }
+
+    const btn = document.getElementById('import-btn');
+    btn.disabled = true;
+    let ok = 0, fail = 0;
+
+    for (const cb of checks) {
+        const idx = parseInt(cb.dataset.index);
+        const row = csvParsedRows[idx];
+        const cell = document.getElementById(`csv-status-${idx}`);
+        cell.innerHTML = '<span class="csv-status-loading"><i class="fas fa-spinner fa-spin"></i> Importazione…</span>';
+
+        try {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: row.title, description: row.description || '',
+                    date: row.date, time: row.time, place: row.place,
+                    event_type: row.event_type,
+                    end_date: row.end_date || null, end_time: row.end_time || null
+                })
+            });
+            if (res.ok) {
+                cell.innerHTML = '<span class="csv-status-ok"><i class="fas fa-check-circle"></i> Importato</span>';
+                cb.checked = false; cb.disabled = true; ok++;
+            } else {
+                cell.innerHTML = '<span class="csv-status-error"><i class="fas fa-times-circle"></i> Errore server</span>';
+                fail++;
+            }
+        } catch (e) {
+            cell.innerHTML = '<span class="csv-status-error"><i class="fas fa-times-circle"></i> Errore rete</span>';
+            fail++;
+        }
+    }
+
+    btn.disabled = false;
+    updateCsvImportCount();
+    if (ok > 0)   { showToast(`${ok} event${ok === 1 ? 'o importato' : 'i importati'} con successo!`); loadEvents(); }
+    if (fail > 0) { showToast(`${fail} event${fail === 1 ? 'o non importato' : 'i non importati'}.`, 'error'); }
+}
+
+function parseFromText() {
+    const text = document.getElementById('csv-text').value.trim();
+    if (!text) { showToast('Incolla il contenuto CSV prima di analizzare.', 'error'); return; }
+    const result = parseCSV(text);
+    if (result.error) { showToast(result.error, 'error'); return; }
+    showCsvPreview(result.rows);
+}
+
 // --- Init ---
 window.addEventListener('DOMContentLoaded', () => {
     // Set today's date as default
@@ -439,6 +638,40 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('edit-event-dialog').addEventListener('click', function(e) {
         if (e.target === this) closeEditDialog();
+    });
+
+    // CSV file input
+    const csvInput = document.getElementById('csv-file-input');
+    csvInput.addEventListener('change', function () {
+        if (!this.files[0]) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            const result = parseCSV(e.target.result);
+            if (result.error) { showToast(result.error, 'error'); return; }
+            showCsvPreview(result.rows);
+        };
+        reader.readAsText(this.files[0]);
+        this.value = '';
+    });
+
+    // Drag-and-drop
+    const dropZone = document.getElementById('csv-drop-zone');
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (!file || (!file.name.endsWith('.csv') && file.type !== 'text/csv')) {
+            showToast('Seleziona un file CSV.', 'error'); return;
+        }
+        const reader = new FileReader();
+        reader.onload = ev => {
+            const result = parseCSV(ev.target.result);
+            if (result.error) { showToast(result.error, 'error'); return; }
+            showCsvPreview(result.rows);
+        };
+        reader.readAsText(file);
     });
 
     loadEvents();
