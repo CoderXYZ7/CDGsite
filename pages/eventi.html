@@ -446,19 +446,25 @@
             /* Hide pills on mobile, show dots instead */
             .cal-pills { display: none; }
 
-            .cal-cell.has-events::after {
+            .cal-cell.has-events::after,
+            .cal-cell.has-continuous::after,
+            .cal-cell.has-mixed::after {
                 content: '';
-                display: block;
-                width: 6px;
-                height: 6px;
+                position: absolute;
+                bottom: 5px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 5px;
+                height: 5px;
                 border-radius: 50%;
                 background: var(--red);
-                margin: 0 auto;
             }
 
             .cal-cell.has-continuous::after { background: var(--cont); }
             .cal-cell.has-mixed::after {
+                width: 10px;
                 background: linear-gradient(90deg, var(--red) 50%, var(--cont) 50%);
+                border-radius: 3px;
             }
 
             .cal-title { font-size: 1rem; min-width: 140px; }
