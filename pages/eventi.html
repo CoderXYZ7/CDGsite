@@ -18,6 +18,421 @@
       gtag('js', new Date());
       gtag('config', 'G-B2QXHE6MQX');
     </script>
+    <style>
+        /* ── Calendar page variables ── */
+        :root {
+            --cal-blue:    #1a365d;
+            --cal-red:     #e53e3e;
+            --cal-orange:  #ff6a3d;
+            --cal-cont:    #3b82f6;
+            --cal-bg:      #f4f6f9;
+            --cal-white:   #ffffff;
+            --cal-border:  #e2e8f0;
+            --cal-muted:   #94a3b8;
+            --cal-text:    #1e293b;
+            --cal-sub:     #64748b;
+        }
+
+        /* ── Layout ── */
+        .events-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 1.5rem;
+            padding: 1.5rem 2rem 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: start;
+        }
+
+        /* ── Calendar card ── */
+        .calendar-section {
+            background: var(--cal-white);
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(26,54,93,.07);
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            background: var(--cal-blue);
+            color: var(--cal-white);
+        }
+
+        .calendar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: .01em;
+            margin: 0;
+            color: var(--cal-white);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: .5rem;
+        }
+
+        .nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255,255,255,.15);
+            color: var(--cal-white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,.3);
+        }
+
+        /* ── Weekday row ── */
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: var(--cal-blue);
+            padding: 0 .5rem .75rem;
+            gap: 2px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-size: .7rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.55);
+            padding: .25rem 0;
+        }
+
+        /* ── Days grid ── */
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            padding: .5rem;
+            background: var(--cal-border);
+        }
+
+        .calendar-day {
+            background: var(--cal-white);
+            border-radius: 8px;
+            min-height: 68px;
+            padding: .4rem .45rem .35rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 3px;
+            transition: background .15s, transform .1s;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background: #f0f4ff;
+            transform: scale(1.03);
+            z-index: 1;
+        }
+
+        .calendar-day.other-month {
+            background: #fafafa;
+        }
+
+        .calendar-day.other-month .day-number {
+            color: var(--cal-muted);
+        }
+
+        .day-number {
+            font-size: .85rem;
+            font-weight: 700;
+            color: var(--cal-text);
+            line-height: 1;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        /* Today */
+        .calendar-day.today .day-number {
+            background: var(--cal-red);
+            color: #fff;
+        }
+
+        /* Selected */
+        .calendar-day.selected {
+            background: #eff6ff;
+            outline: 2px solid var(--cal-blue);
+            outline-offset: -2px;
+        }
+
+        /* ── Event dots ── */
+        .event-dots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-top: auto;
+        }
+
+        .event-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── Sidebar ── */
+        .events-sidebar {
+            background: var(--cal-white);
+            border-radius: 16px;
+            box-shadow: 0 2px 16px rgba(26,54,93,.07);
+            overflow: hidden;
+            position: sticky;
+            top: 1.5rem;
+        }
+
+        .sidebar-header {
+            padding: 1.25rem 1.5rem 1rem;
+            border-bottom: 1px solid var(--cal-border);
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--cal-blue);
+            margin: 0;
+        }
+
+        .sidebar-title i {
+            color: var(--cal-red);
+            margin-right: .4rem;
+        }
+
+        .events-container {
+            padding: 1rem;
+            max-height: 520px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: .75rem;
+        }
+
+        .events-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .events-container::-webkit-scrollbar-track { background: transparent; }
+        .events-container::-webkit-scrollbar-thumb {
+            background: var(--cal-border);
+            border-radius: 4px;
+        }
+
+        /* ── Event card ── */
+        .event-card {
+            border-radius: 10px;
+            border: 1px solid var(--cal-border);
+            overflow: hidden;
+            transition: box-shadow .2s;
+        }
+
+        .event-card:hover {
+            box-shadow: 0 4px 12px rgba(26,54,93,.1);
+        }
+
+        .event-section-1 {
+            padding: .65rem .85rem .5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .3rem;
+        }
+
+        .event-section-2 {
+            padding: .5rem .85rem;
+            background: #f8fafc;
+            border-top: 1px solid var(--cal-border);
+            display: flex;
+            flex-direction: column;
+            gap: .35rem;
+        }
+
+        .event-section-3 {
+            padding: .5rem .85rem .65rem;
+            border-top: 1px solid var(--cal-border);
+        }
+
+        .event-type {
+            display: inline-flex;
+            align-items: center;
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            text-transform: uppercase;
+            padding: .2rem .55rem;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .event-type.single {
+            background: #fff1f1;
+            color: var(--cal-red);
+        }
+
+        .event-type.continuous {
+            background: #eff6ff;
+            color: var(--cal-cont);
+        }
+
+        .event-title {
+            font-size: .95rem;
+            font-weight: 700;
+            color: var(--cal-text);
+            line-height: 1.3;
+        }
+
+        .datetime-row {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            font-size: .8rem;
+            color: var(--cal-sub);
+        }
+
+        .datetime-row i {
+            color: var(--cal-muted);
+            width: 14px;
+            text-align: center;
+            font-size: .75rem;
+        }
+
+        .event-datetime {
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+        }
+
+        .event-place {
+            font-size: .8rem;
+            color: var(--cal-sub);
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+        }
+
+        .event-place i {
+            color: var(--cal-red);
+            font-size: .75rem;
+            width: 14px;
+            text-align: center;
+        }
+
+        .event-description {
+            font-size: .8rem;
+            color: var(--cal-sub);
+            line-height: 1.45;
+        }
+
+        .event-description i {
+            color: var(--cal-muted);
+            margin-right: .35rem;
+        }
+
+        .day-counter, .duration-info, .duration-badge {
+            font-size: .75rem;
+            color: var(--cal-cont);
+            font-weight: 600;
+        }
+
+        .day-counter i, .duration-info i, .duration-badge i {
+            margin-right: .3rem;
+        }
+
+        /* ── No events placeholder ── */
+        .no-events {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            padding: 2rem 1rem;
+            color: var(--cal-muted);
+            text-align: center;
+        }
+
+        .no-events i {
+            font-size: 2rem;
+            opacity: .5;
+        }
+
+        .no-events p {
+            font-size: .875rem;
+            margin: 0;
+        }
+
+        /* ── Legend ── */
+        .calendar-legend {
+            display: flex;
+            gap: 1.25rem;
+            padding: .75rem 1.5rem;
+            border-top: 1px solid var(--cal-border);
+            background: #fafbfc;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            font-size: .75rem;
+            color: var(--cal-sub);
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .events-layout {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .events-sidebar {
+                position: static;
+            }
+
+            .calendar-day {
+                min-height: 52px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-day {
+                min-height: 42px;
+                border-radius: 6px;
+            }
+
+            .day-number {
+                font-size: .78rem;
+                width: 22px;
+                height: 22px;
+            }
+
+            .event-dot {
+                width: 5px;
+                height: 5px;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -34,12 +449,12 @@
             <!-- Calendar Section -->
             <div class="calendar-section">
                 <div class="calendar-header">
-                    <h2 class="calendar-title" id="calendar-title">Loading...</h2>
+                    <h2 class="calendar-title" id="calendar-title">Caricamento...</h2>
                     <div class="calendar-nav">
-                        <button class="nav-btn" id="prev-month">
+                        <button class="nav-btn" id="prev-month" aria-label="Mese precedente">
                             <i class="fas fa-chevron-left"></i>
                         </button>
-                        <button class="nav-btn" id="next-month">
+                        <button class="nav-btn" id="next-month" aria-label="Mese successivo">
                             <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
@@ -55,6 +470,20 @@
                         <div class="weekday">Sab</div>
                     </div>
                     <div id="calendar-days" class="calendar-days"></div>
+                </div>
+                <div class="calendar-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:var(--cal-red)"></div>
+                        <span>Evento singolo</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:var(--cal-cont)"></div>
+                        <span>Evento continuo</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:var(--cal-red); outline: 2px solid var(--cal-red); outline-offset:1px"></div>
+                        <span>Oggi</span>
+                    </div>
                 </div>
             </div>
 
@@ -75,14 +504,12 @@
     <!-- Footer placeholder -->
     <div id="footer-placeholder"></div>
 
-    <!-- Add components script -->
     <script src="../static/js/components.js"></script>
 
     <script>
         let currentDate = new Date();
         let events = [];
 
-        // Load events from API
         async function loadEvents() {
             try {
                 const response = await fetch('../api/events.php');
@@ -98,26 +525,20 @@
             }
         }
 
-        // Render calendar
         function renderCalendar() {
             const calendarTitle = document.getElementById('calendar-title');
             const calendarDays = document.getElementById('calendar-days');
 
-            // Set title
             const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
                 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
             calendarTitle.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
 
-            // Clear previous days
             calendarDays.innerHTML = '';
 
-            // Get first day of month and last day
             const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
             const startDate = new Date(firstDay);
             startDate.setDate(startDate.getDate() - firstDay.getDay());
 
-            // Generate 42 days (6 weeks)
             for (let i = 0; i < 42; i++) {
                 const day = new Date(startDate);
                 day.setDate(startDate.getDate() + i);
@@ -133,12 +554,10 @@
                     dayElement.classList.add('today');
                 }
 
-                // Check if day has events (including continuous events)
                 const dayEvents = events.filter(event => {
                     const eventDate = new Date(event.date);
                     if (event.event_type === 'continuous' && event.end_date) {
                         const endDate = new Date(event.end_date);
-                        // Normalize dates to avoid timezone issues
                         const dayNormalized = new Date(day.getFullYear(), day.getMonth(), day.getDate());
                         const startNormalized = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
                         const endNormalized = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
@@ -148,51 +567,24 @@
                     }
                 });
 
-                // Categorize events and apply appropriate styling
                 if (dayEvents.length > 0) {
-                    const hasSingle = dayEvents.some(event => event.event_type === 'single');
-                    const hasContinuous = dayEvents.some(event => event.event_type === 'continuous');
+                    const hasSingle = dayEvents.some(e => e.event_type === 'single');
+                    const hasContinuous = dayEvents.some(e => e.event_type === 'continuous');
+                    if (hasSingle && hasContinuous) dayElement.classList.add('has-mixed-events');
+                    else if (hasContinuous) dayElement.classList.add('has-continuous-events');
+                    else dayElement.classList.add('has-single-events');
 
-                    if (hasSingle && hasContinuous) {
-                        dayElement.classList.add('has-mixed-events');
-                    } else if (hasContinuous) {
-                        dayElement.classList.add('has-continuous-events');
-                    } else {
-                        dayElement.classList.add('has-single-events');
-                    }
-
-                    // Add event dots with different colors
-                    dayEvents.forEach((event, index) => {
-                        if (index < 3) { // Limit to 3 dots
-                            const dot = document.createElement('div');
-                            dot.className = 'event-dot';
-                            if (event.event_type === 'continuous') {
-                                dot.style.background = 'var(--dot-cont)';
-                            } else {
-                                dot.style.background = 'var(--dot-sing)';
-                            }
-                            dayElement.appendChild(dot);
-                        }
-                    });
-
-                    // Add start/end indicators for continuous events
-                    const continuousEvents = dayEvents.filter(event => event.event_type === 'continuous');
+                    const continuousEvents = dayEvents.filter(e => e.event_type === 'continuous');
                     continuousEvents.forEach(event => {
                         if (event.end_date) {
                             const eventStart = new Date(event.date);
                             const eventEnd = new Date(event.end_date);
-
-                            if (day.toDateString() === eventStart.toDateString()) {
-                                dayElement.classList.add('event-start');
-                            }
-                            if (day.toDateString() === eventEnd.toDateString()) {
-                                dayElement.classList.add('event-end');
-                            }
+                            if (day.toDateString() === eventStart.toDateString()) dayElement.classList.add('event-start');
+                            if (day.toDateString() === eventEnd.toDateString()) dayElement.classList.add('event-end');
                         }
                     });
                 }
 
-                // Add click handler to show events for this day
                 dayElement.addEventListener('click', () => showDayEvents(day, dayEvents));
 
                 const dayNumber = document.createElement('div');
@@ -200,26 +592,33 @@
                 dayNumber.textContent = day.getDate();
                 dayElement.appendChild(dayNumber);
 
+                if (dayEvents.length > 0) {
+                    const dotsWrapper = document.createElement('div');
+                    dotsWrapper.className = 'event-dots';
+                    dayEvents.slice(0, 3).forEach(event => {
+                        const dot = document.createElement('div');
+                        dot.className = 'event-dot';
+                        dot.style.background = event.event_type === 'continuous'
+                            ? 'var(--cal-cont)'
+                            : 'var(--cal-red)';
+                        dotsWrapper.appendChild(dot);
+                    });
+                    dayElement.appendChild(dotsWrapper);
+                }
+
                 calendarDays.appendChild(dayElement);
             }
         }
 
-        // Show events for a specific day
         function showDayEvents(day, dayEvents) {
-            // Remove previous selection
-            document.querySelectorAll('.calendar-day.selected').forEach(el => {
-                el.classList.remove('selected');
-            });
-
-            // Add selection to clicked day
+            document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
             event.currentTarget.classList.add('selected');
 
             const eventsList = document.getElementById('events-list');
             const sidebarTitle = document.getElementById('sidebar-title');
 
-            // Update sidebar title
             const dayName = day.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
-            sidebarTitle.innerHTML = `<i class="fas fa-calendar-day"></i> Eventi del ${dayName}`;
+            sidebarTitle.innerHTML = `<i class="fas fa-calendar-day"></i> ${dayName}`;
 
             eventsList.innerHTML = '';
 
@@ -228,261 +627,137 @@
                     <div class="no-events">
                         <i class="fas fa-calendar-times"></i>
                         <p>Nessun evento in questa data</p>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
 
-            dayEvents.forEach(event => {
-                const eventCard = document.createElement('div');
-                eventCard.className = 'event-card';
+            dayEvents.forEach(event => renderEventCard(event, day, eventsList));
+        }
 
-                // Section 1: Name and Type
-                const section1 = document.createElement('div');
-                section1.className = 'event-section event-section-1';
+        function renderEventCard(event, day, container) {
+            const eventCard = document.createElement('div');
+            eventCard.className = 'event-card';
 
-                const eventType = document.createElement('div');
-                eventType.className = `event-type ${event.event_type}`;
-                eventType.textContent = event.event_type === 'continuous' ? 'Continuo' : 'Singolo';
-                section1.appendChild(eventType);
+            const section1 = document.createElement('div');
+            section1.className = 'event-section event-section-1';
 
-                const eventTitle = document.createElement('div');
-                eventTitle.className = 'event-title';
-                eventTitle.textContent = event.title;
-                section1.appendChild(eventTitle);
+            const eventType = document.createElement('div');
+            eventType.className = `event-type ${event.event_type}`;
+            eventType.textContent = event.event_type === 'continuous' ? 'Continuo' : 'Singolo';
+            section1.appendChild(eventType);
 
-                eventCard.appendChild(section1);
+            const eventTitle = document.createElement('div');
+            eventTitle.className = 'event-title';
+            eventTitle.textContent = event.title;
+            section1.appendChild(eventTitle);
+            eventCard.appendChild(section1);
 
-                // Section 2: Dates + Times + Location
-                const section2 = document.createElement('div');
-                section2.className = 'event-section event-section-2';
+            const section2 = document.createElement('div');
+            section2.className = 'event-section event-section-2';
 
-                if (event.event_type === 'continuous' && event.end_date && event.end_date !== '') {
-                    // For continuous events, show start and end info
-                    const startDateTime = document.createElement('div');
-                    startDateTime.className = 'event-datetime';
-                    startDateTime.innerHTML = `
-                        <div class="datetime-row">
-                            <i class="fas fa-play-circle"></i>
-                            <span class="datetime-value">${event.date.toLocaleDateString('it-IT')}</span>
-                        </div>
-                        <div class="datetime-row">
-                            <i class="fas fa-clock"></i>
-                            <span class="datetime-value">${event.time}</span>
-                        </div>
-                    `;
-                    section2.appendChild(startDateTime);
+            if (event.event_type === 'continuous' && event.end_date && event.end_date !== '') {
+                const startDT = document.createElement('div');
+                startDT.className = 'event-datetime';
+                startDT.innerHTML = `
+                    <div class="datetime-row"><i class="fas fa-play-circle"></i><span>${event.date.toLocaleDateString('it-IT')}</span></div>
+                    <div class="datetime-row"><i class="fas fa-clock"></i><span>${event.time}</span></div>`;
+                section2.appendChild(startDT);
 
-                    const endDateTime = document.createElement('div');
-                    endDateTime.className = 'event-datetime';
-                    endDateTime.innerHTML = `
-                        <div class="datetime-row">
-                            <i class="fas fa-stop-circle"></i>
-                            <span class="datetime-value">${new Date(event.end_date).toLocaleDateString('it-IT')}</span>
-                        </div>
-                        <div class="datetime-row">
-                            <i class="fas fa-clock"></i>
-                            <span class="datetime-value">${event.end_time}</span>
-                        </div>
-                    `;
-                    section2.appendChild(endDateTime);
+                const endDT = document.createElement('div');
+                endDT.className = 'event-datetime';
+                endDT.innerHTML = `
+                    <div class="datetime-row"><i class="fas fa-stop-circle"></i><span>${new Date(event.end_date).toLocaleDateString('it-IT')}</span></div>
+                    <div class="datetime-row"><i class="fas fa-clock"></i><span>${event.end_time}</span></div>`;
+                section2.appendChild(endDT);
 
-                    // Day counter for continuous events
+                if (day) {
                     const eventStart = new Date(event.date.getFullYear(), event.date.getMonth(), event.date.getDate());
                     const eventEnd = new Date(new Date(event.end_date).getFullYear(), new Date(event.end_date).getMonth(), new Date(event.end_date).getDate());
-                    const dayNormalized = new Date(day.getFullYear(), day.getMonth(), day.getDate());
-                    const totalDays = Math.ceil((eventEnd - eventStart) / (1000 * 60 * 60 * 24)) + 1;
-                    const currentDay = Math.floor((dayNormalized - eventStart) / (1000 * 60 * 60 * 24)) + 1;
-
+                    const dayNorm = new Date(day.getFullYear(), day.getMonth(), day.getDate());
+                    const totalDays = Math.ceil((eventEnd - eventStart) / 86400000) + 1;
+                    const currentDay = Math.floor((dayNorm - eventStart) / 86400000) + 1;
                     const dayCounter = document.createElement('div');
                     dayCounter.className = 'day-counter';
-                    dayCounter.innerHTML = `<i class="fas fa-hashtag"></i> ${currentDay}/${totalDays}`;
+                    dayCounter.innerHTML = `<i class="fas fa-hashtag"></i> Giorno ${currentDay} di ${totalDays}`;
                     section2.appendChild(dayCounter);
-                } else {
-                    // For single events, show date and time
-                    const eventDateTime = document.createElement('div');
-                    eventDateTime.className = 'event-datetime';
-                    eventDateTime.innerHTML = `
-                        <div class="datetime-row">
-                            <i class="fas fa-calendar-day"></i>
-                            <span class="datetime-value">${event.date.toLocaleDateString('it-IT')}</span>
-                        </div>
-                        <div class="datetime-row">
-                            <i class="fas fa-clock"></i>
-                            <span class="datetime-value">${event.time}</span>
-                        </div>
-                    `;
-                    section2.appendChild(eventDateTime);
                 }
+            } else {
+                const eventDT = document.createElement('div');
+                eventDT.className = 'event-datetime';
+                eventDT.innerHTML = `
+                    <div class="datetime-row"><i class="fas fa-calendar-day"></i><span>${event.date.toLocaleDateString('it-IT')}</span></div>
+                    <div class="datetime-row"><i class="fas fa-clock"></i><span>${event.time}</span></div>`;
+                section2.appendChild(eventDT);
+            }
 
-                // Place
+            if (event.place) {
                 const eventPlace = document.createElement('div');
                 eventPlace.className = 'event-place';
                 eventPlace.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${event.place}`;
                 section2.appendChild(eventPlace);
+            }
+            eventCard.appendChild(section2);
 
-                eventCard.appendChild(section2);
-
-                // Section 3: Info (description, duration, etc.)
+            if (event.description) {
                 const section3 = document.createElement('div');
                 section3.className = 'event-section event-section-3';
+                const desc = document.createElement('div');
+                desc.className = 'event-description';
+                desc.innerHTML = `<i class="fas fa-info-circle"></i> ${event.description}`;
+                section3.appendChild(desc);
 
-                // Description
-                if (event.description) {
-                    const eventDescription = document.createElement('div');
-                    eventDescription.className = 'event-description';
-                    eventDescription.innerHTML = `<i class="fas fa-info-circle"></i> ${event.description}`;
-                    section3.appendChild(eventDescription);
-                }
-
-                // Duration for continuous events
-                if (event.event_type === 'continuous' && event.end_date && event.end_date !== '') {
-                    const startDateTimeObj = new Date(event.date.getFullYear(), event.date.getMonth(), event.date.getDate(),
-                        event.time.split(':')[0], event.time.split(':')[1]);
-                    const endDateTimeObj = new Date(event.end_date + 'T' + event.end_time);
-                    const diffMs = endDateTimeObj - startDateTimeObj;
-                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-                    let duration = '';
-                    if (diffDays > 0) duration += `${diffDays}g `;
-                    if (diffHours > 0) duration += `${diffHours}h `;
-                    if (diffMinutes > 0) duration += `${diffMinutes}m`;
-
-                    if (duration.trim()) {
-                        const durationInfo = document.createElement('div');
-                        durationInfo.className = 'duration-info';
-                        durationInfo.innerHTML = `<i class="fas fa-hourglass-half"></i> ${duration.trim()}`;
-                        section3.appendChild(durationInfo);
+                if (event.event_type === 'continuous' && event.end_date && event.end_time) {
+                    const startDTObj = new Date(event.date.getFullYear(), event.date.getMonth(), event.date.getDate(),
+                        ...event.time.split(':').map(Number));
+                    const endDTObj = new Date(event.end_date + 'T' + event.end_time);
+                    const diffMs = endDTObj - startDTObj;
+                    const d = Math.floor(diffMs / 86400000);
+                    const h = Math.floor((diffMs % 86400000) / 3600000);
+                    const m = Math.floor((diffMs % 3600000) / 60000);
+                    let dur = '';
+                    if (d > 0) dur += `${d}g `;
+                    if (h > 0) dur += `${h}h `;
+                    if (m > 0) dur += `${m}m`;
+                    if (dur.trim()) {
+                        const durationEl = document.createElement('div');
+                        durationEl.className = 'duration-info';
+                        durationEl.innerHTML = `<i class="fas fa-hourglass-half"></i> Durata: ${dur.trim()}`;
+                        section3.appendChild(durationEl);
                     }
                 }
-
                 eventCard.appendChild(section3);
+            }
 
-                eventsList.appendChild(eventCard);
-            });
+            container.appendChild(eventCard);
         }
 
-        // Render events list
         function renderEventsList() {
             const eventsList = document.getElementById('events-list');
             const sidebarTitle = document.getElementById('sidebar-title');
             eventsList.innerHTML = '';
 
-            // Filter events for current month
             const monthEvents = events.filter(event =>
                 event.date.getMonth() === currentDate.getMonth() &&
                 event.date.getFullYear() === currentDate.getFullYear()
             );
 
-            // Update sidebar title with event count
             const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
                 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
-            sidebarTitle.innerHTML = `<i class="fas fa-list"></i> Eventi di ${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            sidebarTitle.innerHTML = `<i class="fas fa-list"></i> ${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
 
             if (monthEvents.length === 0) {
                 eventsList.innerHTML = `
                     <div class="no-events">
                         <i class="fas fa-calendar-times"></i>
                         <p>Nessun evento programmato per questo mese</p>
-                    </div>
-                `;
+                    </div>`;
                 return;
             }
 
-            // Sort by date
             monthEvents.sort((a, b) => a.date - b.date);
-
-            monthEvents.forEach(event => {
-                const eventCard = document.createElement('div');
-                eventCard.className = 'event-card';
-
-                // Section 1: Name and Type
-                const section1 = document.createElement('div');
-                section1.className = 'event-section event-section-1';
-
-                const eventType = document.createElement('div');
-                eventType.className = `event-type ${event.event_type}`;
-                eventType.textContent = event.event_type === 'continuous' ? 'Continuo' : 'Singolo';
-                section1.appendChild(eventType);
-
-                const eventTitle = document.createElement('div');
-                eventTitle.className = 'event-title';
-                eventTitle.textContent = event.title;
-                section1.appendChild(eventTitle);
-
-                eventCard.appendChild(section1);
-
-                // Section 2: Dates + Times + Location
-                const section2 = document.createElement('div');
-                section2.className = 'event-section event-section-2';
-
-                // Date and Time
-                const eventDateTime = document.createElement('div');
-                eventDateTime.className = 'event-datetime';
-                eventDateTime.innerHTML = `
-                    <div class="datetime-row">
-                        <i class="fas fa-calendar-day"></i>
-                        <span class="datetime-value">${event.date.toLocaleDateString('it-IT')}</span>
-                    </div>
-                    <div class="datetime-row">
-                        <i class="fas fa-clock"></i>
-                        <span class="datetime-value">${event.time}</span>
-                    </div>
-                `;
-                section2.appendChild(eventDateTime);
-
-                // Place
-                const eventPlace = document.createElement('div');
-                eventPlace.className = 'event-place';
-                eventPlace.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${event.place}`;
-                section2.appendChild(eventPlace);
-
-                eventCard.appendChild(section2);
-
-                // Section 3: Info (description, duration, etc.)
-                const section3 = document.createElement('div');
-                section3.className = 'event-section event-section-3';
-
-                // Description
-                if (event.description) {
-                    const eventDescription = document.createElement('div');
-                    eventDescription.className = 'event-description';
-                    eventDescription.innerHTML = `<i class="fas fa-info-circle"></i> ${event.description}`;
-                    section3.appendChild(eventDescription);
-                }
-
-                // Duration for continuous events
-                if (event.event_type === 'continuous' && event.end_date && event.end_date !== '' && event.end_time && event.end_time !== '') {
-                    const startDateTime = new Date(event.date.getFullYear(), event.date.getMonth(), event.date.getDate(),
-                        event.time.split(':')[0], event.time.split(':')[1]);
-                    const endDateTime = new Date(event.end_date + 'T' + event.end_time);
-                    const diffMs = endDateTime - startDateTime;
-                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-                    let duration = '';
-                    if (diffDays > 0) duration += `${diffDays}g `;
-                    if (diffHours > 0) duration += `${diffHours}h `;
-                    if (diffMinutes > 0) duration += `${diffMinutes}m`;
-
-                    if (duration.trim()) {
-                        const durationBadge = document.createElement('div');
-                        durationBadge.className = 'duration-badge';
-                        durationBadge.innerHTML = `<i class="fas fa-hourglass-half"></i> ${duration.trim()}`;
-                        section3.appendChild(durationBadge);
-                    }
-                }
-
-                eventCard.appendChild(section3);
-
-                eventsList.appendChild(eventCard);
-            });
+            monthEvents.forEach(event => renderEventCard(event, null, eventsList));
         }
 
-        // Event listeners
         document.getElementById('prev-month').addEventListener('click', () => {
             currentDate.setMonth(currentDate.getMonth() - 1);
             renderCalendar();
@@ -495,7 +770,6 @@
             renderEventsList();
         });
 
-        // Initialize
         window.onload = loadEvents;
     </script>
 </body>
