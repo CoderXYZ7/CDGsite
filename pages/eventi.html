@@ -405,7 +405,68 @@
             gap: .35rem;
         }
 
-        /* Empty state */
+        /* ─── View toggle ────────────────────────────────────── */
+        .view-toggle {
+            display: flex;
+            gap: 0;
+            background: var(--gray-100);
+            border-radius: 10px;
+            padding: 3px;
+            margin-bottom: 1.25rem;
+            width: fit-content;
+        }
+
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            font-size: .82rem;
+            font-weight: 600;
+            padding: .45rem 1rem;
+            border-radius: 7px;
+            border: none;
+            background: transparent;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: background .15s, color .15s, box-shadow .15s;
+        }
+
+        .toggle-btn.active {
+            background: #fff;
+            color: var(--blue);
+            box-shadow: 0 1px 4px rgba(0,0,0,.1);
+        }
+
+        .toggle-btn i { font-size: .78rem; }
+
+        /* ─── List view date separator ───────────────────────── */
+        .list-day-group { display: flex; flex-direction: column; gap: .75rem; }
+
+        .list-day-header {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            margin-top: .5rem;
+        }
+
+        .list-day-label {
+            font-size: .78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--gray-400);
+            white-space: nowrap;
+        }
+
+        .list-day-label.today-label { color: var(--red); }
+
+        .list-day-line {
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        /* ─── Empty state ─────────────────────────────────────── */
         .no-events {
             background: #fff;
             border-radius: 12px;
@@ -492,8 +553,18 @@
 
         <div class="events-page">
 
+            <!-- ── View toggle ── -->
+            <div class="view-toggle">
+                <button class="toggle-btn active" id="view-cal">
+                    <i class="fas fa-calendar-alt"></i> Calendario
+                </button>
+                <button class="toggle-btn" id="view-list">
+                    <i class="fas fa-list"></i> Lista
+                </button>
+            </div>
+
             <!-- ── Calendar ── -->
-            <div class="cal-card">
+            <div class="cal-card" id="cal-card">
                 <div class="cal-header">
                     <div class="cal-nav-group">
                         <button class="cal-nav-btn" id="prev-month" aria-label="Mese precedente">
@@ -547,7 +618,8 @@
 
         let currentDate = new Date();
         let events = [];
-        let selectedDay = null;  // null = month view
+        let selectedDay = null;   // null = month view
+        let viewMode = 'calendar'; // 'calendar' | 'list'
 
         /* ── Data loading ───────────────────────── */
         async function loadEvents() {
@@ -563,8 +635,21 @@
 
         /* ── Master render ──────────────────────── */
         function render() {
-            renderCalendar();
-            renderEventList();
+            const calCard = document.getElementById('cal-card');
+            const evSection = document.querySelector('.events-section');
+
+            if (viewMode === 'list') {
+                calCard.style.display = 'none';
+                evSection.style.display = 'flex';
+                selectedDay = null;
+                document.getElementById('back-btn').style.display = 'none';
+                renderListView();
+            } else {
+                calCard.style.display = '';
+                evSection.style.display = 'flex';
+                renderCalendar();
+                renderEventList();
+            }
         }
 
         /* ── Calendar ───────────────────────────── */
@@ -786,6 +871,60 @@
             return card;
         }
 
+        /* ── List view (grouped by day) ─────────── */
+        function renderListView() {
+            const list  = document.getElementById('events-list');
+            const title = document.getElementById('sidebar-title');
+            list.innerHTML = '';
+
+            title.innerHTML = `<span>Tutti gli eventi —</span> ${MONTH_NAMES[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+            const monthEvents = events.filter(e =>
+                e.date.getMonth()    === currentDate.getMonth() &&
+                e.date.getFullYear() === currentDate.getFullYear()
+            ).sort((a, b) => a.date - b.date);
+
+            if (monthEvents.length === 0) {
+                list.innerHTML = `
+                    <div class="no-events">
+                        <i class="fas fa-calendar-xmark"></i>
+                        <p>Nessun evento programmato per questo mese</p>
+                    </div>`;
+                return;
+            }
+
+            // Group by date string
+            const groups = {};
+            monthEvents.forEach(ev => {
+                const key = ev.date.toDateString();
+                if (!groups[key]) groups[key] = { date: ev.date, events: [] };
+                groups[key].events.push(ev);
+            });
+
+            const today = new Date();
+            Object.values(groups).forEach(({ date, events: dayEvs }) => {
+                const isToday = sameDay(date, today);
+                const dayLabel = date.toLocaleDateString('it-IT',
+                    { weekday: 'long', day: 'numeric', month: 'long' });
+
+                // Day separator
+                const separator = document.createElement('div');
+                separator.className = 'list-day-header';
+                separator.innerHTML = `
+                    <div class="list-day-label ${isToday ? 'today-label' : ''}">
+                        ${isToday ? '● Oggi — ' : ''}${dayLabel}
+                    </div>
+                    <div class="list-day-line"></div>`;
+
+                const group = document.createElement('div');
+                group.className = 'list-day-group';
+                group.appendChild(separator);
+
+                dayEvs.forEach(ev => group.appendChild(buildEventCard(ev, null)));
+                list.appendChild(group);
+            });
+        }
+
         /* ── Helpers ────────────────────────────── */
         function sameDay(a, b) {
             return a.getFullYear() === b.getFullYear() &&
@@ -834,6 +973,20 @@
         document.getElementById('back-btn').addEventListener('click', () => {
             selectedDay = null;
             document.getElementById('back-btn').style.display = 'none';
+            render();
+        });
+
+        document.getElementById('view-cal').addEventListener('click', () => {
+            viewMode = 'calendar';
+            document.getElementById('view-cal').classList.add('active');
+            document.getElementById('view-list').classList.remove('active');
+            render();
+        });
+
+        document.getElementById('view-list').addEventListener('click', () => {
+            viewMode = 'list';
+            document.getElementById('view-list').classList.add('active');
+            document.getElementById('view-cal').classList.remove('active');
             render();
         });
 
