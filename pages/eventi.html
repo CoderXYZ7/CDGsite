@@ -134,6 +134,7 @@
         }
 
         .cal-cell {
+            min-width: 0;
             min-height: 96px;
             padding: .5rem .45rem .4rem;
             border-right: 1px solid var(--gray-200);
@@ -730,18 +731,10 @@
                 range.className = 'ev-range';
                 range.innerHTML = `
                     <i class="fas fa-calendar-range"></i>
-                    ${ev.date.toLocaleDateString('it-IT')}
+                    ${ev.date.toLocaleDateString('it-IT')}${ev.time ? ' ' + ev.time : ''}
                     <span class="ev-range-sep">→</span>
-                    ${new Date(ev.end_date).toLocaleDateString('it-IT')}`;
+                    ${new Date(ev.end_date).toLocaleDateString('it-IT')}${ev.end_time ? ' ' + ev.end_time : ''}`;
                 meta.appendChild(range);
-
-                // Time
-                if (ev.time) {
-                    const timeEl = document.createElement('div');
-                    timeEl.className = 'ev-meta-item';
-                    timeEl.innerHTML = `<i class="fas fa-clock"></i> ${ev.time}${ev.end_time ? ' – ' + ev.end_time : ''}`;
-                    meta.appendChild(timeEl);
-                }
 
                 // Day counter when a specific day is selected
                 if (contextDay) {
