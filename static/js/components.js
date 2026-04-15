@@ -38,19 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <li><a href="${basePath}pages/segreteria.html"><i class="fas fa-address-book"></i>Segreteria</a></li>
             <li><a href="${basePath}pages/contatti.html"><i class="fas fa-envelope"></i>Contatti</a></li>
         </ul>
-        <a class="collapsible-list"><i class="fas fa-chevron-right collapsible-icon"></i>Parrochie</a>
-        <div class="collapsible-content">
-            <a class="card-link" href="${basePath}pages/tutteLeParrocchie.html">Tutte le parrochie</a>
-            <a class="card-link" href="${basePath}pages/sangiorgio.html">San Giorgio di Nogaro</a>
-            <a class="card-link" href="${basePath}pages/marano.html">Marano</a>
-            <a class="card-link" href="${basePath}pages/porpetto.html">Porpetto</a>
-            <a class="card-link" href="${basePath}pages/castello.html">Castello</a>
-            <a class="card-link" href="${basePath}pages/carlino.html">Carlino</a>
-            <a class="card-link" href="${basePath}pages/corgnolo.html">Corgnolo</a>
-            <a class="card-link" href="${basePath}pages/portonogaro.html">Porto Nogaro</a>
-            <a class="card-link" href="${basePath}pages/villanova.html">Villanova</a>
-            <a class="card-link" href="${basePath}pages/zellina.html">Zellina</a>
-        </div>
+        <a class="card-link" href="${basePath}pages/tutteLeParrocchie.html"><i class="fas fa-church"></i>Parrocchie</a>
     </nav>
     <button class="nav-toggle-btn" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>

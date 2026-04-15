@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /pages/admin/
+Disallow: /api/
+
+Sitemap: https://www.cpsangiorgio.it/sitemap.xml

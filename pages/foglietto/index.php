@@ -23,6 +23,15 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
     <!-- PDF.js CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf_viewer.min.css">
     <link rel="stylesheet" href="../../static/css/stylesViewer.css">
+    <link rel="canonical" href="https://www.cpsangiorgio.it/pages/foglietto/">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B2QXHE6MQX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-B2QXHE6MQX');
+    </script>
 </head>
 <body>
     <!-- Navigation placeholder -->
