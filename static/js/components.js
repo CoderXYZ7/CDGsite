@@ -37,8 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <li><a href="${basePath}pages/chi-siamo.html"><i class="fas fa-users"></i>Chi Siamo</a></li>
             <li><a href="${basePath}pages/segreteria.html"><i class="fas fa-address-book"></i>Segreteria</a></li>
             <li><a href="${basePath}pages/contatti.html"><i class="fas fa-envelope"></i>Contatti</a></li>
+            <li><a href="${basePath}pages/tutteLeParrocchie.html"><i class="fas fa-church"></i>Parrocchie</a></li>
         </ul>
-        <a class="card-link" href="${basePath}pages/tutteLeParrocchie.html"><i class="fas fa-church"></i>Parrocchie</a>
     </nav>
     <button class="nav-toggle-btn" aria-label="Toggle menu">
         <i class="fas fa-bars"></i>
