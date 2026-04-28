@@ -2,135 +2,189 @@
 include '../../config.php';
 checkAuth();
 checkTag('admin');
-
-// Check database availability
-$db_available = ($db !== null);
-
-if ($db_available) {
-    // Add User
-    if (isset($_POST['add_user'])) {
-        $username = $_POST['username'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $tag = $_POST['tag'];
-
-        try {
-            $stmt = $db->prepare("INSERT INTO users (username, password, tag) VALUES (?, ?, ?)");
-            $stmt->execute([$username, $password, $tag]);
-            $success_message = "User added successfully!";
-        } catch (Exception $e) {
-            $error_message = "Failed to add user: " . $e->getMessage();
-        }
-    }
-
-    // Update Tags
-    if (isset($_POST['update_tags'])) {
-        try {
-            foreach ($_POST['tags'] as $userId => $tag) {
-                $stmt = $db->prepare("UPDATE users SET tag = ? WHERE id = ?");
-                $stmt->execute([$tag, $userId]);
-            }
-            $success_message = "User roles updated successfully!";
-        } catch (Exception $e) {
-            $error_message = "Failed to update user roles: " . $e->getMessage();
-        }
-    }
-
-    // Get all users
-    try {
-        $users = $db->query("SELECT * FROM users")->fetchAll();
-    } catch (Exception $e) {
-        $users = [];
-        $error_message = "Failed to load users: " . $e->getMessage();
-    }
-} else {
-    $users = [];
-    $error_message = "Database unavailable - User management features are disabled";
-}
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-    <title>Admin Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Gestione Utenti - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../../static/css/styles.css">
+    <link rel="stylesheet" href="assets/adminEve.css">
+    <style>
+        .user-self-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            background: #1a365d;
+            color: white;
+            padding: 1px 6px;
+            border-radius: 3px;
+            margin-left: 6px;
+            vertical-align: middle;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .user-tag-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .user-tag-badge.tag-admin {
+            background: #e53e3e;
+            color: white;
+        }
+        .user-tag-badge.tag-student {
+            background: #1a365d;
+            color: white;
+        }
+        .password-input-row {
+            position: relative;
+        }
+        .password-input-row input {
+            padding-right: 2.5rem;
+        }
+        .toggle-pw {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            font-size: 0.9rem;
+            box-shadow: none;
+        }
+        .toggle-pw:hover {
+            color: #1a365d;
+            transform: translateY(-50%);
+            box-shadow: none;
+        }
+    </style>
 </head>
 <body>
     <div id="nav-placeholder"></div>
+    <div id="toast-container"></div>
+
+    <!-- Hidden field carries the current user's ID so JS can highlight "Tu" and block self-delete -->
+    <input type="hidden" id="current-user-id" value="<?php echo (int)$_SESSION['user_id']; ?>">
+
     <main class="main-wrapper">
-        <div class="content">
-            <section class="hero">
-                <h1>Admin Panel</h1>
-                <p>Add or manage user accounts</p>
-            </section>
+        <div class="page-header">
+            <h1><i class="fas fa-users-cog"></i> Gestione Utenti</h1>
+            <p class="page-subtitle">Aggiungi, modifica ed elimina gli account admin</p>
+        </div>
 
-            <?php if (isset($success_message)): ?>
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle"></i> <?= htmlspecialchars($success_message) ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if (isset($error_message)): ?>
-                <div class="alert alert-error">
-                    <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($error_message) ?>
-                </div>
-            <?php endif; ?>
-
-            <section class="card main-card">
-                <div class="card-content">
-                    <h3><i class="fas fa-user-plus"></i> Add User</h3>
-                    <form method="POST">
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" placeholder="Username" required>
+        <!-- Add User Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-user-plus"></i> Aggiungi Utente</h2>
+            </div>
+            <div class="compact-form">
+                <div class="form-row">
+                    <div class="form-control">
+                        <label for="new-username">Username:</label>
+                        <input type="text" id="new-username" placeholder="es. mario.rossi" autocomplete="off">
+                    </div>
+                    <div class="form-control">
+                        <label for="new-password">Password:</label>
+                        <div class="password-input-row">
+                            <input type="password" id="new-password" placeholder="Password" autocomplete="new-password">
+                            <button type="button" class="toggle-pw" onclick="togglePw('new-password', this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" name="password" placeholder="Password" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="tag">User Role</label>
-                            <select name="tag" id="tag" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;">
-                                <option value="admin">Admin</option>
-                                <option value="student">Student</option>
-                            </select>
-                        </div>
-                        <button type="submit" name="add_user" class="button primary">Add User</button>
-                    </form>
+                    </div>
+                    <div class="form-control" style="flex:0 0 180px">
+                        <label for="new-tag">Ruolo:</label>
+                        <select id="new-tag">
+                            <option value="student">Collaboratore</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
                 </div>
-            </section>
+                <div class="form-actions">
+                    <button type="button" id="add-user-btn" onclick="addUser()" class="primary-btn">
+                        <i class="fas fa-plus"></i> Crea Utente
+                    </button>
+                </div>
+            </div>
+        </div>
 
-            <section class="card main-card">
-                <div class="card-content">
-                    <h3><i class="fas fa-users-cog"></i> Manage Users</h3>
-                    <form method="POST">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Username</th>
-                                    <th>Role</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($users as $user): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($user['username']) ?></td>
-                                        <td>
-                                            <select name="tags[<?= $user['id'] ?>]" style="padding: 0.5rem; border-radius: 4px; border: 1px solid #ddd;">
-                                                <option value="admin" <?= $user['tag'] === 'admin' ? 'selected' : '' ?>>Admin</option>
-                                                <option value="student" <?= $user['tag'] === 'student' ? 'selected' : '' ?>>Student</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                        <button type="submit" name="update_tags" class="button primary" style="margin-top: 1rem;">Update Roles</button>
-                    </form>
+        <!-- Users Table -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Utenti Registrati</h2>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-user"></i> Username</th>
+                            <th><i class="fas fa-tag"></i> Ruolo</th>
+                            <th><i class="fas fa-cogs"></i> Azioni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Edit User Dialog -->
+        <div id="edit-user-dialog" class="custom-input-dialog">
+            <div class="dialog-content dialog-wide">
+                <h3><i class="fas fa-user-edit"></i> Modifica — <span id="edit-user-title"></span></h3>
+                <input type="hidden" id="edit-user-id">
+
+                <div class="form-group">
+                    <label for="edit-tag">Ruolo:</label>
+                    <select id="edit-tag">
+                        <option value="student">Collaboratore</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    <small style="color:#666;display:block;margin-top:4px">
+                        Il ruolo Admin ha accesso a tutti i moduli.
+                    </small>
                 </div>
-            </section>
+
+                <div class="form-group">
+                    <label for="edit-password">Nuova password: <small style="font-weight:normal">(lascia vuoto per non cambiare)</small></label>
+                    <div class="password-input-row">
+                        <input type="password" id="edit-password" placeholder="Nuova password" autocomplete="new-password">
+                        <button type="button" class="toggle-pw" onclick="togglePw('edit-password', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dialog-buttons">
+                    <button type="button" onclick="closeEditDialog()" class="secondary">Annulla</button>
+                    <button type="button" onclick="saveUserEdit()" class="primary-btn-dialog">Salva</button>
+                </div>
+            </div>
         </div>
     </main>
-    <div id="admin-username" style="display: none;"><?= htmlspecialchars($_SESSION['username']) ?></div>
+
+    <div id="admin-username" style="display: none;"><?php echo htmlspecialchars($_SESSION['username']); ?></div>
+    <script src="assets/adminUsers.js"></script>
     <script src="assets/adminNav.js"></script>
+    <script>
+        function togglePw(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon  = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>

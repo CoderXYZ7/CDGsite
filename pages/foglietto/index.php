@@ -1,16 +1,3 @@
-<?php
-// Get list of PDF files
-$pdf_files = glob("pdfs/*.pdf");
-
-// Sort PDFs by filename (date) in descending order
-usort($pdf_files, function($a, $b) {
-    return strcmp(basename($b), basename($a));
-});
-
-// Get the most recent PDF
-$most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
-?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -45,98 +32,84 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
                 <p>Consulta il foglietto di questa e delle settimane precedenti</p>
             </section>
 
-            <?php if ($most_recent_pdf): ?>
-                <section class="main-card">
-                    <div class="card-content">
-                        <h3><i class="fas fa-file-pdf"></i> Documento più recente (<?php echo str_replace('.pdf', '', basename($most_recent_pdf)); ?>)</h3>
-                        
-                        <div class="pdf-container" id="pdf-container">
-                            <div class="pdf-controls" id="pdf-controls">
-                                <button id="prev-page"><i class="fas fa-chevron-left"></i> <span class="button-text">Precedente</span></button>
-                                <div class="page-info">
-                                    Pagina <input type="number" id="current-page" min="1" value="1"> di <span id="page-count">0</span>
-                                </div>
-                                <button id="next-page"><span class="button-text">Successiva</span> <i class="fas fa-chevron-right"></i></button>
-                                <button id="zoom-in"><i class="fas fa-search-plus"></i> <span class="button-text">Zoom In</span></button>
-                                <button id="zoom-out"><i class="fas fa-search-minus"></i> <span class="button-text">Zoom Out</span></button>
-                                <button id="reset-zoom"><i class="fas fa-sync-alt"></i> <span class="button-text">Reset Zoom</span></button>
-                                <button id="fullscreen-btn"><i class="fas fa-expand"></i> <span class="button-text">Schermo intero</span></button>
-                            </div>
-                            <div id="pdf-viewer">
-                                <div class="loading-spinner" id="loading-spinner"></div>
-                                <div class="pdf-scroll-container">
-                                    <canvas id="pdf-canvas"></canvas>
-                                </div>
-                                <div class="zoom-level" id="zoom-level">Zoom: 100%</div>
-                            </div>
-                            <button class="exit-fullscreen-btn" id="exit-fullscreen-btn" style="display: none;"><i class="fas fa-times"></i></button>
-                        </div>
-                        
-                        <div class="section-footer">
-                            <a href="<?php echo $most_recent_pdf; ?>" download class="button primary">
-                                <i class="fas fa-download"></i> Scarica Documento
-                            </a>
-                        </div>
-                    </div>
-                </section>
-            <?php else: ?>
-                <section class="main-card">
-                    <div class="card-content">
-                        <p>Nessun documento PDF disponibile al momento.</p>
-                    </div>
-                </section>
-            <?php endif; ?>
+            <!-- Viewer section: hidden until a PDF is selected -->
+            <section class="main-card" id="viewer-section" style="display:none;">
+                <div class="card-content">
+                    <h3 id="viewer-title"><i class="fas fa-file-pdf"></i> </h3>
 
+                    <div class="pdf-container" id="pdf-container">
+                        <div class="pdf-controls" id="pdf-controls">
+                            <button id="prev-page"><i class="fas fa-chevron-left"></i> <span class="button-text">Precedente</span></button>
+                            <div class="page-info">
+                                Pagina <input type="number" id="current-page" min="1" value="1"> di <span id="page-count">0</span>
+                            </div>
+                            <button id="next-page"><span class="button-text">Successiva</span> <i class="fas fa-chevron-right"></i></button>
+                            <button id="zoom-in"><i class="fas fa-search-plus"></i> <span class="button-text">Zoom In</span></button>
+                            <button id="zoom-out"><i class="fas fa-search-minus"></i> <span class="button-text">Zoom Out</span></button>
+                            <button id="reset-zoom"><i class="fas fa-sync-alt"></i> <span class="button-text">Reset Zoom</span></button>
+                            <button id="fullscreen-btn"><i class="fas fa-expand"></i> <span class="button-text">Schermo intero</span></button>
+                        </div>
+                        <div id="pdf-viewer">
+                            <div class="loading-spinner" id="loading-spinner"></div>
+                            <div class="pdf-scroll-container">
+                                <canvas id="pdf-canvas"></canvas>
+                            </div>
+                            <div class="zoom-level" id="zoom-level">Zoom: 100%</div>
+                        </div>
+                        <button class="exit-fullscreen-btn" id="exit-fullscreen-btn" style="display: none;"><i class="fas fa-times"></i></button>
+                    </div>
+
+                    <div class="section-footer">
+                        <a id="download-btn" href="#" download class="button primary">
+                            <i class="fas fa-download"></i> Scarica Documento
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Shown when no PDFs are available -->
+            <section class="main-card" id="no-pdfs-section" style="display:none;">
+                <div class="card-content">
+                    <p>Nessun documento PDF disponibile al momento.</p>
+                </div>
+            </section>
+
+            <!-- PDF list -->
             <section class="main-card">
                 <div class="card-content">
                     <h3><i class="fas fa-list"></i> Tutti i Documenti</h3>
-                    <?php if (!empty($pdf_files)): ?>
-                        <div class="pdf-list">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($pdf_files as $pdf): ?>
-                                        <?php $file_name = basename($pdf); ?>
-                                        <tr>
-                                            <td><?php echo str_replace('.pdf', '', $file_name); ?></td>
-                                            <td>
-                                                <a href="javascript:void(0)" onclick="loadPDF('<?php echo $pdf; ?>')" class="button primary small">
-                                                    <i class="fas fa-eye"></i> Visualizza
-                                                </a>
-                                                <a href="<?php echo $pdf; ?>" download class="button primary small">
-                                                    <i class="fas fa-download"></i> Scarica
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <p>Nessun documento disponibile.</p>
-                    <?php endif; ?>
+                    <div id="pdf-list-loading" style="padding:1rem;color:#666">
+                        <i class="fas fa-spinner fa-spin"></i> Caricamento…
+                    </div>
+                    <div class="pdf-list" id="pdf-list" style="display:none;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pdf-list-body"></tbody>
+                        </table>
+                    </div>
+                    <p id="pdf-list-empty" style="display:none;">Nessun documento disponibile.</p>
                 </div>
             </section>
         </div>
     </main>
-    
+
     <!-- Footer placeholder -->
     <div id="footer-placeholder"></div>
 
     <!-- PDF.js Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-
     <script src="../../static/js/components.js"></script>
 
     <script>
-        // Set up PDF.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-        
+
+        const FOG_API = '../../api/foglietto.php';
+
         let pdfDoc = null,
             pageNum = 1,
             pageRendering = false,
@@ -148,437 +121,217 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
             isMobile = window.innerWidth <= 768,
             pdfViewer = document.getElementById('pdf-viewer'),
             zoomLevel = document.getElementById('zoom-level');
-            
-        // Touch and mouse variables for zoom and pan
-        let initialPinchDistance = 0;
-        let lastX = 0;
-        let lastY = 0;
-        let isDragging = false;
-        let isMouseDown = false;
-        let viewportTransform = {
-            offsetX: 0,
-            offsetY: 0,
-            scale: 1.0
-        };
-        
-        // Minimum and maximum zoom limits
-        const MIN_SCALE = 1.0;  // 100%
-        const MAX_SCALE = 5.0;  // 500%
-        
-        // Check if device is mobile
-        function checkMobile() {
-            isMobile = window.innerWidth <= 768;
-        }
-        
-        // Run on page load and window resize
+
+        let initialPinchDistance = 0,
+            lastX = 0, lastY = 0,
+            isDragging = false,
+            isMouseDown = false,
+            viewportTransform = { offsetX: 0, offsetY: 0, scale: 1.0 };
+
+        const MIN_SCALE = 1.0, MAX_SCALE = 5.0;
+
+        function checkMobile() { isMobile = window.innerWidth <= 768; }
         window.addEventListener('load', checkMobile);
         window.addEventListener('resize', checkMobile);
 
-        // Initial PDF to load when page loads (most recent PDF)
-        <?php if ($most_recent_pdf): ?>
-            window.addEventListener('load', function() {
-                loadPDF('<?php echo $most_recent_pdf; ?>');
-            });
-        <?php endif; ?>
+        // ── Foglietto list ────────────────────────────────────────────────────
+        async function loadPdfList() {
+            try {
+                const res  = await fetch(FOG_API);
+                const pdfs = await res.json();
 
-        /**
-         * Load a PDF document
-         */
+                document.getElementById('pdf-list-loading').style.display = 'none';
+
+                if (!pdfs.length) {
+                    document.getElementById('pdf-list-empty').style.display = 'block';
+                    document.getElementById('no-pdfs-section').style.display = 'block';
+                    return;
+                }
+
+                const tbody = document.getElementById('pdf-list-body');
+                pdfs.forEach(pdf => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${pdf.date}</td>
+                        <td>
+                            <a href="javascript:void(0)" onclick="selectPdf(${JSON.stringify(pdf).replace(/"/g, '&quot;')})"
+                               class="button primary small">
+                                <i class="fas fa-eye"></i> Visualizza
+                            </a>
+                            <a href="${pdf.url}" download="${pdf.filename}" class="button primary small">
+                                <i class="fas fa-download"></i> Scarica
+                            </a>
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('pdf-list').style.display = 'block';
+
+                // Auto-load most recent
+                selectPdf(pdfs[0]);
+
+            } catch (e) {
+                console.error('Errore caricamento foglietti:', e);
+                document.getElementById('pdf-list-loading').textContent = 'Errore nel caricamento dei documenti.';
+            }
+        }
+
+        function selectPdf(pdf) {
+            document.getElementById('viewer-section').style.display = 'block';
+            document.getElementById('viewer-title').innerHTML =
+                `<i class="fas fa-file-pdf"></i> Documento più recente (${pdf.date})`;
+            document.getElementById('download-btn').href         = pdf.url;
+            document.getElementById('download-btn').download     = pdf.filename;
+            loadPDF(pdf.url);
+        }
+
+        // ── PDF viewer ────────────────────────────────────────────────────────
         function loadPDF(url) {
             document.getElementById('loading-spinner').style.display = 'block';
-            
-            // Reset variables
             pageNum = 1;
             scale = 1.0;
-            viewportTransform = {
-                offsetX: 0,
-                offsetY: 0,
-                scale: 1.0
-            };
+            viewportTransform = { offsetX: 0, offsetY: 0, scale: 1.0 };
             pdfViewer.scrollLeft = 0;
-            pdfViewer.scrollTop = 0;
-            
-            // Get document
-            pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-                pdfDoc = pdfDoc_;
-                document.getElementById('page-count').textContent = pdfDoc.numPages;
-                document.getElementById('current-page').value = pageNum;
-                document.getElementById('current-page').max = pdfDoc.numPages;
-                
-                // Initial/first page rendering
+            pdfViewer.scrollTop  = 0;
+
+            pdfjsLib.getDocument(url).promise.then(function(doc) {
+                pdfDoc = doc;
+                document.getElementById('page-count').textContent   = pdfDoc.numPages;
+                document.getElementById('current-page').value       = pageNum;
+                document.getElementById('current-page').max         = pdfDoc.numPages;
                 renderPage(pageNum);
-            }).catch(function(error) {
-                console.error('Error loading PDF:', error);
+            }).catch(function(err) {
+                console.error('Errore caricamento PDF:', err);
                 document.getElementById('loading-spinner').style.display = 'none';
-                alert('Errore nel caricamento del PDF. Riprova più tardi.');
             });
         }
 
-        /**
-         * Render the page
-         */
         function renderPage(num) {
             pageRendering = true;
             document.getElementById('loading-spinner').style.display = 'block';
-            
-            // Get page
             pdfDoc.getPage(num).then(function(page) {
-                // Always apply the current scale to the page viewport
-                const viewport = page.getViewport({ scale: scale });
-                
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-                
-                // Center the canvas if smaller than viewport
+                const viewport = page.getViewport({ scale });
+                canvas.height  = viewport.height;
+                canvas.width   = viewport.width;
                 centerCanvasInViewport();
-                
-                // Render PDF page into canvas context
-                const renderContext = {
-                    canvasContext: ctx,
-                    viewport: viewport
-                };
-                
-                const renderTask = page.render(renderContext);
-                
-                // Wait for rendering to finish
-                renderTask.promise.then(function() {
+                page.render({ canvasContext: ctx, viewport }).promise.then(function() {
                     pageRendering = false;
                     document.getElementById('loading-spinner').style.display = 'none';
-                    
                     if (pageNumPending !== null) {
-                        // New page rendering is pending
                         renderPage(pageNumPending);
                         pageNumPending = null;
                     }
-                }).catch(function(error) {
-                    console.error('Error rendering page:', error);
+                }).catch(function() {
                     pageRendering = false;
                     document.getElementById('loading-spinner').style.display = 'none';
                 });
             });
-            
-            // Update page counters
             document.getElementById('current-page').value = num;
         }
 
-        /**
-         * If another page rendering in progress, wait until the rendering is
-         * finished. Otherwise, execute rendering immediately.
-         */
         function queueRenderPage(num) {
-            if (pageRendering) {
-                pageNumPending = num;
-            } else {
-                renderPage(num);
-            }
+            if (pageRendering) { pageNumPending = num; } else { renderPage(num); }
         }
 
-        /**
-         * Display previous page
-         */
         function onPrevPage() {
-            if (pageNum <= 1) {
-                return;
-            }
-            pageNum--;
-            // Reset scroll position and zoom when changing pages
-            resetZoom();
-            queueRenderPage(pageNum);
+            if (pageNum <= 1) return;
+            pageNum--; resetZoom(); queueRenderPage(pageNum);
         }
-
-        /**
-         * Display next page
-         */
         function onNextPage() {
-            if (pageNum >= pdfDoc.numPages) {
-                return;
-            }
-            pageNum++;
-            // Reset scroll position and zoom when changing pages
-            resetZoom();
-            queueRenderPage(pageNum);
+            if (pageNum >= pdfDoc.numPages) return;
+            pageNum++; resetZoom(); queueRenderPage(pageNum);
         }
 
-        /**
-         * Zoom in
-         */
         function zoomIn() {
-            // Limit maximum zoom to 500%
             if (scale >= MAX_SCALE) return;
-            
-            const oldScale = scale;
             scale = Math.min(MAX_SCALE, scale + 0.2);
-            
-            // Re-render at the new scale
-            queueRenderPage(pageNum);
-            
-            // Update zoom indicator
-            updateZoomIndicator();
-            updateCursorForZoom();
+            queueRenderPage(pageNum); updateZoomIndicator(); updateCursorForZoom();
         }
-
-        /**
-         * Zoom out
-         */
         function zoomOut() {
-            // Limit minimum zoom to 100%
             if (scale <= MIN_SCALE) return;
-            
-            const oldScale = scale;
             scale = Math.max(MIN_SCALE, scale - 0.2);
-            
-            // Re-render at the new scale
-            queueRenderPage(pageNum);
-            
-            // Update zoom indicator
-            updateZoomIndicator();
-            updateCursorForZoom();
+            queueRenderPage(pageNum); updateZoomIndicator(); updateCursorForZoom();
         }
-        
-        /**
-         * Reset zoom to 100%
-         */
         function resetZoom() {
             scale = 1.0;
-            viewportTransform.offsetX = 0;
-            viewportTransform.offsetY = 0;
-            viewportTransform.scale = 1.0;
-            pdfViewer.scrollLeft = 0;
-            pdfViewer.scrollTop = 0;
-            
-            queueRenderPage(pageNum);
-            updateZoomIndicator();
-            updateCursorForZoom();
+            viewportTransform = { offsetX: 0, offsetY: 0, scale: 1.0 };
+            pdfViewer.scrollLeft = 0; pdfViewer.scrollTop = 0;
+            queueRenderPage(pageNum); updateZoomIndicator(); updateCursorForZoom();
         }
-        
-        /**
-         * Update zoom level indicator
-         */
+
         function updateZoomIndicator() {
-            const percentage = Math.round(scale * 100);
-            zoomLevel.textContent = `Zoom: ${percentage}%`;
+            zoomLevel.textContent = `Zoom: ${Math.round(scale * 100)}%`;
             zoomLevel.classList.add('visible');
-            
-            // Hide zoom indicator after 2 seconds
             clearTimeout(window.zoomTimeout);
-            window.zoomTimeout = setTimeout(() => {
-                zoomLevel.classList.remove('visible');
-            }, 2000);
+            window.zoomTimeout = setTimeout(() => zoomLevel.classList.remove('visible'), 2000);
         }
-        
-        /**
-         * Update cursor based on zoom level
-         */
         function updateCursorForZoom() {
-            const scrollContainer = document.querySelector('.pdf-scroll-container');
-            if (scale > 1) {
-                scrollContainer.classList.add('zoomed');
-                scrollContainer.style.cursor = isMouseDown ? 'grabbing' : 'move';
-            } else {
-                scrollContainer.classList.remove('zoomed');
-                scrollContainer.style.cursor = 'default';
-            }
+            const sc = document.querySelector('.pdf-scroll-container');
+            if (scale > 1) { sc.classList.add('zoomed'); sc.style.cursor = isMouseDown ? 'grabbing' : 'move'; }
+            else           { sc.classList.remove('zoomed'); sc.style.cursor = 'default'; }
         }
-        
-        /**
-         * Center canvas in viewport
-         */
         function centerCanvasInViewport() {
-            const pdfViewerWidth = pdfViewer.clientWidth;
-            const pdfViewerHeight = pdfViewer.clientHeight;
-            
-            // Calculate margins for centering
-            const marginX = Math.max(0, (pdfViewerWidth - canvas.width) / 2);
-            const marginY = Math.max(0, (pdfViewerHeight - canvas.height) / 2);
-            
-            // Apply margins to canvas
-            canvas.style.margin = `${marginY}px ${marginX}px`;
+            const mx = Math.max(0, (pdfViewer.clientWidth  - canvas.width)  / 2);
+            const my = Math.max(0, (pdfViewer.clientHeight - canvas.height) / 2);
+            canvas.style.margin = `${my}px ${mx}px`;
         }
-        
-        /**
-         * Toggle fullscreen mode
-         */
         function toggleFullscreen() {
             const container = document.getElementById('pdf-container');
-            const exitBtn = document.getElementById('exit-fullscreen-btn');
-            
-            if (!isFullscreen) {
-                // Enter fullscreen
-                container.classList.add('fullscreen-container');
-                exitBtn.style.display = 'flex';
-                isFullscreen = true;
-                
-                // Adjust viewport after transition
-                setTimeout(() => {
-                    centerCanvasInViewport();
-                }, 300);
-                
-            } else {
-                // Exit fullscreen
-                container.classList.remove('fullscreen-container');
-                exitBtn.style.display = 'none';
-                isFullscreen = false;
-                
-                // Adjust viewport after transition
-                setTimeout(() => {
-                    centerCanvasInViewport();
-                }, 300);
-            }
+            const exitBtn   = document.getElementById('exit-fullscreen-btn');
+            isFullscreen = !isFullscreen;
+            container.classList.toggle('fullscreen-container', isFullscreen);
+            exitBtn.style.display = isFullscreen ? 'flex' : 'none';
+            setTimeout(centerCanvasInViewport, 300);
         }
-        
-        // Calculate distance between two touch points
+
+        // Touch / mouse events (unchanged from original)
         function getPinchDistance(e) {
-            return Math.hypot(
-                e.touches[0].clientX - e.touches[1].clientX,
-                e.touches[0].clientY - e.touches[1].clientY
-            );
+            return Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
+                              e.touches[0].clientY - e.touches[1].clientY);
         }
-        
-        // Handle touch start event
         function handleTouchStart(e) {
-            if (e.touches.length === 2) {
-                // Pinch gesture starts
-                e.preventDefault();
-                initialPinchDistance = getPinchDistance(e);
-            } else if (e.touches.length === 1) {
-                // Single touch for panning
-                lastX = e.touches[0].clientX;
-                lastY = e.touches[0].clientY;
-                isDragging = true;
-            }
+            if (e.touches.length === 2) { e.preventDefault(); initialPinchDistance = getPinchDistance(e); }
+            else if (e.touches.length === 1) { lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; isDragging = true; }
         }
-        
-        // Handle touch move event
         function handleTouchMove(e) {
             if (e.touches.length === 2) {
-                // Pinch gesture (zooming)
                 e.preventDefault();
-                const currentDistance = getPinchDistance(e);
-                
+                const cur = getPinchDistance(e);
                 if (initialPinchDistance > 0) {
-                    // Calculate new scale factor
-                    const pinchRatio = currentDistance / initialPinchDistance;
-                    const newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * pinchRatio));
-                    
-                    // Only update if scale actually changed
-                    if (newScale !== scale) {
-                        scale = newScale;
-                        queueRenderPage(pageNum);
-                        updateZoomIndicator();
-                        updateCursorForZoom();
-                    }
-                    
-                    // Reset initial distance for smoother zooming
-                    initialPinchDistance = currentDistance;
+                    const ns = Math.max(MIN_SCALE, Math.min(MAX_SCALE, scale * (cur / initialPinchDistance)));
+                    if (ns !== scale) { scale = ns; queueRenderPage(pageNum); updateZoomIndicator(); updateCursorForZoom(); }
+                    initialPinchDistance = cur;
                 }
             } else if (e.touches.length === 1 && isDragging && scale > 1) {
-                // Single touch panning (only when zoomed in)
-                const currentX = e.touches[0].clientX;
-                const currentY = e.touches[0].clientY;
-                
-                // Calculate drag distance
-                const deltaX = currentX - lastX;
-                const deltaY = currentY - lastY;
-                
-                // Update scroll position
-                pdfViewer.scrollLeft -= deltaX;
-                pdfViewer.scrollTop -= deltaY;
-                
-                // Update last position
-                lastX = currentX;
-                lastY = currentY;
+                pdfViewer.scrollLeft -= e.touches[0].clientX - lastX;
+                pdfViewer.scrollTop  -= e.touches[0].clientY - lastY;
+                lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
             }
         }
-        
-        // Handle touch end event
-        function handleTouchEnd() {
-            initialPinchDistance = 0;
-            isDragging = false;
-        }
-        
-        // Handle mouse down event for PC drag
-        function handleMouseDown(e) {
-            e.preventDefault();
-            isMouseDown = true;
-            lastX = e.clientX;
-            lastY = e.clientY;
-            
-            // Only change cursor to grabbing if we're zoomed in
-            if (scale > 1) {
-                pdfViewer.style.cursor = 'grabbing';
-            }
-        }
-        
-        // Handle mouse move event for PC drag
+        function handleTouchEnd()  { initialPinchDistance = 0; isDragging = false; }
+        function handleMouseDown(e) { e.preventDefault(); isMouseDown = true; lastX = e.clientX; lastY = e.clientY; if (scale > 1) pdfViewer.style.cursor = 'grabbing'; }
         function handleMouseMove(e) {
             if (!isMouseDown) return;
-            
-            const deltaX = e.clientX - lastX;
-            const deltaY = e.clientY - lastY;
-            
-            // Only enable drag functionality when zoomed in
-            if (scale > 1) {
-                pdfViewer.scrollLeft -= deltaX;
-                pdfViewer.scrollTop -= deltaY;
-            }
-            
-            lastX = e.clientX;
-            lastY = e.clientY;
+            if (scale > 1) { pdfViewer.scrollLeft -= e.clientX - lastX; pdfViewer.scrollTop -= e.clientY - lastY; }
+            lastX = e.clientX; lastY = e.clientY;
         }
-        
-        // Handle mouse up event
-        function handleMouseUp() {
-            isMouseDown = false;
-            // Only set cursor to move if zoomed in, otherwise return to default
-            pdfViewer.style.cursor = scale > 1 ? 'move' : 'default';
-        }
-        
-        // Handle mouse leave event
-        function handleMouseLeave() {
-            if (isMouseDown) {
-                isMouseDown = false;
-                // Only set cursor to move if zoomed in, otherwise return to default
-                pdfViewer.style.cursor = scale > 1 ? 'move' : 'default';
-            }
-        }
-        
-        // Setup mouse event listeners for PC
-        pdfViewer.addEventListener('mousedown', handleMouseDown);
-        pdfViewer.addEventListener('mousemove', handleMouseMove);
-        pdfViewer.addEventListener('mouseup', handleMouseUp);
-        pdfViewer.addEventListener('mouseleave', handleMouseLeave);
-        
-        // Setup touch event listeners for mobile
-        pdfViewer.addEventListener('touchstart', handleTouchStart, { passive: false });
-        pdfViewer.addEventListener('touchmove', handleTouchMove, { passive: false });
-        pdfViewer.addEventListener('touchend', handleTouchEnd);
-        pdfViewer.addEventListener('touchcancel', handleTouchEnd);
+        function handleMouseUp()    { isMouseDown = false; pdfViewer.style.cursor = scale > 1 ? 'move' : 'default'; }
+        function handleMouseLeave() { if (isMouseDown) { isMouseDown = false; pdfViewer.style.cursor = scale > 1 ? 'move' : 'default'; } }
 
-        // Handle mouse wheel zoom
+        pdfViewer.addEventListener('mousedown',  handleMouseDown);
+        pdfViewer.addEventListener('mousemove',  handleMouseMove);
+        pdfViewer.addEventListener('mouseup',    handleMouseUp);
+        pdfViewer.addEventListener('mouseleave', handleMouseLeave);
+        pdfViewer.addEventListener('touchstart', handleTouchStart, { passive: false });
+        pdfViewer.addEventListener('touchmove',  handleTouchMove,  { passive: false });
+        pdfViewer.addEventListener('touchend',   handleTouchEnd);
+        pdfViewer.addEventListener('touchcancel',handleTouchEnd);
         pdfViewer.addEventListener('wheel', function(e) {
-            // Only zoom with Ctrl key pressed (standard zoom behavior)
-            if (e.ctrlKey) {
-                e.preventDefault();
-                
-                // Zoom in or out based on wheel direction
-                if (e.deltaY < 0) {
-                    // Wheel up - zoom in
-                    if (scale < MAX_SCALE) {
-                        scale = Math.min(MAX_SCALE, scale + 0.1);
-                        queueRenderPage(pageNum);
-                        updateZoomIndicator();
-                        updateCursorForZoom();
-                    }
-                } else {
-                    // Wheel down - zoom out
-                    if (scale > MIN_SCALE) {
-                        scale = Math.max(MIN_SCALE, scale - 0.1);
-                        queueRenderPage(pageNum);
-                        updateZoomIndicator();
-                        updateCursorForZoom();
-                    }
-                }
-            }
+            if (!e.ctrlKey) return;
+            e.preventDefault();
+            if (e.deltaY < 0 && scale < MAX_SCALE) { scale = Math.min(MAX_SCALE, scale + 0.1); }
+            else if (e.deltaY > 0 && scale > MIN_SCALE) { scale = Math.max(MIN_SCALE, scale - 0.1); }
+            queueRenderPage(pageNum); updateZoomIndicator(); updateCursorForZoom();
         }, { passive: false });
 
         // Button events
@@ -589,51 +342,24 @@ $most_recent_pdf = !empty($pdf_files) ? $pdf_files[0] : null;
         document.getElementById('reset-zoom').addEventListener('click', resetZoom);
         document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
         document.getElementById('exit-fullscreen-btn').addEventListener('click', toggleFullscreen);
-        
-        // Page input
         document.getElementById('current-page').addEventListener('change', function() {
-            const num = parseInt(this.value);
-            if (num >= 1 && num <= pdfDoc.numPages) {
-                pageNum = num;
-                // Reset zoom when changing pages
-                resetZoom();
-                queueRenderPage(pageNum);
-            } else {
-                this.value = pageNum;
-            }
+            const n = parseInt(this.value);
+            if (n >= 1 && n <= pdfDoc.numPages) { pageNum = n; resetZoom(); queueRenderPage(pageNum); }
+            else this.value = pageNum;
         });
-
-        // Handle keyboard events for navigation
         document.addEventListener('keydown', function(e) {
             if (!pdfDoc) return;
-            
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                onNextPage();
-            } else if (e.key === 'ArrowLeft') {
-                onPrevPage();
-            } else if (e.key === 'Escape' && isFullscreen) {
-                toggleFullscreen();
-            } else if (e.key === '0' && e.ctrlKey) {
-                // Ctrl+0 to reset zoom (common shortcut)
-                e.preventDefault();
-                resetZoom();
-            } else if (e.key === '+' && e.ctrlKey) {
-                // Ctrl++ to zoom in (common shortcut)
-                e.preventDefault();
-                zoomIn();
-            } else if (e.key === '-' && e.ctrlKey) {
-                // Ctrl+- to zoom out (common shortcut)
-                e.preventDefault();
-                zoomOut();
-            }
+            if      (e.key === 'ArrowRight' || e.key === ' ') onNextPage();
+            else if (e.key === 'ArrowLeft')                    onPrevPage();
+            else if (e.key === 'Escape' && isFullscreen)       toggleFullscreen();
+            else if (e.ctrlKey && e.key === '0') { e.preventDefault(); resetZoom(); }
+            else if (e.ctrlKey && e.key === '+') { e.preventDefault(); zoomIn(); }
+            else if (e.ctrlKey && e.key === '-') { e.preventDefault(); zoomOut(); }
         });
-        
-        // Handle window resize
-        window.addEventListener('resize', function() {
-            if (pdfDoc) {
-                centerCanvasInViewport();
-            }
-        });
+        window.addEventListener('resize', function() { if (pdfDoc) centerCanvasInViewport(); });
+
+        // Init
+        window.addEventListener('load', loadPdfList);
     </script>
 </body>
 </html>
